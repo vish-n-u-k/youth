@@ -1,0 +1,491 @@
+{
+  "generatedAt": "2026-03-06",
+  "version": "v1.0.0",
+  "totalQuestions": 13,
+  "resolvedCount": 13,
+  "unresolvedCount": 0,
+  "questions": [
+    {
+      "questionId": "GAP-Q01",
+      "title": "Lead Status Transition Rules",
+      "description": "The OpenAPI spec defines 7 lead statuses (NEW, CONTACTED, TRIAL_SCHEDULED, TRIAL_ATTENDED, ENROLLED, DROPPED, NOT_INTERESTED) but no explicit transition matrix exists. The updateLeadStatus endpoint has a business_rule_guard inferred from GP-04, but valid transitions are not defined. Which transitions should be allowed?",
+      "impact": "Determines whether admin can freely move leads between statuses or must follow a strict workflow. Affects the business_rule_guard implementation on PATCH /api/leads/{leadId}/status.",
+      "options": [
+        {
+          "optionId": "GAP-Q01-A",
+          "label": "Forward-only with terminal states",
+          "source": "inferred",
+          "resolutionEffect": "Enforce ordered transitions: NEW -> CONTACTED -> TRIAL_SCHEDULED -> TRIAL_ATTENDED -> ENROLLED. DROPPED and NOT_INTERESTED reachable from any non-terminal state. No backward transitions. Admin cannot reactivate DROPPED/NOT_INTERESTED leads.",
+          "pros": ["Strict workflow prevents accidental regressions", "Clear funnel analytics"],
+          "cons": ["Admin loses flexibility for edge cases", "Cannot undo mistakes without DB intervention"],
+          "confidence": "medium"
+        },
+        {
+          "optionId": "GAP-Q01-B",
+          "label": "Forward-only with admin override",
+          "source": "inferred",
+          "resolutionEffect": "Default forward path: NEW -> CONTACTED -> TRIAL_SCHEDULED -> TRIAL_ATTENDED -> ENROLLED. DROPPED and NOT_INTERESTED reachable from any state. Admin CAN move backward (e.g., DROPPED -> CONTACTED) as an explicit override. All transitions logged in LeadActivity.",
+          "pros": ["Maintains workflow discipline while allowing corrections", "Every transition is audited", "Handles real-world edge cases (lead returns after dropping)"],
+          "cons": ["Slightly more complex business rule guard", "Analytics must account for non-linear paths"],
+          "confidence": "high"
+        },
+        {
+          "optionId": "GAP-Q01-C",
+          "label": "Fully open transitions",
+          "source": "fe_details",
+          "resolutionEffect": "Any status can transition to any other status. No validation beyond checking the new status is a valid enum value. Relies on admin discipline.",
+          "pros": ["Simplest implementation", "Maximum flexibility"],
+          "cons": ["No workflow enforcement", "Funnel analytics unreliable", "Easy to make mistakes"],
+          "confidence": "low"
+        }
+      ],
+      "recommendedOptionId": "GAP-Q01-B",
+      "selectedOptionId": "GAP-Q01-B",
+      "selectionRationale": "Forward-only with admin override provides workflow discipline while handling real-world edge cases. Auto-advance from GP-04 follows the forward path; manual admin changes are logged as overrides in LeadActivity.",
+      "allowCustomOption": true,
+      "relatedGapIds": ["LM-GAP-02"],
+      "moduleId": "lead_management",
+      "severity": "medium"
+    },
+    {
+      "questionId": "GAP-Q02",
+      "title": "Enrollment Status Transition Rules",
+      "description": "Enrollment has 3 statuses (ACTIVE, CANCELLED, COMPLETED) but no explicit transition rules. The BE policy infers ACTIVE->CANCELLED requires cancellationReason. Can CANCELLED enrollments be reactivated? Can COMPLETED go back to ACTIVE?",
+      "impact": "Determines enrollment lifecycle rigidity. Affects updateEnrollmentStatus business_rule_guard and whether cancelled enrollments can be recovered without creating new ones.",
+      "options": [
+        {
+          "optionId": "GAP-Q02-A",
+          "label": "Strict one-way transitions only",
+          "source": "inferred",
+          "resolutionEffect": "ACTIVE -> CANCELLED (requires cancellationReason). ACTIVE -> COMPLETED. No reverse transitions. CANCELLED and COMPLETED are terminal states. To re-enroll, parent must create a new enrollment.",
+          "pros": ["Simple, predictable lifecycle", "No ambiguity about enrollment state", "Payment tracking stays clean (one payment per enrollment)"],
+          "cons": ["Cannot undo accidental cancellations", "Parent must re-enroll from scratch"],
+          "confidence": "high"
+        },
+        {
+          "optionId": "GAP-Q02-B",
+          "label": "Allow reactivation from CANCELLED",
+          "source": "inferred",
+          "resolutionEffect": "ACTIVE -> CANCELLED, ACTIVE -> COMPLETED, CANCELLED -> ACTIVE. COMPLETED is terminal. Reactivation clears cancellationReason and restores the enrollment. Payment record must be re-evaluated.",
+          "pros": ["Handles accidental cancellations", "Better UX for admin corrections"],
+          "cons": ["Payment state becomes complex (was it refunded? re-issued?)", "Capacity must be re-checked on reactivation"],
+          "confidence": "medium"
+        },
+        {
+          "optionId": "GAP-Q02-C",
+          "label": "Fully flexible transitions",
+          "source": "inferred",
+          "resolutionEffect": "Any transition between ACTIVE, CANCELLED, COMPLETED is allowed. Admin has full control.",
+          "pros": ["Maximum flexibility"],
+          "cons": ["Payment tracking becomes unreliable", "Enrollment history unclear", "Over-engineered for MVP"],
+          "confidence": "low"
+        }
+      ],
+      "recommendedOptionId": "GAP-Q02-A",
+      "selectedOptionId": "GAP-Q02-A",
+      "selectionRationale": "Strict one-way transitions keep the MVP simple. Payment is 1:1 with enrollment, and reactivation would complicate that. If an admin cancels by mistake, they can create a new enrollment. COMPLETED is set when the program ends.",
+      "allowCustomOption": true,
+      "relatedGapIds": ["ET-GAP-03"],
+      "moduleId": "enrollment_trial",
+      "severity": "medium"
+    },
+    {
+      "questionId": "GAP-Q03",
+      "title": "Enrollment Duplicate Check Scope (Per-Child vs Per-Parent)",
+      "description": "bookTrial checks duplicates using parentEmail + childName + programId (per child per program), but submitEnrollment checks using parentEmail + programId (per parent per program). GP-01 states 'one enrollment per child per program'. If a parent has two children, they should be able to enroll both in the same program, but the current submitEnrollment logic would block the second enrollment.",
+      "impact": "Critical for families with multiple children. Inconsistency between trial booking and enrollment creates confusing behavior where a parent can book trials for two children but only enroll one.",
+      "options": [
+        {
+          "optionId": "GAP-Q03-A",
+          "label": "Per child per program (align with bookTrial)",
+          "source": "openapi",
+          "resolutionEffect": "Change submitEnrollment duplicate check to parentEmail + childName + programId. A parent can enroll multiple children in the same program. Consistent with bookTrial behavior and GP-01 intent.",
+          "pros": ["Consistent with GP-01", "Supports multi-child families", "Matches bookTrial behavior"],
+          "cons": ["childName matching is case/whitespace sensitive — needs normalization", "Slightly more complex duplicate check"],
+          "confidence": "high"
+        },
+        {
+          "optionId": "GAP-Q03-B",
+          "label": "Per parent per program (keep current submitEnrollment)",
+          "source": "fe_details",
+          "resolutionEffect": "Keep submitEnrollment checking parentEmail + programId. One enrollment per parent per program. If a parent has multiple children, they must use different email addresses.",
+          "pros": ["Simpler duplicate check", "Prevents accidental double submissions"],
+          "cons": ["Blocks multi-child families from same program", "Inconsistent with bookTrial", "Violates GP-01 intent"],
+          "confidence": "low"
+        }
+      ],
+      "recommendedOptionId": "GAP-Q03-A",
+      "selectedOptionId": "GAP-Q03-A",
+      "selectionRationale": "GP-01 clearly intends per-child-per-program uniqueness. Aligning submitEnrollment with bookTrial ensures consistency. childName normalization (trim + lowercase compare) mitigates matching issues.",
+      "allowCustomOption": true,
+      "relatedGapIds": [],
+      "moduleId": "enrollment_trial",
+      "severity": "medium"
+    },
+    {
+      "questionId": "GAP-Q04",
+      "title": "Capacity Race Condition Strategy",
+      "description": "When two parents submit enrollment at the same time for the last spot in a program, concurrent writes could exceed capacity. The submitEnrollment and bookTrial transactions need a concurrency strategy to prevent overbooking.",
+      "impact": "Without protection, the system can exceed program capacity. Affects data integrity for the most critical public-facing transaction.",
+      "options": [
+        {
+          "optionId": "GAP-Q04-A",
+          "label": "Pessimistic locking (SELECT FOR UPDATE)",
+          "source": "prisma_contract",
+          "resolutionEffect": "Use Prisma interactive transactions with SELECT FOR UPDATE on the Program row during enrollment/trial booking. Locks the row until the transaction completes, preventing concurrent reads of stale capacity.",
+          "pros": ["Guaranteed correctness", "Prisma supports it natively", "Simple mental model", "No retry logic needed"],
+          "cons": ["Brief lock contention under high concurrency", "Slightly higher latency per request"],
+          "confidence": "high"
+        },
+        {
+          "optionId": "GAP-Q04-B",
+          "label": "Optimistic locking (version check)",
+          "source": "inferred",
+          "resolutionEffect": "Add a version/updatedAt check to the enrollment count query. If the count changed between read and write, retry the transaction. No row-level locks.",
+          "pros": ["No lock contention", "Better throughput under high concurrency"],
+          "cons": ["Requires retry logic", "More complex implementation", "Prisma optimistic locking is manual", "Overkill for single-tenant MVP"],
+          "confidence": "medium"
+        }
+      ],
+      "recommendedOptionId": "GAP-Q04-A",
+      "selectedOptionId": "GAP-Q04-A",
+      "selectionRationale": "Single-tenant MVP with low concurrency makes pessimistic locking the pragmatic choice. SELECT FOR UPDATE is straightforward with Prisma interactive transactions. Lock duration is minimal (single transaction).",
+      "allowCustomOption": true,
+      "relatedGapIds": ["ET-DB-U-01"],
+      "moduleId": "enrollment_trial",
+      "severity": "medium"
+    },
+    {
+      "questionId": "GAP-Q05",
+      "title": "Payment Overdue Threshold Storage Location",
+      "description": "The payment overdue reminder (HO-04) needs a configurable threshold (default 3 days) to determine when PENDING payments trigger reminder emails. The storage location is unspecified — should it live in LocationSettings (admin-editable via Settings UI) or in environment config (.env)?",
+      "impact": "Determines whether the admin can change the overdue threshold via the UI or if a developer must update environment variables and redeploy.",
+      "options": [
+        {
+          "optionId": "GAP-Q05-A",
+          "label": "Store in LocationSettings (admin-configurable)",
+          "source": "prisma_contract",
+          "resolutionEffect": "Add paymentOverdueDays (Int, default 3) field to LocationSettings model. Admin can change it via the Settings screen. The payment_overdue_check cron job reads this value at runtime.",
+          "pros": ["Admin self-service — no developer needed", "Consistent with other admin-configurable settings", "Can differ per location in future multi-location expansion"],
+          "cons": ["Adds a field to LocationSettings", "Settings UI needs a new field"],
+          "confidence": "high"
+        },
+        {
+          "optionId": "GAP-Q05-B",
+          "label": "Store in environment config (.env)",
+          "source": "inferred",
+          "resolutionEffect": "Add PAYMENT_OVERDUE_DAYS env variable (default 3). Requires redeploy to change. The payment_overdue_check cron job reads from process.env.",
+          "pros": ["No schema change", "No UI change"],
+          "cons": ["Requires developer intervention to change", "Not admin-configurable as spec intended (PT-A-01)"],
+          "confidence": "low"
+        }
+      ],
+      "recommendedOptionId": "GAP-Q05-A",
+      "selectedOptionId": "GAP-Q05-A",
+      "selectionRationale": "PT-A-01 explicitly states admin-configurable. LocationSettings is the natural home. Adding one Int field is minimal effort.",
+      "allowCustomOption": true,
+      "relatedGapIds": ["PT-GAP-03", "PT-DB-U-01"],
+      "moduleId": "payment_tracking",
+      "severity": "medium"
+    },
+    {
+      "questionId": "GAP-Q06",
+      "title": "Transactional Email Provider Selection",
+      "description": "5 modules require transactional email (auth, leads, enrollment, payments, communication) with 6 automation triggers, delivery tracking, and retry. No provider is specified in any source artifact. This must be resolved before implementation.",
+      "impact": "Blocks implementation of password reset, trial/enrollment confirmations, payment reminders, and all 6 automation triggers. Affects 5 modules.",
+      "options": [
+        {
+          "optionId": "GAP-Q06-A",
+          "label": "Resend",
+          "source": "inferred",
+          "resolutionEffect": "Use Resend as the email provider behind an EmailService adapter interface. Simple REST API, excellent developer experience, built for transactional email. Free tier: 100 emails/day.",
+          "pros": ["Simplest API of all candidates", "Excellent TypeScript SDK", "Modern DX", "Free tier sufficient for MVP", "Good deliverability"],
+          "cons": ["Newer provider — less battle-tested", "Smaller community than SendGrid"],
+          "confidence": "high"
+        },
+        {
+          "optionId": "GAP-Q06-B",
+          "label": "SendGrid",
+          "source": "inferred",
+          "resolutionEffect": "Use SendGrid as the email provider. Most widely documented, battle-tested at scale. Free tier: 100 emails/day.",
+          "pros": ["Most documented", "Battle-tested", "Large community", "Good deliverability"],
+          "cons": ["More complex API", "Heavier SDK", "Acquired by Twilio — pricing unpredictable"],
+          "confidence": "high"
+        },
+        {
+          "optionId": "GAP-Q06-C",
+          "label": "AWS SES",
+          "source": "inferred",
+          "resolutionEffect": "Use AWS SES if deploying on AWS. Cheapest at scale ($0.10/1000 emails). Requires AWS account and domain verification.",
+          "pros": ["Cheapest at scale", "No vendor lock-in if already on AWS"],
+          "cons": ["More setup (domain verification, IAM)", "Sandbox mode requires approval", "Raw API — needs more wrapper code"],
+          "confidence": "medium"
+        },
+        {
+          "optionId": "GAP-Q06-D",
+          "label": "Postmark",
+          "source": "inferred",
+          "resolutionEffect": "Use Postmark for highest deliverability. Focused exclusively on transactional email. Free tier: 100 emails/month.",
+          "pros": ["Best deliverability rates", "Fast delivery", "Clean API"],
+          "cons": ["Strictest free tier (100/month)", "No marketing email support if needed later"],
+          "confidence": "medium"
+        }
+      ],
+      "recommendedOptionId": "GAP-Q06-A",
+      "selectedOptionId": "GAP-Q06-A",
+      "selectionRationale": "Resend offers the best DX for a TypeScript/Next.js project, simple API, and sufficient free tier for MVP. Implementation uses an adapter interface so the provider can be swapped later without code changes.",
+      "allowCustomOption": true,
+      "relatedGapIds": ["UNRESOLVED-INT-01"],
+      "moduleId": "global",
+      "severity": "medium"
+    },
+    {
+      "questionId": "GAP-Q07",
+      "title": "Bot Protection for Public Write Endpoints",
+      "description": "Public write endpoints (bookTrial, submitEnrollment) have no CAPTCHA or bot-protection. Only rate limiting (5 req/15min per IP) is applied. Should CAPTCHA be added for MVP?",
+      "impact": "Without CAPTCHA, automated bots could submit fake trial bookings or enrollments up to the rate limit. Each submission creates Lead, Trial/Enrollment, Payment, and LeadActivity records.",
+      "options": [
+        {
+          "optionId": "GAP-Q07-A",
+          "label": "Rate limiting only (defer CAPTCHA to post-MVP)",
+          "source": "openapi",
+          "resolutionEffect": "Keep current rate limiting (5 req/15min per IP) as sole bot protection. Monitor abuse in production. Add CAPTCHA if abuse is detected.",
+          "pros": ["Simpler implementation", "No UX friction for parents", "Rate limiting handles casual abuse", "Single-tenant app has low attack surface"],
+          "cons": ["Determined bots can rotate IPs", "No protection against distributed attacks"],
+          "confidence": "high"
+        },
+        {
+          "optionId": "GAP-Q07-B",
+          "label": "Add invisible reCAPTCHA v3 for MVP",
+          "source": "inferred",
+          "resolutionEffect": "Add Google reCAPTCHA v3 (invisible, score-based) to bookTrial and submitEnrollment forms. Reject submissions with score < 0.5. No visible CAPTCHA challenge for legitimate users.",
+          "pros": ["Invisible to real users", "Good bot detection", "Free tier sufficient"],
+          "cons": ["Adds Google dependency", "Requires frontend integration", "Score threshold tuning needed"],
+          "confidence": "medium"
+        }
+      ],
+      "recommendedOptionId": "GAP-Q07-A",
+      "selectedOptionId": "GAP-Q07-A",
+      "selectionRationale": "For a single-tenant MVP with low traffic, rate limiting is sufficient. The app creates leads (not financial transactions) so the blast radius of bot submissions is manageable. CAPTCHA adds UX friction and integration complexity that isn't justified yet.",
+      "allowCustomOption": true,
+      "relatedGapIds": ["ET-GAP-04"],
+      "moduleId": "enrollment_trial",
+      "severity": "medium"
+    },
+    {
+      "questionId": "GAP-Q08",
+      "title": "Authentication Rate Limit Values",
+      "description": "Rate limit values for auth endpoints were inferred as defaults (5 req/15min for login/reset, 3 req/15min for forgot-password) since no explicit config exists in the OpenAPI spec.",
+      "impact": "Affects brute-force protection on login, password reset, and forgot-password endpoints. Too strict = legitimate users locked out. Too loose = vulnerable to credential attacks.",
+      "options": [
+        {
+          "optionId": "GAP-Q08-A",
+          "label": "Accept inferred defaults",
+          "source": "inferred",
+          "resolutionEffect": "Login: 5 req/15min (ip+email). Forgot-password: 3 req/15min (ip). Reset-password: 5 req/15min (ip). These are standard values for admin-facing auth endpoints.",
+          "pros": ["Industry-standard values", "Balances security and usability", "Already configured in be_policy_flow"],
+          "cons": ["May be too strict for admins who mistype passwords frequently"],
+          "confidence": "high"
+        },
+        {
+          "optionId": "GAP-Q08-B",
+          "label": "More lenient limits",
+          "source": "inferred",
+          "resolutionEffect": "Login: 10 req/15min. Forgot-password: 5 req/15min. Reset-password: 10 req/15min.",
+          "pros": ["Less likely to lock out legitimate admins"],
+          "cons": ["Weaker brute-force protection"],
+          "confidence": "low"
+        }
+      ],
+      "recommendedOptionId": "GAP-Q08-A",
+      "selectedOptionId": "GAP-Q08-A",
+      "selectionRationale": "Inferred defaults are industry-standard for admin auth. Single-admin app means lockout risk is low (one user, known email). The ip+email scope on login prevents one mistyped password from affecting other users.",
+      "allowCustomOption": true,
+      "relatedGapIds": ["AA-GAP-01"],
+      "moduleId": "auth_accounts",
+      "severity": "medium"
+    },
+    {
+      "questionId": "GAP-Q09",
+      "title": "Lead-Child Relationship Model",
+      "description": "Lead has @@unique([email]) making it one-per-parent, but also has optional childName/childAge fields. A parent with multiple children gets one Lead record. The Lead's child fields represent whichever child triggered lead creation first. Subsequent children are only tracked in Trial/Enrollment records, not on the Lead.",
+      "impact": "Affects how the admin sees lead data. If a parent enrolls child A then child B, the Lead still shows child A's name/age. The admin must look at Enrollments to see all children.",
+      "options": [
+        {
+          "optionId": "GAP-Q09-A",
+          "label": "Lead represents the parent (child fields are informational)",
+          "source": "prisma_contract",
+          "resolutionEffect": "Keep current design. Lead.childName/childAge store the first child mentioned. They are informational context, not authoritative. Child data is authoritative on Trial/Enrollment records. Lead detail screen shows linked trials/enrollments for full child visibility.",
+          "pros": ["No schema change needed", "Lead = parent contact record (CRM convention)", "Child data preserved on per-booking/enrollment records", "Admin sees all children via lead detail relations"],
+          "cons": ["Lead's childName/childAge may be stale or misleading", "Admin must understand the convention"],
+          "confidence": "high"
+        },
+        {
+          "optionId": "GAP-Q09-B",
+          "label": "Remove child fields from Lead",
+          "source": "inferred",
+          "resolutionEffect": "Remove childName and childAge from the Lead model. Child data only exists on Trial and Enrollment. Lead is purely a parent contact record.",
+          "pros": ["No ambiguity about whose child data is shown", "Cleaner data model"],
+          "cons": ["Schema change", "Loses initial child context on lead creation", "Auto-created leads from bookTrial lose child info at lead level"],
+          "confidence": "medium"
+        }
+      ],
+      "recommendedOptionId": "GAP-Q09-A",
+      "selectedOptionId": "GAP-Q09-A",
+      "selectionRationale": "Current design works for MVP. Lead is a parent contact record with optional child context. The lead detail screen already shows linked trials/enrollments which contain authoritative child data per booking.",
+      "allowCustomOption": true,
+      "relatedGapIds": [],
+      "moduleId": "lead_management",
+      "severity": "medium"
+    },
+    {
+      "questionId": "GAP-Q10",
+      "title": "Cascade Delete Behavior for Unspecified Relations",
+      "description": "Only 2 of 15+ relations have explicit cascade behavior (Lead -> LeadNote/LeadActivity = Cascade, CalendarDate -> Trial = Restrict). The remaining relations (Admin -> Session, Program -> Trial/Enrollment/CalendarDate, LocationSettings -> Lead/Program, Enrollment -> Payment, Trial -> Enrollment) have no specified cascade behavior.",
+      "impact": "Without explicit cascade rules, Prisma defaults to 'Required' relations throwing errors on parent delete, and 'Optional' relations setting FK to null. This must be explicitly configured to prevent orphaned records or accidental data loss.",
+      "options": [
+        {
+          "optionId": "GAP-Q10-A",
+          "label": "Restrict by default, Cascade only for session/token cleanup",
+          "source": "inferred",
+          "resolutionEffect": "Default: Restrict (prevent deletion if children exist). Exceptions: Admin -> Session/PasswordResetToken = Cascade (cleanup on admin delete). All other relations use Restrict to prevent accidental data loss. Programs/Locations cannot be deleted if they have dependent records.",
+          "pros": ["Safest default — prevents accidental data loss", "Explicit admin cleanup", "Forces proper lifecycle management (archive/close instead of delete)"],
+          "cons": ["Admin must close/archive before cleanup", "No bulk delete possible"],
+          "confidence": "high"
+        },
+        {
+          "optionId": "GAP-Q10-B",
+          "label": "Cascade for owned relations, Restrict for shared",
+          "source": "inferred",
+          "resolutionEffect": "Cascade: Admin -> Session/PasswordResetToken, Lead -> LeadNote/LeadActivity/Trial/Enrollment, Enrollment -> Payment. Restrict: Program -> *, LocationSettings -> *, CalendarDate -> Trial.",
+          "pros": ["Deleting a lead cleans up all related data", "Intuitive ownership model"],
+          "cons": ["Deleting a lead cascades to enrollments and payments — dangerous", "Data loss risk for billing-critical records"],
+          "confidence": "low"
+        }
+      ],
+      "recommendedOptionId": "GAP-Q10-A",
+      "selectedOptionId": "GAP-Q10-A",
+      "selectionRationale": "Restrict-by-default is the safest approach for an MVP with billing data. Programs use CLOSED status instead of deletion. Leads use DROPPED/NOT_INTERESTED status. Only session/token cleanup cascades (no business value in orphaned sessions).",
+      "allowCustomOption": true,
+      "relatedGapIds": [],
+      "moduleId": "global",
+      "severity": "medium"
+    },
+    {
+      "questionId": "GAP-Q11",
+      "title": "Session Cleanup Strategy",
+      "description": "Expired sessions accumulate in the database. No cleanup mechanism is specified. Options are a scheduled cron job (periodic batch delete) or lazy deletion (check and delete on each session read).",
+      "impact": "Low — expired sessions are small records and accumulation is slow in a single-admin app. But cleanup prevents unbounded table growth over time.",
+      "options": [
+        {
+          "optionId": "GAP-Q11-A",
+          "label": "Scheduled cron job (daily cleanup)",
+          "source": "inferred",
+          "resolutionEffect": "Add a daily cron job that deletes all sessions where expiresAt < now(). Runs during low-traffic hours. Can share the same job scheduler as payment_overdue_check and communication triggers.",
+          "pros": ["Clean separation of concerns", "Predictable DB size", "Batch delete is efficient", "Reuses cron infrastructure"],
+          "cons": ["Requires cron/job scheduler setup"],
+          "confidence": "high"
+        },
+        {
+          "optionId": "GAP-Q11-B",
+          "label": "Lazy deletion on session read",
+          "source": "inferred",
+          "resolutionEffect": "On every getSession call, check if session is expired. If yes, delete it and return 401. Other expired sessions remain until they are accessed.",
+          "pros": ["No cron infrastructure needed", "Immediate cleanup of accessed sessions"],
+          "cons": ["Never-accessed expired sessions pile up", "Adds delete operation to every auth check"],
+          "confidence": "medium"
+        }
+      ],
+      "recommendedOptionId": "GAP-Q11-A",
+      "selectedOptionId": "GAP-Q11-A",
+      "selectionRationale": "Cron job is cleaner and reuses the job scheduler already needed for payment_overdue_check and communication triggers (TRIAL_APPROACHING, CLASS_START_APPROACHING). Single daily run handles all expired sessions.",
+      "allowCustomOption": true,
+      "relatedGapIds": ["AA-DB-U-01"],
+      "moduleId": "auth_accounts",
+      "severity": "low"
+    },
+    {
+      "questionId": "GAP-Q12",
+      "title": "Facebook/Google Lead Ingestion Method",
+      "description": "LeadSource enum includes FACEBOOK and GOOGLE values, but no ingestion mechanism is specified. Leads are currently only created via enrollment/trial flows (GP-02) or manual admin entry is not available (no POST /api/leads endpoint).",
+      "impact": "Low for MVP. Determines how external leads enter the system in future phases.",
+      "options": [
+        {
+          "optionId": "GAP-Q12-A",
+          "label": "Manual only for MVP",
+          "source": "fe_details",
+          "resolutionEffect": "FACEBOOK and GOOGLE source values exist in the enum but are only used when leads are manually attributed. No automated ingestion. A future POST /api/leads endpoint or webhook can be added post-MVP.",
+          "pros": ["Zero integration complexity", "Enum values ready for future use", "Focus MVP on core enrollment flow"],
+          "cons": ["No automated lead capture from ads", "Admin must manually enter external leads"],
+          "confidence": "high"
+        },
+        {
+          "optionId": "GAP-Q12-B",
+          "label": "Webhook endpoint for future integration",
+          "source": "inferred",
+          "resolutionEffect": "Add a POST /api/webhooks/leads endpoint (not in MVP scope but designed). External systems can POST lead data. Validates payload, creates Lead + LEAD_CREATED activity.",
+          "pros": ["Ready for integration when needed"],
+          "cons": ["Out of MVP scope", "Security considerations for webhook auth"],
+          "confidence": "low"
+        }
+      ],
+      "recommendedOptionId": "GAP-Q12-A",
+      "selectedOptionId": "GAP-Q12-A",
+      "selectionRationale": "Manual attribution is sufficient for MVP. The enum values are already in place. Webhook/polling integration is a post-MVP feature that can be designed when the specific ad platform requirements are known.",
+      "allowCustomOption": true,
+      "relatedGapIds": ["LM-DB-U-01"],
+      "moduleId": "lead_management",
+      "severity": "low"
+    },
+    {
+      "questionId": "GAP-Q13",
+      "title": "Coupon Model Missing updatedAt Field",
+      "description": "The Coupon model has createdAt but no updatedAt field, yet an updateCoupon endpoint exists (PUT /api/coupons/{couponId}). The global_db_patterns file also flags this inconsistency. Without updatedAt, there's no way to track when a coupon was last modified.",
+      "impact": "Low — functional impact is minimal, but inconsistent with the timestamp pattern used by all other mutable models. Could cause confusion during debugging or auditing.",
+      "options": [
+        {
+          "optionId": "GAP-Q13-A",
+          "label": "Add updatedAt to Coupon model",
+          "source": "prisma_contract",
+          "resolutionEffect": "Add updatedAt DateTime @updatedAt to the Coupon model. Consistent with all other mutable models (Admin, Lead, Program, CalendarDate, Template, LocationSettings, Payment).",
+          "pros": ["Consistent with all other mutable models", "Enables tracking last modification time", "Prisma @updatedAt is automatic"],
+          "cons": ["Minor schema change"],
+          "confidence": "high"
+        },
+        {
+          "optionId": "GAP-Q13-B",
+          "label": "Keep Coupon without updatedAt",
+          "source": "prisma_contract",
+          "resolutionEffect": "Accept the inconsistency. Coupon updates are tracked via audit_log middleware instead of a model field.",
+          "pros": ["No schema change"],
+          "cons": ["Inconsistent with other mutable models", "No direct way to query 'recently modified coupons'"],
+          "confidence": "low"
+        }
+      ],
+      "recommendedOptionId": "GAP-Q13-A",
+      "selectedOptionId": "GAP-Q13-A",
+      "selectionRationale": "Adding @updatedAt is trivial and makes the Coupon model consistent with all other mutable models in the system. Prisma handles it automatically.",
+      "allowCustomOption": true,
+      "relatedGapIds": [],
+      "moduleId": "program_pricing",
+      "severity": "low"
+    }
+  ],
+  "summary": {
+    "byModule": {
+      "enrollment_trial": 4,
+      "lead_management": 3,
+      "payment_tracking": 1,
+      "auth_accounts": 2,
+      "program_pricing": 1,
+      "global": 2
+    },
+    "bySeverity": {
+      "medium": 10,
+      "low": 3
+    },
+    "allResolved": true,
+    "decisionsRequiringSchemaChange": ["GAP-Q05", "GAP-Q13"],
+    "decisionsRequiringNewInfrastructure": ["GAP-Q06", "GAP-Q11"]
+  }
+}

@@ -1,0 +1,156 @@
+{
+  "generatedAt": "2026-03-06",
+  "version": "v1.0.0",
+  "totalQuestions": 3,
+  "resolvedCount": 3,
+  "unresolvedCount": 0,
+  "questions": [
+    {
+      "questionId": "CON-Q01",
+      "title": "Enrollment Duplicate Check Mismatch Between bookTrial and submitEnrollment",
+      "description": "bookTrial checks for duplicates using parentEmail + childName + programId (per child per program), while submitEnrollment checks using only parentEmail + programId (per parent per program). GP-01 policy states 'one enrollment per child per program'. These two endpoints are inconsistent in enforcing the same business rule.",
+      "impact": "A parent with two children can book trials for both in the same program, but only one can enroll. This creates a confusing user experience and violates GP-01.",
+      "options": [
+        {
+          "optionId": "CON-Q01-A",
+          "label": "Align both to per-child-per-program (parentEmail + childName + programId)",
+          "source": "openapi",
+          "resolutionEffect": "Change submitEnrollment duplicate check to match bookTrial: parentEmail + childName + programId. Both endpoints now enforce GP-01 consistently. A parent can enroll multiple children in the same program. childName comparison uses case-insensitive trimmed matching.",
+          "pros": ["Consistent with GP-01", "Matches bookTrial behavior", "Supports multi-child families", "Uses OpenAPI-defined fields"],
+          "cons": ["childName matching needs normalization (trim, lowercase)", "Edge case: parent enters 'John' vs 'Johnny' — treated as different children"],
+          "confidence": "high"
+        },
+        {
+          "optionId": "CON-Q01-B",
+          "label": "Align both to per-parent-per-program (parentEmail + programId)",
+          "source": "fe_details",
+          "resolutionEffect": "Change bookTrial duplicate check to match submitEnrollment: parentEmail + programId. Only one trial booking and one enrollment per parent per program. Multi-child families must use separate email addresses.",
+          "pros": ["Simpler duplicate check", "Prevents any form of double submission"],
+          "cons": ["Blocks multi-child families", "Changes bookTrial behavior", "Violates GP-01 intent"],
+          "confidence": "low"
+        },
+        {
+          "optionId": "CON-Q01-C",
+          "label": "Add childName + childAge composite key to enrollment uniqueness",
+          "source": "prisma_contract",
+          "resolutionEffect": "Add a database-level unique constraint @@unique([parentEmail, childName, programId]) on both Trial and Enrollment models. Enforces GP-01 at the DB level in addition to application-level checks.",
+          "pros": ["DB-level guarantee prevents race conditions", "Strongest enforcement of GP-01"],
+          "cons": ["childName normalization must happen before DB insert", "DB constraint error messages are less user-friendly", "Overly rigid for names that might vary slightly"],
+          "confidence": "medium"
+        }
+      ],
+      "recommendedOptionId": "CON-Q01-A",
+      "selectedOptionId": "CON-Q01-A",
+      "selectionRationale": "Application-level check with normalized childName (trim + lowercase) is the right balance. DB-level unique constraint (CON-Q01-C) is too rigid for name variations. The OpenAPI source (bookTrial) has the correct behavior — submitEnrollment should match it.",
+      "allowCustomOption": true,
+      "conflictSources": {
+        "openapi": "bookTrial uses parentEmail + childName + programId",
+        "fe_details": "submitEnrollment UI may not emphasize per-child distinction",
+        "prisma_contract": "No unique constraint defined for this combination on Enrollment model"
+      },
+      "relatedGapIds": ["GAP-Q03"],
+      "moduleId": "enrollment_trial",
+      "severity": "medium"
+    },
+    {
+      "questionId": "CON-Q02",
+      "title": "Contract Status Mismatch on admin_dashboard Module",
+      "description": "The admin_dashboard module has a status discrepancy between its source artifacts. The OpenAPI spec has x-contract-status: 'draft' while the FE details has status: 'agreed'. This means the API contract may not be considered finalized by the backend team while the frontend considers it done.",
+      "impact": "Low — the admin_dashboard has 4 simple GET endpoints with no write operations. The discrepancy is likely an oversight since all endpoints, schemas, and behaviors are fully defined in both sources.",
+      "options": [
+        {
+          "optionId": "CON-Q02-A",
+          "label": "Align to 'agreed' (FE is correct)",
+          "source": "fe_details",
+          "resolutionEffect": "Treat the admin_dashboard contract as agreed/finalized. The OpenAPI 'draft' status is an oversight — all 4 endpoints are fully specified with response schemas, error handling, and security. Update OpenAPI x-contract-status to 'agreed'.",
+          "pros": ["All specs are complete — no actual draft content", "Prevents unnecessary re-review", "Consistent with other modules"],
+          "cons": ["Assumes the 'draft' label was accidental"],
+          "confidence": "high"
+        },
+        {
+          "optionId": "CON-Q02-B",
+          "label": "Keep as 'draft' until explicitly reviewed",
+          "source": "openapi",
+          "resolutionEffect": "Treat admin_dashboard as draft. Flag for explicit review before implementation. May delay dashboard implementation.",
+          "pros": ["Conservative — respects the explicit 'draft' label"],
+          "cons": ["Delays implementation", "No actual gaps or issues to resolve in review", "All other modules are 'agreed'"],
+          "confidence": "low"
+        }
+      ],
+      "recommendedOptionId": "CON-Q02-A",
+      "selectedOptionId": "CON-Q02-A",
+      "selectionRationale": "The admin_dashboard contract is fully specified with no open questions. The 'draft' label is an oversight — all 4 endpoints have complete schemas, security, and error handling. Aligning to 'agreed' prevents unnecessary delays.",
+      "allowCustomOption": true,
+      "conflictSources": {
+        "openapi": "x-contract-status: 'draft'",
+        "fe_details": "status: 'agreed'"
+      },
+      "relatedGapIds": ["AD-U-02"],
+      "moduleId": "admin_dashboard",
+      "severity": "low"
+    },
+    {
+      "questionId": "CON-Q03",
+      "title": "RBAC Source Gap — Admin Role Inferred from FE Across 8 Modules",
+      "description": "All 42 protected endpoints derive their 'admin' role from FE allowedRoles, not from OpenAPI x-required-roles annotations. The OpenAPI specs specify cookieAuth (authentication) but not which roles are required (authorization). This is a systematic gap affecting auth_accounts, admin_dashboard, settings, lead_management, calendar_scheduling, program_pricing, payment_tracking, enrollment_trial, and communication modules.",
+      "impact": "Low for MVP (single-role app with only 'admin'). Becomes critical if additional roles are added in Phase 2 (e.g., staff, instructor). The OpenAPI spec is technically incomplete for authorization.",
+      "options": [
+        {
+          "optionId": "CON-Q03-A",
+          "label": "Accept FE roles as authoritative for MVP, document for Phase 2",
+          "source": "fe_details",
+          "resolutionEffect": "Use FE allowedRoles as the RBAC source. Implement role_permission_check middleware with admin role on all 42 protected endpoints. Document that OpenAPI x-required-roles should be added before introducing additional roles in Phase 2.",
+          "pros": ["No blocking changes needed", "FE and BE agree on the role (admin)", "Single-role app means low risk", "Documented for future compliance"],
+          "cons": ["OpenAPI spec remains technically incomplete for authorization"],
+          "confidence": "high"
+        },
+        {
+          "optionId": "CON-Q03-B",
+          "label": "Add x-required-roles to all OpenAPI specs now",
+          "source": "openapi",
+          "resolutionEffect": "Update all 9 OpenAPI specs to add x-required-roles: ['admin'] on every protected endpoint. Makes the API contract self-contained for authorization.",
+          "pros": ["Complete API contract", "Self-documenting authorization", "Ready for Phase 2 roles"],
+          "cons": ["42 endpoint annotations to add", "All specs must be regenerated", "No functional impact for MVP"],
+          "confidence": "medium"
+        },
+        {
+          "optionId": "CON-Q03-C",
+          "label": "Define roles in global middleware registry only",
+          "source": "inferred",
+          "resolutionEffect": "Define the role-to-endpoint mapping in global_middleware_registry.json (already partially exists). Endpoints reference the registry rather than carrying role annotations. Centralizes RBAC config.",
+          "pros": ["Single source of truth for RBAC", "Easy to update when adding roles", "No per-spec changes needed"],
+          "cons": ["Non-standard approach", "Requires custom middleware resolution", "Loses per-endpoint visibility in OpenAPI"],
+          "confidence": "medium"
+        }
+      ],
+      "recommendedOptionId": "CON-Q03-A",
+      "selectedOptionId": "CON-Q03-A",
+      "selectionRationale": "For a single-role MVP, accepting FE roles is pragmatic. The role inference is consistent across all modules and the global_security_policies.json already documents this pattern. Adding x-required-roles to OpenAPI is a Phase 2 prerequisite, not an MVP blocker.",
+      "allowCustomOption": true,
+      "conflictSources": {
+        "openapi": "security: ['cookieAuth'] — authentication only, no role annotation",
+        "fe_details": "allowedRoles: ['admin'] — explicit role requirement on every protected screen",
+        "prisma_contract": "N/A — RBAC not defined at DB level"
+      },
+      "relatedGapIds": ["AD-GAP-01", "LM-GAP-01", "ET-GAP-02", "PP-GAP-01", "PT-GAP-02", "CS-GAP-01", "CM-GAP-01", "ST-GAP-01"],
+      "moduleId": "global",
+      "severity": "low"
+    }
+  ],
+  "summary": {
+    "byModule": {
+      "enrollment_trial": 1,
+      "admin_dashboard": 1,
+      "global": 1
+    },
+    "bySeverity": {
+      "medium": 1,
+      "low": 2
+    },
+    "allResolved": true,
+    "conflictsBySourcePair": {
+      "openapi_vs_fe_details": 2,
+      "openapi_vs_db_flow": 1
+    }
+  }
+}

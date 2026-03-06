@@ -1,0 +1,51 @@
+{
+  "compilerOptions": {
+    // Strictness - Maximum type safety
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // Module resolution
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+
+    // Next.js requirements
+    "jsx": "preserve",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "target": "ES2017",
+    "allowJs": true,
+    "incremental": true,
+    "noEmit": true,
+
+    // Plugins
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+
+    // Path aliases
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/schemas": ["./src/schemas"],
+      "@/schemas/*": ["./src/schemas/*"],
+      "@/server/*": ["./src/server/*"],
+      "@/client/*": ["./src/client/*"],
+      "@/shared/*": ["./src/shared/*"],
+      "@/app/*": ["./src/app/*"]
+    },
+
+    // Other
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

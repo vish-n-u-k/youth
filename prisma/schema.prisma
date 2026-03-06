@@ -1,0 +1,206 @@
+// ============================================
+// PRISMA SCHEMA
+// ============================================
+// Run after changes:
+//   npm run db:generate   (regenerate Prisma client)
+//   npm run db:migrate    (create migration)
+// ============================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// CORE IDENTITY MODELS
+// ============================================
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String   // Hashed password
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Security fields (for lockout feature)
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+  passwordChangedAt   DateTime?
+
+  // Relations
+  userRoles         UserRole[]        @relation("UserRoles")
+  grantedRoles      UserRole[]        @relation("GrantedBy")
+  userPermissionMap UserPermissionMap?
+  grantedPermissions UserPermissionMap[] @relation("PermissionGrantedBy")
+  memberships       OrganizationMember[]
+  sessions          Session[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  members           OrganizationMember[]
+  roles             Role[]
+  permissions       Permission[]
+  userRoles         UserRole[]
+  userPermissionMaps UserPermissionMap[]
+}
+
+model OrganizationMember {
+  id             String   @id @default(cuid())
+  userId         String
+  organizationId String
+  isOwner        Boolean  @default(false)
+  joinedAt       DateTime @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([userId])
+  @@index([organizationId])
+}
+
+// ============================================
+// PERMISSION SYSTEM MODELS
+// ============================================
+
+/// Permission definitions - reference catalog
+model Permission {
+  id             String   @id @default(cuid())
+  key            String   // e.g., "projects:read:all"
+  name           String   // e.g., "View Projects"
+  description    String?
+  category       String?  // For grouping in UI (e.g., "Projects", "Users")
+  organizationId String?  // NULL = global permission
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([key, organizationId])
+  @@index([key])
+  @@index([category])
+}
+
+/// Role definitions - global or org-scoped
+model Role {
+  id             String   @id @default(cuid())
+  name           String   // e.g., "Admin", "Developer", "Viewer"
+  description    String?
+  permissions    String[] // Array of permission keys
+  organizationId String?  // NULL = global role (applies across all orgs)
+  isSystem       Boolean  @default(false) // System roles cannot be deleted
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userRoles    UserRole[]
+
+  @@unique([name, organizationId])
+  @@index([organizationId])
+  @@index([name])
+}
+
+/// User-Role assignments
+model UserRole {
+  id             String    @id @default(cuid())
+  userId         String
+  roleId         String
+  organizationId String?   // Context where role applies
+  grantedById    String?
+  grantedAt      DateTime  @default(now())
+  expiresAt      DateTime? // NULL = never expires
+  reason         String?
+  createdAt      DateTime  @default(now())
+
+  user         User          @relation("UserRoles", fields: [userId], references: [id], onDelete: Cascade)
+  role         Role          @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  grantedBy    User?         @relation("GrantedBy", fields: [grantedById], references: [id])
+
+  @@unique([userId, roleId, organizationId])
+  @@index([userId])
+  @@index([roleId])
+  @@index([organizationId])
+}
+
+/// Direct permission assignments (for edge cases, temporary grants)
+model UserPermissionMap {
+  id             String    @id @default(cuid())
+  userId         String    @unique // One map per user per org
+  organizationId String?
+  permissions    String[]  // Array of permission keys
+  grantedById    String?
+  grantedAt      DateTime  @default(now())
+  expiresAt      DateTime? // NULL = never expires
+  reason         String?   // Why was this direct grant needed?
+  createdAt      DateTime  @default(now())
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  grantedBy    User?         @relation("PermissionGrantedBy", fields: [grantedById], references: [id])
+
+  @@unique([userId, organizationId])
+  @@index([userId])
+  @@index([organizationId])
+}
+
+// ============================================
+// SECURITY MODELS
+// ============================================
+
+/// Audit log for security events
+model AuditLog {
+  id        String   @id @default(cuid())
+  event     String   // e.g., "LOGIN_SUCCESS", "LOGIN_FAILED", "PASSWORD_CHANGED"
+  userId    String?  // May be null for failed logins with unknown user
+  email     String?  // Store email for failed login tracking
+  ipAddress String?
+  userAgent String?
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([event])
+  @@index([createdAt])
+  @@index([email])
+}
+
+// ============================================
+// YOUR DOMAIN MODELS GO BELOW
+// ============================================
+//
+// Example:
+//
+// model Project {
+//   id          String   @id @default(cuid())
+//   name        String
+//   description String?
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
+// }
