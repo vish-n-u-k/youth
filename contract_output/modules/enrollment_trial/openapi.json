@@ -1,0 +1,464 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Enrollment & Trial API",
+    "version": "v1.0.0",
+    "x-module-id": "enrollment_trial",
+    "x-contract-status": "draft",
+    "x-change-type": "none"
+  },
+  "paths": {
+    "/api/enrollments": {
+      "get": {
+        "operationId": "getEnrollments",
+        "summary": "List all enrollments with filters, search, and pagination (admin)",
+        "tags": ["admin-enrollments"],
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["active", "cancelled", "completed"] } },
+          { "name": "programId", "in": "query", "schema": { "type": "string" } },
+          { "name": "paymentStatus", "in": "query", "schema": { "type": "string", "enum": ["pending", "paid", "partial", "waived"] } },
+          { "name": "search", "in": "query", "description": "Search by parent name, child name, or email", "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "minimum": 1, "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 25 } }
+        ],
+        "responses": {
+          "200": { "description": "Paginated enrollment list", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AdminEnrollmentListResponse" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/enrollments/{enrollmentId}": {
+      "get": {
+        "operationId": "getEnrollment",
+        "summary": "Get full enrollment details (admin)",
+        "tags": ["admin-enrollments"],
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          { "name": "enrollmentId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Enrollment details", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AdminEnrollmentDetailResponse" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "404": { "description": "Enrollment not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/enrollments/{enrollmentId}/status": {
+      "patch": {
+        "operationId": "updateEnrollmentStatus",
+        "summary": "Cancel or complete an enrollment (admin)",
+        "tags": ["admin-enrollments"],
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          { "name": "enrollmentId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateEnrollmentStatusRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Enrollment status updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AdminEnrollmentDetailResponse" } } } },
+          "400": { "description": "Invalid status transition", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "404": { "description": "Enrollment not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/public/programs": {
+      "get": {
+        "operationId": "getPublicPrograms",
+        "summary": "List active programs for parent discovery (no auth)",
+        "tags": ["public-programs"],
+        "security": [],
+        "x-policy-ref": "GP-06: Parent-facing pages are publicly accessible without login",
+        "responses": {
+          "200": { "description": "Active programs list", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PublicProgramListResponse" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/public/programs/{programId}": {
+      "get": {
+        "operationId": "getPublicProgram",
+        "summary": "Get public program details for trial booking or enrollment form",
+        "tags": ["public-programs"],
+        "security": [],
+        "parameters": [
+          { "name": "programId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Program details", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PublicProgramResponse" } } } },
+          "404": { "description": "Program not found or not active", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/public/programs/{programId}/price": {
+      "post": {
+        "operationId": "getPriceBreakdown",
+        "summary": "Calculate price breakdown with optional coupon",
+        "tags": ["public-programs"],
+        "security": [],
+        "parameters": [
+          { "name": "programId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PriceBreakdownRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Price breakdown", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PriceBreakdownResponse" } } } },
+          "400": { "description": "Invalid coupon code", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "404": { "description": "Program not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/public/trials": {
+      "post": {
+        "operationId": "bookTrial",
+        "summary": "Book a trial class for a child",
+        "tags": ["public-trials"],
+        "security": [],
+        "x-handoff-ref": "HO-03: enrollment_trial -> communication (background email fires on trial booked)",
+        "x-policy-ref": "GP-01: One enrollment per child",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TrialBookingRequest" } } }
+        },
+        "responses": {
+          "201": { "description": "Trial booked", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TrialBookingResponse" } } } },
+          "400": {
+            "description": "Validation error (e.g. age outside program range, date fully booked)",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } }
+          },
+          "404": { "description": "Program or trial date not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "409": { "description": "Trial already booked for this child at this program", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/public/enrollments": {
+      "post": {
+        "operationId": "submitEnrollment",
+        "summary": "Submit enrollment for a child in a program",
+        "tags": ["public-enrollments"],
+        "security": [],
+        "x-handoff-refs": [
+          "HO-02: enrollment_trial -> payment_tracking (shows Zelle instructions after enrollment)",
+          "HO-03: enrollment_trial -> communication (confirmation email fires)"
+        ],
+        "x-policy-refs": [
+          "GP-01: One enrollment per child per program",
+          "GP-02: Returning parents identified by email skip lead capture",
+          "GP-04: Lead status auto-advances on enrollment"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EnrollmentRequest" } } }
+        },
+        "responses": {
+          "201": { "description": "Enrollment created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EnrollmentResponse" } } } },
+          "400": {
+            "description": "Validation error (e.g. age mismatch, invalid coupon, program full)",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } }
+          },
+          "404": { "description": "Program not found or not active", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "409": { "description": "Child already enrolled in this program (GP-01)", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/public/enrollments/{enrollmentId}/confirmation": {
+      "get": {
+        "operationId": "getEnrollmentConfirmation",
+        "summary": "Get enrollment confirmation with Zelle payment instructions",
+        "tags": ["public-enrollments"],
+        "security": [],
+        "parameters": [
+          { "name": "enrollmentId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Confirmation details with payment instructions", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EnrollmentConfirmationResponse" } } } },
+          "404": { "description": "Enrollment not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AdminEnrollmentListResponse": {
+        "type": "object",
+        "required": ["enrollments", "total", "page", "limit"],
+        "properties": {
+          "enrollments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["enrollmentId", "parentName", "parentEmail", "childName", "childAge", "programId", "programName", "status", "paymentStatus", "totalDue", "amountReceived", "enrolledAt"],
+              "properties": {
+                "enrollmentId": { "type": "string" },
+                "parentName": { "type": "string" },
+                "parentEmail": { "type": "string", "format": "email" },
+                "childName": { "type": "string" },
+                "childAge": { "type": "integer" },
+                "programId": { "type": "string" },
+                "programName": { "type": "string" },
+                "status": { "type": "string", "enum": ["active", "cancelled", "completed"] },
+                "paymentStatus": { "type": "string", "enum": ["pending", "paid", "partial", "waived"] },
+                "totalDue": { "type": "number" },
+                "amountReceived": { "type": "number" },
+                "enrolledAt": { "type": "string", "format": "date-time" }
+              }
+            }
+          },
+          "total": { "type": "integer" },
+          "page": { "type": "integer" },
+          "limit": { "type": "integer" }
+        },
+        "x-zod-schema": "AdminEnrollmentListResponse"
+      },
+      "AdminEnrollmentDetailResponse": {
+        "type": "object",
+        "required": ["enrollmentId", "parentName", "parentEmail", "parentPhone", "childName", "childAge", "programId", "programName", "programSchedule", "location", "status", "paymentStatus", "totalDue", "amountReceived", "remainingBalance", "priceBreakdown", "couponApplied", "enrolledAt", "updatedAt"],
+        "properties": {
+          "enrollmentId": { "type": "string" },
+          "parentName": { "type": "string" },
+          "parentEmail": { "type": "string", "format": "email" },
+          "parentPhone": { "type": "string" },
+          "childName": { "type": "string" },
+          "childAge": { "type": "integer" },
+          "programId": { "type": "string" },
+          "programName": { "type": "string" },
+          "programSchedule": { "type": "string" },
+          "location": { "type": "string" },
+          "status": { "type": "string", "enum": ["active", "cancelled", "completed"] },
+          "paymentStatus": { "type": "string", "enum": ["pending", "paid", "partial", "waived"] },
+          "totalDue": { "type": "number" },
+          "amountReceived": { "type": "number" },
+          "remainingBalance": { "type": "number" },
+          "priceBreakdown": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["label", "amount"],
+              "properties": {
+                "label": { "type": "string" },
+                "amount": { "type": "number" }
+              }
+            }
+          },
+          "couponApplied": { "type": "string", "nullable": true },
+          "leadId": { "type": "string", "nullable": true },
+          "trialId": { "type": "string", "nullable": true },
+          "cancellationReason": { "type": "string", "nullable": true },
+          "enrolledAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "x-zod-schema": "AdminEnrollmentDetailResponse"
+      },
+      "UpdateEnrollmentStatusRequest": {
+        "type": "object",
+        "required": ["status"],
+        "properties": {
+          "status": { "type": "string", "enum": ["active", "cancelled", "completed"] },
+          "cancellationReason": { "type": "string", "description": "Required when status is 'cancelled'" }
+        },
+        "x-zod-schema": "UpdateEnrollmentStatusRequest"
+      },
+      "PublicProgramListResponse": {
+        "type": "object",
+        "required": ["programs"],
+        "properties": {
+          "programs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["programId", "name", "ageGroupMin", "ageGroupMax", "schedule", "totalFee", "trialAvailable", "isFull", "enrollmentOpen"],
+              "properties": {
+                "programId": { "type": "string" },
+                "name": { "type": "string" },
+                "ageGroupMin": { "type": "integer" },
+                "ageGroupMax": { "type": "integer" },
+                "schedule": { "type": "string" },
+                "totalFee": { "type": "number" },
+                "trialAvailable": { "type": "boolean" },
+                "isFull": { "type": "boolean" },
+                "enrollmentOpen": { "type": "boolean" }
+              }
+            }
+          }
+        },
+        "x-zod-schema": "PublicProgramListResponse"
+      },
+      "PublicProgramResponse": {
+        "type": "object",
+        "required": ["programId", "name", "ageGroupMin", "ageGroupMax", "totalSessions", "sessionDuration", "location", "startDate", "endDate", "totalFee", "registrationFeeRequired", "trialAvailable", "isFull", "enrollmentOpen"],
+        "properties": {
+          "programId": { "type": "string" },
+          "name": { "type": "string" },
+          "ageGroupMin": { "type": "integer" },
+          "ageGroupMax": { "type": "integer" },
+          "totalSessions": { "type": "integer" },
+          "sessionDuration": { "type": "number" },
+          "location": { "type": "string" },
+          "startDate": { "type": "string", "format": "date-time" },
+          "endDate": { "type": "string", "format": "date-time" },
+          "totalFee": { "type": "number" },
+          "registrationFee": { "type": "number", "nullable": true },
+          "registrationFeeRequired": { "type": "boolean" },
+          "trialAvailable": { "type": "boolean" },
+          "isFull": { "type": "boolean" },
+          "enrollmentOpen": { "type": "boolean" }
+        },
+        "x-zod-schema": "PublicProgramResponse"
+      },
+      "PriceBreakdownRequest": {
+        "type": "object",
+        "properties": {
+          "couponCode": { "type": "string" }
+        },
+        "x-zod-schema": "PriceBreakdownRequest"
+      },
+      "PriceBreakdownResponse": {
+        "type": "object",
+        "required": ["programFee", "couponDiscount", "totalDue", "breakdown"],
+        "properties": {
+          "programFee": { "type": "number" },
+          "registrationFee": { "type": "number", "nullable": true },
+          "couponDiscount": { "type": "number" },
+          "couponAppliedTo": { "type": "string", "enum": ["program_fee", "registration_fee", "both"], "nullable": true },
+          "totalDue": { "type": "number" },
+          "breakdown": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["label", "amount"],
+              "properties": {
+                "label": { "type": "string" },
+                "amount": { "type": "number" }
+              }
+            }
+          }
+        },
+        "x-zod-schema": "PriceBreakdownResponse"
+      },
+      "TrialBookingRequest": {
+        "type": "object",
+        "required": ["programId", "parentName", "email", "phone", "childName", "childAge", "trialDateId"],
+        "properties": {
+          "programId": { "type": "string" },
+          "parentName": { "type": "string", "minLength": 1 },
+          "email": { "type": "string", "format": "email" },
+          "phone": { "type": "string", "minLength": 1 },
+          "childName": { "type": "string", "minLength": 1 },
+          "childAge": { "type": "integer", "minimum": 0, "maximum": 18 },
+          "trialDateId": { "type": "string" }
+        },
+        "x-zod-schema": "TrialBookingRequest"
+      },
+      "TrialBookingResponse": {
+        "type": "object",
+        "required": ["trialId", "programName", "trialDate", "parentName", "childName", "confirmationEmailSent", "message"],
+        "properties": {
+          "trialId": { "type": "string" },
+          "programName": { "type": "string" },
+          "trialDate": { "type": "string", "format": "date-time" },
+          "parentName": { "type": "string" },
+          "childName": { "type": "string" },
+          "confirmationEmailSent": { "type": "boolean" },
+          "message": { "type": "string" }
+        },
+        "x-zod-schema": "TrialBookingResponse"
+      },
+      "EnrollmentRequest": {
+        "type": "object",
+        "required": ["programId", "parentName", "email", "phone", "childName", "childAge"],
+        "properties": {
+          "programId": { "type": "string" },
+          "parentName": { "type": "string", "minLength": 1 },
+          "email": { "type": "string", "format": "email" },
+          "phone": { "type": "string", "minLength": 1 },
+          "childName": { "type": "string", "minLength": 1 },
+          "childAge": { "type": "integer", "minimum": 0, "maximum": 18 },
+          "couponCode": { "type": "string" }
+        },
+        "x-zod-schema": "EnrollmentRequest"
+      },
+      "EnrollmentResponse": {
+        "type": "object",
+        "required": ["enrollmentId", "programName", "parentName", "childName", "totalDue", "paymentStatus", "confirmationEmailSent"],
+        "properties": {
+          "enrollmentId": { "type": "string" },
+          "programName": { "type": "string" },
+          "parentName": { "type": "string" },
+          "childName": { "type": "string" },
+          "totalDue": { "type": "number" },
+          "paymentStatus": { "type": "string", "enum": ["pending"] },
+          "confirmationEmailSent": { "type": "boolean" }
+        },
+        "x-zod-schema": "EnrollmentResponse"
+      },
+      "EnrollmentConfirmationResponse": {
+        "type": "object",
+        "required": ["enrollmentId", "programName", "parentName", "childName", "childAge", "schedule", "location", "totalDue", "priceBreakdown", "paymentStatus", "zelleInstructions"],
+        "properties": {
+          "enrollmentId": { "type": "string" },
+          "programName": { "type": "string" },
+          "parentName": { "type": "string" },
+          "childName": { "type": "string" },
+          "childAge": { "type": "integer" },
+          "schedule": { "type": "string" },
+          "location": { "type": "string" },
+          "totalDue": { "type": "number" },
+          "priceBreakdown": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["label", "amount"],
+              "properties": {
+                "label": { "type": "string" },
+                "amount": { "type": "number" }
+              }
+            }
+          },
+          "paymentStatus": { "type": "string" },
+          "zelleInstructions": {
+            "type": "object",
+            "required": ["recipientName", "contactInfo", "amount", "referenceNote"],
+            "properties": {
+              "recipientName": { "type": "string" },
+              "contactInfo": { "type": "string" },
+              "amount": { "type": "number" },
+              "referenceNote": { "type": "string" },
+              "customInstructions": { "type": "string", "nullable": true }
+            }
+          }
+        },
+        "x-zod-schema": "EnrollmentConfirmationResponse"
+      },
+      "ApiError": {
+        "type": "object",
+        "required": ["error", "message", "statusCode"],
+        "properties": {
+          "error": { "type": "string" },
+          "message": { "type": "string" },
+          "statusCode": { "type": "integer" }
+        },
+        "x-zod-schema": "ApiError"
+      }
+    },
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "session"
+      }
+    }
+  }
+}

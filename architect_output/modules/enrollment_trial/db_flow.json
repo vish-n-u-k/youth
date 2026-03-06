@@ -1,0 +1,456 @@
+{
+  "moduleId": "enrollment_trial",
+  "generatedAt": "2026-03-06",
+  "dbFlowVersion": "v1.0.0",
+  "endpoints": [
+    {
+      "operationId": "getEnrollments",
+      "method": "GET",
+      "path": "/api/enrollments",
+      "dbOperations": [
+        {
+          "model": "Enrollment",
+          "operation": "READ",
+          "description": "Paginated list of enrollments with filters (status, programId, paymentStatus, search)",
+          "queryType": "list",
+          "filters": ["status", "programId", "search (parentName, parentEmail)"],
+          "pagination": true,
+          "joins": ["Program (for program name)", "Payment (for payment status filtering)"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/enrollments.get", "prisma_contract://models.Enrollment"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "getEnrollment",
+      "method": "GET",
+      "path": "/api/enrollments/{enrollmentId}",
+      "dbOperations": [
+        {
+          "model": "Enrollment",
+          "operation": "READ",
+          "description": "Fetch single enrollment with full relations",
+          "filters": ["id"],
+          "joins": ["Program", "Payment", "Trial", "Lead"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/enrollments/{enrollmentId}.get", "prisma_contract://models.Enrollment"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "updateEnrollmentStatus",
+      "method": "PATCH",
+      "path": "/api/enrollments/{enrollmentId}/status",
+      "dbOperations": [
+        {
+          "model": "Enrollment",
+          "operation": "READ",
+          "description": "Read current enrollment status for transition validation",
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.Enrollment"]
+        },
+        {
+          "model": "Enrollment",
+          "operation": "UPDATE",
+          "description": "Update enrollment status (ACTIVE->CANCELLED requires cancellationReason; ACTIVE->COMPLETED)",
+          "fields": ["status", "cancellationReason", "updatedAt"],
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/enrollments/{enrollmentId}/status.patch", "prisma_contract://models.Enrollment"]
+        }
+      ],
+      "transactionBoundary": "single-write",
+      "transactionNote": "Status update on single enrollment; lead status may need updating in same transaction if auto-advance applies",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_enrollment_status_change",
+          "description": "Audit log records enrollment status transition",
+          "confidence": "medium",
+          "inferred": true,
+          "sourceRefs": ["be_policy_flow://updateEnrollmentStatus.middlewareChain.audit_log"]
+        }
+      ],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "getPublicPrograms",
+      "method": "GET",
+      "path": "/api/public/programs",
+      "dbOperations": [
+        {
+          "model": "Program",
+          "operation": "READ",
+          "description": "Fetch all ACTIVE programs for public listing (GP-06: only ACTIVE status)",
+          "queryType": "list",
+          "filters": ["status == ACTIVE"],
+          "joins": ["LocationSettings (for location name)"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/public/programs.get", "prisma_contract://models.Program"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "getPublicProgram",
+      "method": "GET",
+      "path": "/api/public/programs/{programId}",
+      "dbOperations": [
+        {
+          "model": "Program",
+          "operation": "READ",
+          "description": "Fetch single program detail for public view (must be ACTIVE)",
+          "filters": ["id", "status == ACTIVE"],
+          "joins": ["LocationSettings"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/public/programs/{programId}.get", "prisma_contract://models.Program"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "getPriceBreakdown",
+      "method": "POST",
+      "path": "/api/public/programs/{programId}/price",
+      "dbOperations": [
+        {
+          "model": "Program",
+          "operation": "READ",
+          "description": "Fetch program pricing fields (baseFee, feeType, registrationFee, registrationFeeRequired, totalSessions)",
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/public/programs/{programId}/price.post", "prisma_contract://models.Program"]
+        },
+        {
+          "model": "Coupon",
+          "operation": "READ",
+          "description": "Validate coupon code if provided (exists, not expired, usage not exceeded)",
+          "filters": ["code", "expiresAt > now()", "usageCount < usageLimit"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.Coupon"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "transactionNote": "Read-only price computation; no state changes",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "bookTrial",
+      "method": "POST",
+      "path": "/api/public/trials",
+      "dbOperations": [
+        {
+          "model": "CalendarDate",
+          "operation": "READ",
+          "description": "Validate trialDateId exists, is trialEligible, has capacity (spots remaining check)",
+          "filters": ["id", "trialEligible == true"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.CalendarDate"]
+        },
+        {
+          "model": "Program",
+          "operation": "READ",
+          "description": "Validate program is ACTIVE and exists",
+          "filters": ["id", "status == ACTIVE"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.Program"]
+        },
+        {
+          "model": "Trial",
+          "operation": "READ",
+          "description": "Check for duplicate trial booking (GP-01: one per child per program)",
+          "filters": ["parentEmail", "childName", "programId"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/public/trials.post"]
+        },
+        {
+          "model": "Lead",
+          "operation": "READ",
+          "description": "Check if lead exists by parentEmail (GP-02: auto-create/link)",
+          "filters": ["email"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.Lead"]
+        },
+        {
+          "model": "Lead",
+          "operation": "CREATE",
+          "description": "Auto-create lead if not exists (GP-02), with status TRIAL_SCHEDULED",
+          "fields": ["id", "parentName", "email", "phone", "childName", "childAge", "source", "status", "interestedProgramId", "locationId", "createdAt"],
+          "confidence": "high",
+          "conditional": "only if lead does not exist",
+          "sourceRefs": ["prisma_contract://models.Lead", "normalized://signals.lead_auto_advance"]
+        },
+        {
+          "model": "Lead",
+          "operation": "UPDATE",
+          "description": "Auto-advance existing lead status to TRIAL_SCHEDULED if applicable (GP-04)",
+          "fields": ["status", "updatedAt"],
+          "confidence": "high",
+          "conditional": "only if lead exists and status allows advancement",
+          "sourceRefs": ["normalized://signals.lead_auto_advance"]
+        },
+        {
+          "model": "Trial",
+          "operation": "CREATE",
+          "description": "Create trial booking record",
+          "fields": ["id", "programId", "trialDateId", "parentName", "parentEmail", "parentPhone", "childName", "childAge", "status", "leadId", "bookedAt"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/public/trials.post", "prisma_contract://models.Trial"]
+        },
+        {
+          "model": "LeadActivity",
+          "operation": "CREATE",
+          "description": "Create activity records (LEAD_CREATED if new lead, STATUS_CHANGE for auto-advance)",
+          "confidence": "high",
+          "inferred": true,
+          "sourceRefs": ["prisma_contract://models.LeadActivity"]
+        }
+      ],
+      "transactionBoundary": "multi-entity",
+      "transactionNote": "Capacity check + duplicate check + lead upsert + trial creation + activity log all in single transaction. Email sent async after commit.",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [
+        {
+          "type": "email",
+          "name": "trial_booked_email",
+          "description": "Fires trial confirmation email to parent (HO-03: enrollment_trial -> communication)",
+          "confidence": "high",
+          "inferred": false,
+          "sourceRefs": ["normalized://signals.trial_booked_email"]
+        },
+        {
+          "type": "app_event",
+          "name": "lead_created_notification",
+          "description": "If new lead created, triggers LEAD_CREATED automation (if enabled)",
+          "confidence": "high",
+          "inferred": true,
+          "sourceRefs": ["normalized://signals.lead_auto_advance"]
+        }
+      ],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "submitEnrollment",
+      "method": "POST",
+      "path": "/api/public/enrollments",
+      "dbOperations": [
+        {
+          "model": "Program",
+          "operation": "READ",
+          "description": "Validate program is ACTIVE, has capacity, fetch pricing",
+          "filters": ["id", "status == ACTIVE"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.Program"]
+        },
+        {
+          "model": "Enrollment",
+          "operation": "READ",
+          "description": "Check for duplicate enrollment (GP-01: one per child per program)",
+          "filters": ["parentEmail", "programId"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/public/enrollments.post"]
+        },
+        {
+          "model": "Coupon",
+          "operation": "READ",
+          "description": "Validate coupon if provided (exists, not expired, within usage limit)",
+          "filters": ["code"],
+          "confidence": "high",
+          "conditional": "only if couponCode provided",
+          "sourceRefs": ["prisma_contract://models.Coupon"]
+        },
+        {
+          "model": "Coupon",
+          "operation": "UPDATE",
+          "description": "Increment usageCount on coupon redemption",
+          "fields": ["usageCount"],
+          "confidence": "high",
+          "conditional": "only if couponCode provided and valid",
+          "sourceRefs": ["prisma_contract://models.Coupon"]
+        },
+        {
+          "model": "Lead",
+          "operation": "READ",
+          "description": "Check if lead exists by parentEmail (GP-02)",
+          "filters": ["email"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.Lead"]
+        },
+        {
+          "model": "Lead",
+          "operation": "CREATE",
+          "description": "Auto-create lead if not exists (GP-02), with status ENROLLED",
+          "fields": ["id", "parentName", "email", "phone", "childName", "childAge", "source", "status", "interestedProgramId", "locationId", "createdAt"],
+          "confidence": "high",
+          "conditional": "only if lead does not exist",
+          "sourceRefs": ["prisma_contract://models.Lead"]
+        },
+        {
+          "model": "Lead",
+          "operation": "UPDATE",
+          "description": "Auto-advance existing lead status to ENROLLED (GP-04)",
+          "fields": ["status", "updatedAt"],
+          "confidence": "high",
+          "conditional": "only if lead exists and status allows advancement",
+          "sourceRefs": ["normalized://signals.lead_auto_advance"]
+        },
+        {
+          "model": "Enrollment",
+          "operation": "CREATE",
+          "description": "Create enrollment record with price breakdown snapshot",
+          "fields": ["id", "programId", "parentName", "parentEmail", "parentPhone", "childName", "childAge", "status", "totalDue", "priceBreakdown", "couponCode", "leadId", "trialId", "enrolledAt"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/public/enrollments.post", "prisma_contract://models.Enrollment"]
+        },
+        {
+          "model": "Payment",
+          "operation": "CREATE",
+          "description": "Auto-create Payment record for the enrollment (HO-02: enrollment_trial -> payment_tracking)",
+          "fields": ["id", "enrollmentId", "status", "amountDue", "amountReceived", "createdAt"],
+          "confidence": "high",
+          "sourceRefs": ["normalized://signals.payment_record_creation"]
+        },
+        {
+          "model": "LeadActivity",
+          "operation": "CREATE",
+          "description": "Create activity records (ENROLLMENT_EVENT, STATUS_CHANGE, optionally LEAD_CREATED)",
+          "confidence": "high",
+          "inferred": true,
+          "sourceRefs": ["prisma_contract://models.LeadActivity"]
+        }
+      ],
+      "transactionBoundary": "multi-entity",
+      "transactionNote": "Critical multi-entity transaction: capacity check + duplicate check + coupon validation + lead upsert + enrollment creation + payment creation + activity log. All must succeed atomically. Email sent async after commit.",
+      "dataCriticality": "billing",
+      "sideEffects": [
+        {
+          "type": "email",
+          "name": "enrollment_confirmation_email",
+          "description": "Fires enrollment confirmation email to parent (HO-03)",
+          "confidence": "high",
+          "inferred": false,
+          "sourceRefs": ["normalized://signals.enrollment_confirmation_email"]
+        },
+        {
+          "type": "app_event",
+          "name": "lead_created_notification",
+          "description": "If new lead created, triggers LEAD_CREATED automation",
+          "confidence": "high",
+          "inferred": true,
+          "sourceRefs": ["normalized://signals.lead_auto_advance"]
+        }
+      ],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "getEnrollmentConfirmation",
+      "method": "GET",
+      "path": "/api/public/enrollments/{enrollmentId}/confirmation",
+      "dbOperations": [
+        {
+          "model": "Enrollment",
+          "operation": "READ",
+          "description": "Fetch enrollment details for confirmation page",
+          "filters": ["id"],
+          "joins": ["Program (for program name, schedule)", "Payment (for payment status, amount)"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/public/enrollments/{enrollmentId}/confirmation.get", "prisma_contract://models.Enrollment"]
+        },
+        {
+          "model": "LocationSettings",
+          "operation": "READ",
+          "description": "Fetch location/Zelle info for payment instructions reference",
+          "confidence": "high",
+          "inferred": true,
+          "sourceRefs": ["prisma_contract://models.LocationSettings"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    }
+  ],
+  "modelSummary": {
+    "Trial": {
+      "operations": ["CREATE", "READ"],
+      "dataCriticality": "workspace_data",
+      "sourceRefs": ["prisma_contract://models.Trial"]
+    },
+    "Enrollment": {
+      "operations": ["CREATE", "READ", "UPDATE"],
+      "dataCriticality": "billing",
+      "sourceRefs": ["prisma_contract://models.Enrollment"]
+    }
+  },
+  "crossModuleDependencies": [
+    {
+      "targetModule": "program_pricing",
+      "models": ["Program", "Coupon"],
+      "accessType": "READ+UPDATE",
+      "reason": "Program validation/pricing for booking/enrollment; coupon validation and usage increment",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.Trial.relations.program", "prisma_contract://models.Enrollment.relations.program"]
+    },
+    {
+      "targetModule": "calendar_scheduling",
+      "models": ["CalendarDate"],
+      "accessType": "READ",
+      "reason": "Trial date validation and capacity check for bookTrial",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.Trial.relations.trialDate"]
+    },
+    {
+      "targetModule": "lead_management",
+      "models": ["Lead", "LeadActivity"],
+      "accessType": "CREATE+READ+UPDATE",
+      "reason": "Auto-create/link leads on trial/enrollment (GP-02); auto-advance status (GP-04); create activity records",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.Trial.relations.lead", "prisma_contract://models.Enrollment.relations.lead"]
+    },
+    {
+      "targetModule": "payment_tracking",
+      "models": ["Payment"],
+      "accessType": "CREATE",
+      "reason": "Auto-create payment record on enrollment (HO-02)",
+      "confidence": "high",
+      "sourceRefs": ["normalized://signals.payment_record_creation"]
+    },
+    {
+      "targetModule": "settings",
+      "models": ["LocationSettings"],
+      "accessType": "READ",
+      "reason": "Location info for enrollment confirmation and lead creation",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.LocationSettings"]
+    }
+  ],
+  "scheduledJobs": [],
+  "dbTriggers": [],
+  "unresolved": [
+    {
+      "id": "ET-DB-U-01",
+      "description": "Capacity check race condition: concurrent enrollments could exceed program capacity. Recommend SELECT FOR UPDATE or optimistic locking.",
+      "confidence": "medium",
+      "decision": "deferred_to_implementation"
+    }
+  ]
+}

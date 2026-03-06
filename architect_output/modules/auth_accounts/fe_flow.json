@@ -1,0 +1,127 @@
+{
+  "moduleId": "auth_accounts",
+  "flowVersion": "v1.0.0",
+  "generatedAt": "2026-03-06",
+  "routeGraph": {
+    "entryPoints": [
+      { "route": "/admin/login", "screenId": "admin_login", "context": "Direct navigation / unauthenticated redirect", "confidence": "high", "evidenceRefs": ["fe_details://admin_login"] },
+      { "route": "/admin/reset-password/{token}", "screenId": "set_new_password", "context": "Email link with reset token", "confidence": "high", "evidenceRefs": ["fe_details://set_new_password"] },
+      { "route": "/login", "screenId": "parent_login_stub", "context": "Phase 2 stub — parent entry", "confidence": "high", "evidenceRefs": ["fe_details://parent_login_stub"] }
+    ],
+    "transitions": [
+      { "from": "/admin/login", "to": "/admin/forgot-password", "trigger": "forgotPasswordLinkClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://admin_login", "fe_details://password_reset_request"] },
+      { "from": "/admin/forgot-password", "to": "/admin/login", "trigger": "backToLoginClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://password_reset_request"] },
+      { "from": "/admin/forgot-password", "to": "/admin/login", "trigger": "resetRequestSubmitted", "flowType": "event", "note": "Redirect after success message", "confidence": "high", "evidenceRefs": ["fe_details://password_reset_request"] },
+      { "from": "/admin/reset-password/{token}", "to": "/admin/login", "trigger": "passwordResetSuccess", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://set_new_password"] },
+      { "from": "/admin/login", "to": "/admin/dashboard", "trigger": "loginSuccess", "flowType": "event", "note": "Cross-module: redirects to admin_dashboard", "confidence": "high", "evidenceRefs": ["fe_details://admin_login"] }
+    ]
+  },
+  "screenGraph": [
+    {
+      "screenId": "admin_login",
+      "route": "/admin/login",
+      "components": ["LoginForm", "ForgotPasswordLink"],
+      "actions": [
+        {
+          "actionId": "submitLogin",
+          "flowType": "http",
+          "apiEdge": { "method": "POST", "path": "/api/auth/login", "operationId": "adminLogin" },
+          "onSuccess": "navigateTo:/admin/dashboard",
+          "onError": "showValidationError",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/auth/login.post", "fe_details://admin_login.endpointProposals[0]"]
+        },
+        {
+          "actionId": "navigateToForgotPassword",
+          "flowType": "event",
+          "target": "/admin/forgot-password",
+          "confidence": "high",
+          "evidenceRefs": ["fe_details://admin_login"]
+        }
+      ]
+    },
+    {
+      "screenId": "password_reset_request",
+      "route": "/admin/forgot-password",
+      "components": ["ForgotPasswordForm", "BackToLoginLink"],
+      "actions": [
+        {
+          "actionId": "submitResetRequest",
+          "flowType": "http",
+          "apiEdge": { "method": "POST", "path": "/api/auth/forgot-password", "operationId": "requestPasswordReset" },
+          "onSuccess": "showSuccessMessage+navigateTo:/admin/login",
+          "onError": "showGenericSuccess",
+          "note": "Always returns success regardless of email existence (AA-A-03)",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/auth/forgot-password.post", "fe_details://password_reset_request.endpointProposals[0]"]
+        },
+        {
+          "actionId": "navigateBackToLogin",
+          "flowType": "event",
+          "target": "/admin/login",
+          "confidence": "high",
+          "evidenceRefs": ["fe_details://password_reset_request"]
+        }
+      ]
+    },
+    {
+      "screenId": "set_new_password",
+      "route": "/admin/reset-password/{token}",
+      "components": ["ResetPasswordForm"],
+      "actions": [
+        {
+          "actionId": "submitNewPassword",
+          "flowType": "http",
+          "apiEdge": { "method": "POST", "path": "/api/auth/reset-password", "operationId": "setNewPassword" },
+          "onSuccess": "navigateTo:/admin/login",
+          "onError": "showValidationError",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/auth/reset-password.post", "fe_details://set_new_password.endpointProposals[0]"]
+        }
+      ]
+    },
+    {
+      "screenId": "parent_login_stub",
+      "route": "/login",
+      "components": ["Phase2StubMessage"],
+      "actions": [],
+      "note": "Phase 2 stub — no endpoints or interactions"
+    }
+  ],
+  "guards": [
+    { "route": "/admin/login", "authRequired": false, "allowedRoles": ["admin"], "redirectIfAuthenticated": "/admin/dashboard", "confidence": "high", "evidenceRefs": ["fe_details://admin_login"] },
+    { "route": "/admin/forgot-password", "authRequired": false, "allowedRoles": ["admin"], "confidence": "high", "evidenceRefs": ["fe_details://password_reset_request"] },
+    { "route": "/admin/reset-password/{token}", "authRequired": false, "allowedRoles": ["admin"], "confidence": "high", "evidenceRefs": ["fe_details://set_new_password"] },
+    { "route": "/login", "authRequired": false, "allowedRoles": ["parent"], "confidence": "high", "evidenceRefs": ["fe_details://parent_login_stub"] }
+  ],
+  "unmappedActions": [
+    {
+      "operationId": "adminLogout",
+      "method": "POST",
+      "path": "/api/auth/logout",
+      "reason": "BE-addition: No FE screen maps to this — triggered from global navbar/header component",
+      "suggestedComponent": "AppHeader/NavBar",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/auth/logout.post"]
+    },
+    {
+      "operationId": "getSession",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "reason": "BE-addition: Session validation on app load — called from global auth guard/provider",
+      "suggestedComponent": "AuthProvider/RouteGuard",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/auth/me.get"]
+    }
+  ],
+  "signals": [
+    {
+      "type": "event",
+      "name": "password_reset_email",
+      "trigger": "requestPasswordReset",
+      "description": "Sends password reset link via email when requested",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/auth/forgot-password.post", "fe_details://password_reset_request"]
+    }
+  ]
+}

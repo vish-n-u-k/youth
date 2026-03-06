@@ -1,0 +1,156 @@
+{
+  "moduleId": "program_pricing",
+  "contractVersion": "v1.0.0",
+  "normalizedAt": "2026-03-06",
+  "routes": [
+    {
+      "screenId": "program_list",
+      "name": "Program List",
+      "feRoute": "/admin/programs",
+      "normalizedRoute": "/admin/programs",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "endpointProposals": [
+        { "operationId": "getPrograms", "method": "GET", "path": "/api/programs" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://program_list"]
+    },
+    {
+      "screenId": "program_setup",
+      "name": "Program Setup / Edit",
+      "feRoute": "/admin/programs/:programId",
+      "normalizedRoute": "/admin/programs/{programId}",
+      "type": "input_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "endpointProposals": [
+        { "operationId": "getProgram", "method": "GET", "path": "/api/programs/{programId}" },
+        { "operationId": "createProgram", "method": "POST", "path": "/api/programs" },
+        { "operationId": "updateProgram", "method": "PUT", "path": "/api/programs/{programId}" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://program_setup"],
+      "pathNormalization": { "original": "/admin/programs/:programId", "normalized": "/admin/programs/{programId}", "confidence": "medium" }
+    },
+    {
+      "screenId": "coupon_management",
+      "name": "Coupon Management",
+      "feRoute": "/admin/programs/coupons",
+      "normalizedRoute": "/admin/programs/coupons",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "endpointProposals": [
+        { "operationId": "getCoupons", "method": "GET", "path": "/api/coupons" },
+        { "operationId": "createCoupon", "method": "POST", "path": "/api/coupons" },
+        { "operationId": "updateCoupon", "method": "PUT", "path": "/api/coupons/{couponId}" },
+        { "operationId": "deleteCoupon", "method": "DELETE", "path": "/api/coupons/{couponId}" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://coupon_management"]
+    }
+  ],
+  "endpoints": [
+    { "operationId": "getPrograms", "method": "GET", "path": "/api/programs", "tags": ["programs"], "security": ["cookieAuth"], "requestSchema": "ProgramListQuery", "responseSchema": "ProgramListResponse", "errorSchema": "ApiError", "queryParams": ["status", "page", "limit"], "confidence": "high", "sourceRefs": ["openapi:///api/programs.get"] },
+    { "operationId": "createProgram", "method": "POST", "path": "/api/programs", "tags": ["programs"], "security": ["cookieAuth"], "requestSchema": "ProgramRequest", "responseSchema": "ProgramResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/programs.post"] },
+    { "operationId": "getProgram", "method": "GET", "path": "/api/programs/{programId}", "tags": ["programs"], "security": ["cookieAuth"], "requestSchema": null, "responseSchema": "ProgramResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/programs/{programId}.get"] },
+    { "operationId": "updateProgram", "method": "PUT", "path": "/api/programs/{programId}", "tags": ["programs"], "security": ["cookieAuth"], "requestSchema": "ProgramRequest", "responseSchema": "ProgramResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/programs/{programId}.put"] },
+    { "operationId": "getCoupons", "method": "GET", "path": "/api/coupons", "tags": ["coupons"], "security": ["cookieAuth"], "requestSchema": null, "responseSchema": "CouponListResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/coupons.get"] },
+    { "operationId": "createCoupon", "method": "POST", "path": "/api/coupons", "tags": ["coupons"], "security": ["cookieAuth"], "requestSchema": "CouponRequest", "responseSchema": "CouponResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/coupons.post"] },
+    { "operationId": "updateCoupon", "method": "PUT", "path": "/api/coupons/{couponId}", "tags": ["coupons"], "security": ["cookieAuth"], "requestSchema": "CouponRequest", "responseSchema": "CouponResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/coupons/{couponId}.put"] },
+    { "operationId": "deleteCoupon", "method": "DELETE", "path": "/api/coupons/{couponId}", "tags": ["coupons"], "security": ["cookieAuth"], "requestSchema": null, "responseSchema": "DeleteResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/coupons/{couponId}.delete"] }
+  ],
+  "rbac": [
+    { "endpointId": "getPrograms", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://program_list.allowedRoles"] },
+    { "endpointId": "createProgram", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://program_setup.allowedRoles"] },
+    { "endpointId": "getProgram", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://program_setup.allowedRoles"] },
+    { "endpointId": "updateProgram", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://program_setup.allowedRoles"] },
+    { "endpointId": "getCoupons", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://coupon_management.allowedRoles"] },
+    { "endpointId": "createCoupon", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://coupon_management.allowedRoles"] },
+    { "endpointId": "updateCoupon", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://coupon_management.allowedRoles"] },
+    { "endpointId": "deleteCoupon", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://coupon_management.allowedRoles"] }
+  ],
+  "db": {
+    "models": [
+      {
+        "model": "Program",
+        "fields": [
+          { "name": "id", "type": "String", "isOptional": false, "attributes": ["@id", "@default(cuid())"] },
+          { "name": "name", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "ageGroupMin", "type": "Int", "isOptional": false, "attributes": [] },
+          { "name": "ageGroupMax", "type": "Int", "isOptional": false, "attributes": [] },
+          { "name": "totalSessions", "type": "Int", "isOptional": false, "attributes": [] },
+          { "name": "sessionDuration", "type": "Float", "isOptional": false, "attributes": [] },
+          { "name": "location", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "locationId", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "startDate", "type": "DateTime", "isOptional": false, "attributes": [] },
+          { "name": "endDate", "type": "DateTime", "isOptional": false, "attributes": [] },
+          { "name": "capacity", "type": "Int", "isOptional": false, "attributes": [] },
+          { "name": "status", "type": "ProgramStatus", "isOptional": false, "attributes": ["@default(DRAFT)"] },
+          { "name": "baseFee", "type": "Float", "isOptional": false, "attributes": [] },
+          { "name": "feeType", "type": "FeeType", "isOptional": false, "attributes": [] },
+          { "name": "registrationFee", "type": "Float", "isOptional": true, "attributes": [] },
+          { "name": "registrationFeeRequired", "type": "Boolean", "isOptional": false, "attributes": ["@default(false)"] },
+          { "name": "trialAvailable", "type": "Boolean", "isOptional": false, "attributes": ["@default(false)"] },
+          { "name": "createdAt", "type": "DateTime", "isOptional": false, "attributes": ["@default(now())"] },
+          { "name": "updatedAt", "type": "DateTime", "isOptional": false, "attributes": ["@updatedAt"] }
+        ],
+        "indexes": ["@@index([status])", "@@index([locationId])", "@@index([status, startDate])"],
+        "uniques": [],
+        "relations": [
+          { "name": "locationSettings", "kind": "manyToOne", "target": "LocationSettings", "fkFields": ["locationId"] },
+          { "name": "calendarDates", "kind": "oneToMany", "target": "CalendarDate" },
+          { "name": "trials", "kind": "oneToMany", "target": "Trial" },
+          { "name": "enrollments", "kind": "oneToMany", "target": "Enrollment" },
+          { "name": "interestedLeads", "kind": "oneToMany", "target": "Lead" }
+        ],
+        "confidence": "high",
+        "sourceRefs": ["prisma_contract://models.Program"]
+      },
+      {
+        "model": "Coupon",
+        "fields": [
+          { "name": "id", "type": "String", "isOptional": false, "attributes": ["@id", "@default(cuid())"] },
+          { "name": "code", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "discountType", "type": "DiscountType", "isOptional": false, "attributes": [] },
+          { "name": "discountValue", "type": "Float", "isOptional": false, "attributes": [] },
+          { "name": "scope", "type": "CouponScope", "isOptional": false, "attributes": [] },
+          { "name": "expiresAt", "type": "DateTime", "isOptional": true, "attributes": [] },
+          { "name": "usageLimit", "type": "Int", "isOptional": true, "attributes": [] },
+          { "name": "usageCount", "type": "Int", "isOptional": false, "attributes": ["@default(0)"] },
+          { "name": "createdAt", "type": "DateTime", "isOptional": false, "attributes": ["@default(now())"] }
+        ],
+        "indexes": ["@@index([expiresAt])"],
+        "uniques": ["@@unique([code])"],
+        "relations": [],
+        "confidence": "high",
+        "sourceRefs": ["prisma_contract://models.Coupon"]
+      }
+    ],
+    "enums": [
+      { "name": "ProgramStatus", "values": ["DRAFT", "ACTIVE", "CLOSED"], "volatility": "stable" },
+      { "name": "FeeType", "values": ["TOTAL", "PER_SESSION"], "volatility": "stable" },
+      { "name": "DiscountType", "values": ["PERCENTAGE", "FLAT"], "volatility": "stable" },
+      { "name": "CouponScope", "values": ["PROGRAM_FEE", "REGISTRATION_FEE", "BOTH"], "volatility": "stable" }
+    ],
+    "notes": "enrollmentCount and totalFee are computed at query time. Capacity is per-program (PP-A-02). Coupon code unique at DB level. Coupons cannot reduce total below zero (app-level). Zelle config must exist before program set to ACTIVE."
+  },
+  "signals": [],
+  "unknowns": [
+    {
+      "id": "PP-U-01",
+      "description": "Capacity is per-program not per-session (PP-A-02). May need to change to per-session later.",
+      "confidence": "low",
+      "sourceRefs": ["fe_details://assumptions.PP-A-02"],
+      "decision": "Proceeding with per-program capacity; field kept isolated for future migration"
+    }
+  ],
+  "evidence": {
+    "sourcesUsed": ["fe_details.json", "openapi.json", "prisma_contract.json", "zod_patch.json"],
+    "decisions": [
+      { "id": "PP-D-01", "description": "FE paths with :programId/:couponId normalized to {programId}/{couponId}", "confidence": "medium" }
+    ]
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "moduleId": "calendar_scheduling",
+  "contractVersion": "v1.0.0",
+  "normalizedAt": "2026-03-06",
+  "routes": [
+    {
+      "screenId": "admin_calendar",
+      "name": "Admin Calendar Management",
+      "feRoute": "/admin/calendar",
+      "normalizedRoute": "/admin/calendar",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "endpointProposals": [
+        { "operationId": "getCalendarDates", "method": "GET", "path": "/api/calendar" },
+        { "operationId": "addCalendarDate", "method": "POST", "path": "/api/calendar" },
+        { "operationId": "updateCalendarDate", "method": "PUT", "path": "/api/calendar/{dateId}" },
+        { "operationId": "deleteCalendarDate", "method": "DELETE", "path": "/api/calendar/{dateId}" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://admin_calendar"]
+    },
+    {
+      "screenId": "parent_calendar",
+      "name": "Parent-Facing Calendar",
+      "feRoute": "/programs/:programId/trial-dates",
+      "normalizedRoute": "/programs/{programId}/trial-dates",
+      "type": "api_driven",
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "endpointProposals": [
+        { "operationId": "getAvailableTrialDates", "method": "GET", "path": "/api/programs/{programId}/trial-dates" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://parent_calendar"],
+      "pathNormalization": { "original": "/programs/:programId/trial-dates", "normalized": "/programs/{programId}/trial-dates", "confidence": "medium" }
+    }
+  ],
+  "endpoints": [
+    { "operationId": "getCalendarDates", "method": "GET", "path": "/api/calendar", "tags": ["calendar"], "security": ["cookieAuth"], "requestSchema": "CalendarDatesQuery", "responseSchema": "CalendarDatesResponse", "errorSchema": "ApiError", "queryParams": ["programId", "month", "year"], "confidence": "high", "sourceRefs": ["openapi:///api/calendar.get"] },
+    { "operationId": "addCalendarDate", "method": "POST", "path": "/api/calendar", "tags": ["calendar"], "security": ["cookieAuth"], "requestSchema": "CalendarDateRequest", "responseSchema": "CalendarDateResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/calendar.post"] },
+    { "operationId": "updateCalendarDate", "method": "PUT", "path": "/api/calendar/{dateId}", "tags": ["calendar"], "security": ["cookieAuth"], "requestSchema": "CalendarDateRequest", "responseSchema": "CalendarDateResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/calendar/{dateId}.put"] },
+    { "operationId": "deleteCalendarDate", "method": "DELETE", "path": "/api/calendar/{dateId}", "tags": ["calendar"], "security": ["cookieAuth"], "requestSchema": null, "responseSchema": "DeleteResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/calendar/{dateId}.delete"] },
+    { "operationId": "getAvailableTrialDates", "method": "GET", "path": "/api/programs/{programId}/trial-dates", "tags": ["calendar-public"], "security": [], "requestSchema": null, "responseSchema": "AvailableTrialDatesResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/programs/{programId}/trial-dates.get"], "handoffRefs": ["HO-05"] }
+  ],
+  "rbac": [
+    { "endpointId": "getCalendarDates", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://admin_calendar.allowedRoles"] },
+    { "endpointId": "addCalendarDate", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://admin_calendar.allowedRoles"] },
+    { "endpointId": "updateCalendarDate", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://admin_calendar.allowedRoles"] },
+    { "endpointId": "deleteCalendarDate", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://admin_calendar.allowedRoles"] },
+    { "endpointId": "getAvailableTrialDates", "roles": [], "permissions": [], "confidence": "high", "sourceRefs": ["openapi://security.[]"], "note": "Public endpoint — no auth required" }
+  ],
+  "db": {
+    "models": [
+      {
+        "model": "CalendarDate",
+        "fields": [
+          { "name": "id", "type": "String", "isOptional": false, "attributes": ["@id", "@default(cuid())"] },
+          { "name": "date", "type": "DateTime", "isOptional": false, "attributes": [] },
+          { "name": "programId", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "trialEligible", "type": "Boolean", "isOptional": false, "attributes": ["@default(false)"] },
+          { "name": "capacity", "type": "Int", "isOptional": false, "attributes": [] },
+          { "name": "notes", "type": "String", "isOptional": true, "attributes": [] },
+          { "name": "createdAt", "type": "DateTime", "isOptional": false, "attributes": ["@default(now())"] },
+          { "name": "updatedAt", "type": "DateTime", "isOptional": false, "attributes": ["@updatedAt"] }
+        ],
+        "indexes": ["@@index([programId])", "@@index([date])", "@@index([programId, trialEligible, date])"],
+        "uniques": ["@@unique([programId, date])"],
+        "relations": [
+          { "name": "program", "kind": "manyToOne", "target": "Program", "fkFields": ["programId"] },
+          { "name": "trials", "kind": "oneToMany", "target": "Trial" }
+        ],
+        "confidence": "high",
+        "sourceRefs": ["prisma_contract://models.CalendarDate"]
+      }
+    ],
+    "enums": [],
+    "notes": "spotsRemaining and programName computed at query time. Unique constraint on (programId, date). Hard delete acceptable — FK constraint prevents orphaning trials."
+  },
+  "signals": [],
+  "unknowns": [
+    {
+      "id": "CS-U-01",
+      "description": "Calendar invites (.ics / Google Calendar links) are optional in MVP (CS-A-02). Not implemented.",
+      "confidence": "low",
+      "sourceRefs": ["fe_details://assumptions.CS-A-02"]
+    }
+  ],
+  "evidence": {
+    "sourcesUsed": ["fe_details.json", "openapi.json", "prisma_contract.json", "zod_patch.json"],
+    "decisions": [
+      { "id": "CS-D-01", "description": "FE paths with :dateId/:programId normalized to {dateId}/{programId}", "confidence": "medium" }
+    ]
+  }
+}

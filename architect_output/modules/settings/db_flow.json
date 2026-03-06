@@ -1,0 +1,66 @@
+{
+  "moduleId": "settings",
+  "generatedAt": "2026-03-06",
+  "dbFlowVersion": "v1.0.0",
+  "endpoints": [
+    {
+      "operationId": "getSettings",
+      "method": "GET",
+      "path": "/api/settings",
+      "dbOperations": [
+        {
+          "model": "LocationSettings",
+          "operation": "READ",
+          "description": "Fetch the single LocationSettings record (single-location MVP per ST-A-01)",
+          "queryType": "single",
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/settings.get", "prisma_contract://models.LocationSettings"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "updateSettings",
+      "method": "PUT",
+      "path": "/api/settings",
+      "dbOperations": [
+        {
+          "model": "LocationSettings",
+          "operation": "UPDATE",
+          "description": "Update location settings (business info, Zelle config, notification preferences). ST-A-02: Zelle fields validated — required before any program can be ACTIVE.",
+          "fields": ["businessName", "address", "phone", "email", "websiteUrl", "zelleRecipientName", "zelleContactInfo", "zelleInstructions", "notifyNewLead", "notifyNewEnrollment", "notifyPaymentReceived", "updatedAt"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/settings.put", "prisma_contract://models.LocationSettings"]
+        }
+      ],
+      "transactionBoundary": "single-write",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_settings_update",
+          "description": "Audit log records settings change (affects global business behavior)",
+          "confidence": "medium",
+          "inferred": true,
+          "sourceRefs": ["be_policy_flow://updateSettings.middlewareChain.audit_log"]
+        }
+      ],
+      "dbTriggers": []
+    }
+  ],
+  "modelSummary": {
+    "LocationSettings": {
+      "operations": ["READ", "UPDATE"],
+      "dataCriticality": "workspace_data",
+      "note": "Single record in MVP (ST-A-01). Pre-seeded on first deploy. No CREATE/DELETE endpoints.",
+      "sourceRefs": ["prisma_contract://models.LocationSettings"]
+    }
+  },
+  "crossModuleDependencies": [],
+  "scheduledJobs": [],
+  "dbTriggers": [],
+  "unresolved": []
+}

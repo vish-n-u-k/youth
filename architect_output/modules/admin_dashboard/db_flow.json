@@ -1,0 +1,162 @@
+{
+  "moduleId": "admin_dashboard",
+  "generatedAt": "2026-03-06",
+  "dbFlowVersion": "v1.0.0",
+  "endpoints": [
+    {
+      "operationId": "getDashboardMetrics",
+      "method": "GET",
+      "path": "/api/dashboard/metrics",
+      "dbOperations": [
+        {
+          "model": "Lead",
+          "operation": "READ",
+          "description": "Aggregate lead counts by source and status for metrics cards",
+          "queryType": "aggregate",
+          "confidence": "high",
+          "sourceRefs": ["normalized://db.crossModuleDependencies.lead_management", "openapi:///api/dashboard/metrics.get"]
+        },
+        {
+          "model": "Trial",
+          "operation": "READ",
+          "description": "Count trials by status for conversion rate computation",
+          "queryType": "aggregate",
+          "confidence": "high",
+          "sourceRefs": ["normalized://db.crossModuleDependencies.enrollment_trial"]
+        },
+        {
+          "model": "Enrollment",
+          "operation": "READ",
+          "description": "Count enrollments for conversion rate and active enrollment metrics",
+          "queryType": "aggregate",
+          "confidence": "high",
+          "sourceRefs": ["normalized://db.crossModuleDependencies.enrollment_trial"]
+        },
+        {
+          "model": "Payment",
+          "operation": "READ",
+          "description": "Summarize payment statuses and amounts for revenue metrics",
+          "queryType": "aggregate",
+          "confidence": "high",
+          "sourceRefs": ["normalized://db.crossModuleDependencies.payment_tracking"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "transactionNote": "Multiple aggregate queries; eventual consistency acceptable for dashboard",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "getDashboardRecentLeads",
+      "method": "GET",
+      "path": "/api/dashboard/recent-leads",
+      "dbOperations": [
+        {
+          "model": "Lead",
+          "operation": "READ",
+          "description": "Fetch most recent leads ordered by createdAt DESC, limited count",
+          "fields": ["id", "parentName", "email", "phone", "source", "status", "createdAt"],
+          "queryType": "list",
+          "orderBy": "createdAt DESC",
+          "confidence": "high",
+          "sourceRefs": ["normalized://db.crossModuleDependencies.lead_management"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "getDashboardUpcomingTrials",
+      "method": "GET",
+      "path": "/api/dashboard/upcoming-trials",
+      "dbOperations": [
+        {
+          "model": "Trial",
+          "operation": "READ",
+          "description": "Fetch upcoming trials with status SCHEDULED, date >= now",
+          "queryType": "list",
+          "filters": ["status == SCHEDULED", "trialDate.date >= now()"],
+          "joins": ["CalendarDate (for date)", "Program (for programName)"],
+          "orderBy": "trialDate.date ASC",
+          "confidence": "high",
+          "sourceRefs": ["normalized://db.crossModuleDependencies.enrollment_trial", "normalized://db.crossModuleDependencies.program_pricing"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "getDashboardPendingPayments",
+      "method": "GET",
+      "path": "/api/dashboard/pending-payments",
+      "dbOperations": [
+        {
+          "model": "Payment",
+          "operation": "READ",
+          "description": "Fetch payments with status PENDING or PARTIAL, joined with enrollment for parent/program info",
+          "queryType": "list",
+          "filters": ["status IN (PENDING, PARTIAL)"],
+          "joins": ["Enrollment (for parentName, programId)", "Program (for programName)"],
+          "confidence": "high",
+          "sourceRefs": ["normalized://db.crossModuleDependencies.payment_tracking"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    }
+  ],
+  "modelSummary": {},
+  "crossModuleDependencies": [
+    {
+      "targetModule": "lead_management",
+      "models": ["Lead"],
+      "accessType": "READ",
+      "reason": "Aggregate lead source counts; fetch recent leads",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://dbNotes.queryDependencies"]
+    },
+    {
+      "targetModule": "enrollment_trial",
+      "models": ["Trial", "Enrollment"],
+      "accessType": "READ",
+      "reason": "Conversion rate metrics; upcoming trial list",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://dbNotes.queryDependencies"]
+    },
+    {
+      "targetModule": "payment_tracking",
+      "models": ["Payment"],
+      "accessType": "READ",
+      "reason": "Payment status summary; pending payment list",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://dbNotes.queryDependencies"]
+    },
+    {
+      "targetModule": "program_pricing",
+      "models": ["Program"],
+      "accessType": "READ",
+      "reason": "Program name joins for trial/payment displays",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://dbNotes.queryDependencies"]
+    },
+    {
+      "targetModule": "calendar_scheduling",
+      "models": ["CalendarDate"],
+      "accessType": "READ",
+      "reason": "Trial date info for upcoming trials display",
+      "confidence": "high",
+      "inferred": true,
+      "sourceRefs": ["prisma_contract://models.Trial.relations.trialDate"]
+    }
+  ],
+  "scheduledJobs": [],
+  "dbTriggers": [],
+  "unresolved": []
+}

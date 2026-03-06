@@ -1,0 +1,223 @@
+{
+  "moduleId": "auth_accounts",
+  "generatedAt": "2026-03-06",
+  "dbFlowVersion": "v1.0.0",
+  "endpoints": [
+    {
+      "operationId": "adminLogin",
+      "method": "POST",
+      "path": "/api/auth/login",
+      "dbOperations": [
+        {
+          "model": "Admin",
+          "operation": "READ",
+          "description": "Find admin by email for credential verification",
+          "fields": ["id", "email", "passwordHash", "name", "role"],
+          "filters": ["email"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/auth/login.post", "prisma_contract://models.Admin"]
+        },
+        {
+          "model": "Session",
+          "operation": "CREATE",
+          "description": "Create new server-side session record on successful login",
+          "fields": ["id", "adminId", "expiresAt", "createdAt"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.Session", "openapi://components.schemas.AdminLoginResponse.x-be-note"]
+        }
+      ],
+      "transactionBoundary": "multi-entity",
+      "transactionNote": "Read Admin + Create Session must be atomic to prevent orphaned sessions",
+      "dataCriticality": "core_auth",
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_login_attempt",
+          "description": "Audit log records both successful and failed login attempts",
+          "confidence": "medium",
+          "inferred": true,
+          "sourceRefs": ["be_policy_flow://adminLogin.middlewareChain.audit_log"]
+        }
+      ],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "adminLogout",
+      "method": "POST",
+      "path": "/api/auth/logout",
+      "dbOperations": [
+        {
+          "model": "Session",
+          "operation": "DELETE",
+          "description": "Delete/invalidate the current session record",
+          "filters": ["id (from session cookie)"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/auth/logout.post", "prisma_contract://models.Session"]
+        }
+      ],
+      "transactionBoundary": "single-write",
+      "dataCriticality": "core_auth",
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_logout",
+          "description": "Audit log records logout event",
+          "confidence": "medium",
+          "inferred": true,
+          "sourceRefs": ["be_policy_flow://adminLogout.middlewareChain.audit_log"]
+        }
+      ],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "getSession",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "dbOperations": [
+        {
+          "model": "Session",
+          "operation": "READ",
+          "description": "Validate current session exists and is not expired",
+          "filters": ["id (from session cookie)", "expiresAt > now()"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/auth/me.get", "prisma_contract://models.Session"]
+        },
+        {
+          "model": "Admin",
+          "operation": "READ",
+          "description": "Fetch admin profile data for session response",
+          "fields": ["id", "email", "name", "role"],
+          "filters": ["id (via session.adminId)"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.Admin", "prisma_contract://models.Session.relations.admin"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "transactionNote": "Session + Admin read can be a single join query",
+      "dataCriticality": "core_auth",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "requestPasswordReset",
+      "method": "POST",
+      "path": "/api/auth/forgot-password",
+      "dbOperations": [
+        {
+          "model": "Admin",
+          "operation": "READ",
+          "description": "Check if email exists (result not exposed to client per AA-A-03)",
+          "filters": ["email"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/auth/forgot-password.post", "prisma_contract://models.Admin"]
+        },
+        {
+          "model": "PasswordResetToken",
+          "operation": "CREATE",
+          "description": "Generate and store password reset token (24h expiry per AA-A-02)",
+          "fields": ["id", "adminId", "email", "token", "expiresAt", "used", "createdAt"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.PasswordResetToken"]
+        }
+      ],
+      "transactionBoundary": "multi-entity",
+      "transactionNote": "Admin lookup + token creation should be atomic; always returns success to client",
+      "dataCriticality": "core_auth",
+      "sideEffects": [
+        {
+          "type": "email",
+          "name": "password_reset_email",
+          "description": "Sends password reset link via email (only if admin exists)",
+          "confidence": "high",
+          "inferred": false,
+          "sourceRefs": ["normalized://signals.password_reset_email"]
+        }
+      ],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "setNewPassword",
+      "method": "POST",
+      "path": "/api/auth/reset-password",
+      "dbOperations": [
+        {
+          "model": "PasswordResetToken",
+          "operation": "READ",
+          "description": "Validate token exists, not expired, not used",
+          "filters": ["token", "expiresAt > now()", "used == false"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.PasswordResetToken"]
+        },
+        {
+          "model": "Admin",
+          "operation": "UPDATE",
+          "description": "Update admin passwordHash with new password",
+          "fields": ["passwordHash", "updatedAt"],
+          "filters": ["id (via token.adminId)"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/auth/reset-password.post", "prisma_contract://models.Admin"]
+        },
+        {
+          "model": "PasswordResetToken",
+          "operation": "UPDATE",
+          "description": "Mark token as used (single-use enforcement)",
+          "fields": ["used"],
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.PasswordResetToken"]
+        },
+        {
+          "model": "Session",
+          "operation": "DELETE",
+          "description": "Invalidate all existing sessions for the admin (security best practice)",
+          "filters": ["adminId"],
+          "confidence": "medium",
+          "inferred": true,
+          "sourceRefs": ["be_policy_flow://setNewPassword.middlewareChain.audit_log"]
+        }
+      ],
+      "transactionBoundary": "multi-entity",
+      "transactionNote": "Token validation + password update + token mark-used + session invalidation must all be in a single transaction",
+      "dataCriticality": "core_auth",
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_password_reset",
+          "description": "Audit log records password change event",
+          "confidence": "medium",
+          "inferred": true,
+          "sourceRefs": ["be_policy_flow://setNewPassword.middlewareChain.audit_log"]
+        }
+      ],
+      "dbTriggers": []
+    }
+  ],
+  "modelSummary": {
+    "Admin": {
+      "operations": ["READ", "UPDATE"],
+      "dataCriticality": "core_auth",
+      "sourceRefs": ["prisma_contract://models.Admin"]
+    },
+    "Session": {
+      "operations": ["CREATE", "READ", "DELETE"],
+      "dataCriticality": "core_auth",
+      "sourceRefs": ["prisma_contract://models.Session"]
+    },
+    "PasswordResetToken": {
+      "operations": ["CREATE", "READ", "UPDATE"],
+      "dataCriticality": "core_auth",
+      "sourceRefs": ["prisma_contract://models.PasswordResetToken"]
+    }
+  },
+  "crossModuleDependencies": [],
+  "scheduledJobs": [],
+  "dbTriggers": [],
+  "unresolved": [
+    {
+      "id": "AA-DB-U-01",
+      "description": "Session cleanup strategy (expired sessions) — cron job vs lazy deletion on read. Recommend scheduled cleanup job.",
+      "confidence": "low",
+      "decision": "deferred_to_implementation"
+    }
+  ]
+}

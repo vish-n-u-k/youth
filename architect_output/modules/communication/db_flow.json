@@ -1,0 +1,318 @@
+{
+  "moduleId": "communication",
+  "generatedAt": "2026-03-06",
+  "dbFlowVersion": "v1.0.0",
+  "endpoints": [
+    {
+      "operationId": "getTemplates",
+      "method": "GET",
+      "path": "/api/communications/templates",
+      "dbOperations": [
+        {
+          "model": "Template",
+          "operation": "READ",
+          "description": "List all email templates",
+          "queryType": "list",
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/communications/templates.get", "prisma_contract://models.Template"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "getTemplate",
+      "method": "GET",
+      "path": "/api/communications/templates/{templateId}",
+      "dbOperations": [
+        {
+          "model": "Template",
+          "operation": "READ",
+          "description": "Fetch single template with body content",
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/communications/templates/{templateId}.get", "prisma_contract://models.Template"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "createTemplate",
+      "method": "POST",
+      "path": "/api/communications/templates",
+      "dbOperations": [
+        {
+          "model": "Template",
+          "operation": "CREATE",
+          "description": "Create new custom email template (GP-03: validate template variables like {{parentName}}, {{programName}})",
+          "fields": ["id", "name", "subject", "body", "isDefault", "triggerEvent", "createdAt"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/communications/templates.post", "prisma_contract://models.Template"]
+        }
+      ],
+      "transactionBoundary": "single-write",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "updateTemplate",
+      "method": "PUT",
+      "path": "/api/communications/templates/{templateId}",
+      "dbOperations": [
+        {
+          "model": "Template",
+          "operation": "READ",
+          "description": "Read existing template (verify it exists; default templates are editable but not deletable)",
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.Template"]
+        },
+        {
+          "model": "Template",
+          "operation": "UPDATE",
+          "description": "Update template fields (GP-03: validate template variables). Default templates can be edited.",
+          "fields": ["name", "subject", "body", "triggerEvent", "updatedAt"],
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/communications/templates/{templateId}.put", "prisma_contract://models.Template"]
+        }
+      ],
+      "transactionBoundary": "single-write",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "getAutomations",
+      "method": "GET",
+      "path": "/api/communications/automations",
+      "dbOperations": [
+        {
+          "model": "Automation",
+          "operation": "READ",
+          "description": "List all 6 pre-seeded automation rules with linked template info",
+          "queryType": "list",
+          "joins": ["Template (for template name/subject)"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/communications/automations.get", "prisma_contract://models.Automation"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "updateAutomation",
+      "method": "PUT",
+      "path": "/api/communications/automations/{automationId}",
+      "dbOperations": [
+        {
+          "model": "Template",
+          "operation": "READ",
+          "description": "Validate templateId exists",
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.Automation.relations.template"]
+        },
+        {
+          "model": "Automation",
+          "operation": "UPDATE",
+          "description": "Update automation config (templateId, delayMinutes, enabled toggle). No CREATE/DELETE — only 6 pre-seeded.",
+          "fields": ["templateId", "delayMinutes", "enabled", "updatedAt"],
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/communications/automations/{automationId}.put", "prisma_contract://models.Automation"]
+        }
+      ],
+      "transactionBoundary": "single-write",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_automation_toggle",
+          "description": "Audit log records automation enable/disable (affects email delivery behavior)",
+          "confidence": "medium",
+          "inferred": true,
+          "sourceRefs": ["be_policy_flow://updateAutomation.middlewareChain.audit_log"]
+        }
+      ],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "getCommunicationsLog",
+      "method": "GET",
+      "path": "/api/communications/log",
+      "dbOperations": [
+        {
+          "model": "CommunicationLog",
+          "operation": "READ",
+          "description": "Paginated list of communication log entries with filters (deliveryStatus, triggerEvent, search)",
+          "queryType": "list",
+          "filters": ["deliveryStatus", "triggerEvent", "search (recipientEmail, recipientName)"],
+          "pagination": true,
+          "orderBy": "createdAt DESC",
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/communications/log.get", "prisma_contract://models.CommunicationLog"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "audit",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "retryEmail",
+      "method": "POST",
+      "path": "/api/communications/log/{logId}/retry",
+      "dbOperations": [
+        {
+          "model": "CommunicationLog",
+          "operation": "READ",
+          "description": "Fetch log entry to validate status is FAILED (only FAILED emails can be retried)",
+          "filters": ["id", "deliveryStatus == FAILED"],
+          "confidence": "high",
+          "sourceRefs": ["be_policy_flow://retryEmail.middlewareChain.business_rule_guard"]
+        },
+        {
+          "model": "CommunicationLog",
+          "operation": "UPDATE",
+          "description": "Update delivery status to PENDING (will be re-sent by email worker), clear failureReason",
+          "fields": ["deliveryStatus", "failureReason", "sentAt"],
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/communications/log/{logId}/retry.post", "prisma_contract://models.CommunicationLog"]
+        }
+      ],
+      "transactionBoundary": "single-write",
+      "dataCriticality": "audit",
+      "sideEffects": [
+        {
+          "type": "email",
+          "name": "retry_email_send",
+          "description": "Re-queues the email for sending via email worker/service",
+          "confidence": "high",
+          "inferred": true,
+          "sourceRefs": ["be_policy_flow://retryEmail.middlewareChain.audit_log"]
+        }
+      ],
+      "dbTriggers": []
+    }
+  ],
+  "modelSummary": {
+    "Template": {
+      "operations": ["CREATE", "READ", "UPDATE"],
+      "dataCriticality": "workspace_data",
+      "note": "No DELETE — 6 default templates are not deletable (CM-A-01). Custom templates also not deletable in MVP.",
+      "sourceRefs": ["prisma_contract://models.Template"]
+    },
+    "Automation": {
+      "operations": ["READ", "UPDATE"],
+      "dataCriticality": "workspace_data",
+      "note": "No CREATE/DELETE — 6 pre-seeded automations only. One per TriggerEvent.",
+      "sourceRefs": ["prisma_contract://models.Automation"]
+    },
+    "CommunicationLog": {
+      "operations": ["READ", "UPDATE"],
+      "dataCriticality": "audit",
+      "note": "Append-only from email sending flow. Admin can only read + retry (update status). No FK to Template/Automation — stores snapshot data.",
+      "sourceRefs": ["prisma_contract://models.CommunicationLog"]
+    }
+  },
+  "crossModuleDependencies": [],
+  "scheduledJobs": [
+    {
+      "name": "trial_approaching_reminder",
+      "schedule": "daily",
+      "description": "Check for trials with date approaching (within configured delayMinutes). Fires TRIAL_APPROACHING automation.",
+      "dbOperations": [
+        {
+          "model": "Automation",
+          "operation": "READ",
+          "description": "Fetch TRIAL_APPROACHING automation to check if enabled and get delayMinutes",
+          "filters": ["triggerEvent == TRIAL_APPROACHING", "enabled == true"]
+        },
+        {
+          "model": "Trial",
+          "operation": "READ",
+          "description": "Query trials with status SCHEDULED and trialDate.date within reminder window",
+          "filters": ["status == SCHEDULED", "trialDate.date within delayMinutes of now"]
+        },
+        {
+          "model": "Template",
+          "operation": "READ",
+          "description": "Fetch template linked to TRIAL_APPROACHING automation"
+        },
+        {
+          "model": "CommunicationLog",
+          "operation": "CREATE",
+          "description": "Create log entry for each reminder email sent"
+        }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["normalized://signals.trial_approaching"]
+    },
+    {
+      "name": "class_start_approaching_reminder",
+      "schedule": "daily",
+      "description": "Check for enrollments with program startDate approaching. Fires CLASS_START_APPROACHING automation.",
+      "dbOperations": [
+        {
+          "model": "Automation",
+          "operation": "READ",
+          "description": "Fetch CLASS_START_APPROACHING automation",
+          "filters": ["triggerEvent == CLASS_START_APPROACHING", "enabled == true"]
+        },
+        {
+          "model": "Enrollment",
+          "operation": "READ",
+          "description": "Query active enrollments with program startDate within reminder window",
+          "filters": ["status == ACTIVE"],
+          "joins": ["Program (for startDate check)"]
+        },
+        {
+          "model": "Template",
+          "operation": "READ",
+          "description": "Fetch template linked to automation"
+        },
+        {
+          "model": "CommunicationLog",
+          "operation": "CREATE",
+          "description": "Create log entry for each reminder email"
+        }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["normalized://signals.class_start_approaching"]
+    },
+    {
+      "name": "email_send_worker",
+      "schedule": "continuous/polling",
+      "description": "Worker that picks up CommunicationLog entries with status PENDING and attempts to send via email provider. Updates status to SENT or FAILED.",
+      "dbOperations": [
+        {
+          "model": "CommunicationLog",
+          "operation": "READ",
+          "description": "Query pending emails to send",
+          "filters": ["deliveryStatus == PENDING"]
+        },
+        {
+          "model": "CommunicationLog",
+          "operation": "UPDATE",
+          "description": "Update status to SENT (with sentAt) or FAILED (with failureReason)",
+          "fields": ["deliveryStatus", "sentAt", "failureReason"]
+        }
+      ],
+      "confidence": "high",
+      "inferred": true,
+      "sourceRefs": ["prisma_contract://models.CommunicationLog"]
+    }
+  ],
+  "dbTriggers": [],
+  "unresolved": []
+}

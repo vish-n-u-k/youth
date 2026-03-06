@@ -1,0 +1,137 @@
+{
+  "moduleId": "lead_management",
+  "flowVersion": "v1.0.0",
+  "generatedAt": "2026-03-06",
+  "routeGraph": {
+    "entryPoints": [
+      { "route": "/admin/leads", "screenId": "lead_list", "context": "Sidebar navigation / dashboard widget click", "confidence": "high", "evidenceRefs": ["fe_details://lead_list"] }
+    ],
+    "transitions": [
+      { "from": "/admin/leads", "to": "/admin/leads/{leadId}", "trigger": "leadRowClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://lead_list", "fe_details://lead_detail"] },
+      { "from": "/admin/leads/{leadId}", "to": "/admin/leads", "trigger": "backToListClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://lead_detail"] }
+    ]
+  },
+  "screenGraph": [
+    {
+      "screenId": "lead_list",
+      "route": "/admin/leads",
+      "components": ["LeadFilters", "LeadTable", "StatusDropdown", "Pagination"],
+      "actions": [
+        {
+          "actionId": "loadLeads",
+          "flowType": "http",
+          "trigger": "onMount+onFilterChange",
+          "apiEdge": { "method": "GET", "path": "/api/leads", "operationId": "getLeads" },
+          "queryParams": ["status", "source", "programId", "search", "page", "limit"],
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/leads.get", "fe_details://lead_list.endpointProposals[0]"]
+        },
+        {
+          "actionId": "updateLeadStatus",
+          "flowType": "http",
+          "apiEdge": { "method": "PATCH", "path": "/api/leads/{leadId}/status", "operationId": "updateLeadStatus" },
+          "onSuccess": "refreshLeadList",
+          "onError": "showValidationError",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/leads/{leadId}/status.patch", "fe_details://lead_list.endpointProposals[1]"]
+        },
+        {
+          "actionId": "navigateToLeadDetail",
+          "flowType": "event",
+          "target": "/admin/leads/{leadId}",
+          "confidence": "high",
+          "evidenceRefs": ["fe_details://lead_list"]
+        }
+      ]
+    },
+    {
+      "screenId": "lead_detail",
+      "route": "/admin/leads/{leadId}",
+      "components": ["LeadInfoPanel", "LeadEditForm", "NotesSection", "ActivityTimeline", "SendTrialLinkButton"],
+      "actions": [
+        {
+          "actionId": "loadLead",
+          "flowType": "http",
+          "trigger": "onMount",
+          "apiEdge": { "method": "GET", "path": "/api/leads/{leadId}", "operationId": "getLead" },
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/leads/{leadId}.get", "fe_details://lead_detail.endpointProposals[0]"]
+        },
+        {
+          "actionId": "updateLead",
+          "flowType": "http",
+          "apiEdge": { "method": "PUT", "path": "/api/leads/{leadId}", "operationId": "updateLead" },
+          "onSuccess": "showSuccessToast+refreshLead",
+          "onError": "showValidationError",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/leads/{leadId}.put", "fe_details://lead_detail.endpointProposals[1]"]
+        },
+        {
+          "actionId": "loadNotes",
+          "flowType": "http",
+          "trigger": "onMount",
+          "apiEdge": { "method": "GET", "path": "/api/leads/{leadId}/notes", "operationId": "getLeadNotes" },
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/leads/{leadId}/notes.get", "fe_details://lead_detail.endpointProposals[2]"]
+        },
+        {
+          "actionId": "addNote",
+          "flowType": "http",
+          "apiEdge": { "method": "POST", "path": "/api/leads/{leadId}/notes", "operationId": "addLeadNote" },
+          "onSuccess": "refreshNotes",
+          "onError": "showValidationError",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/leads/{leadId}/notes.post", "fe_details://lead_detail.endpointProposals[3]"]
+        },
+        {
+          "actionId": "loadActivity",
+          "flowType": "http",
+          "trigger": "onMount",
+          "apiEdge": { "method": "GET", "path": "/api/leads/{leadId}/activity", "operationId": "getLeadActivity" },
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/leads/{leadId}/activity.get", "fe_details://lead_detail.endpointProposals[4]"]
+        },
+        {
+          "actionId": "sendTrialBookingLink",
+          "flowType": "http",
+          "apiEdge": { "method": "POST", "path": "/api/leads/{leadId}/send-trial-link", "operationId": "sendTrialBookingLink" },
+          "onSuccess": "showSuccessToast+refreshActivity",
+          "onError": "showError",
+          "note": "Handoff HO-01: sends email with trial booking link to parent",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/leads/{leadId}/send-trial-link.post", "fe_details://lead_detail.endpointProposals[5]"]
+        },
+        {
+          "actionId": "navigateBackToList",
+          "flowType": "event",
+          "target": "/admin/leads",
+          "confidence": "high",
+          "evidenceRefs": ["fe_details://lead_detail"]
+        }
+      ]
+    }
+  ],
+  "guards": [
+    { "route": "/admin/leads", "authRequired": true, "allowedRoles": ["admin"], "redirectIfUnauthenticated": "/admin/login", "confidence": "high", "evidenceRefs": ["fe_details://lead_list"] },
+    { "route": "/admin/leads/{leadId}", "authRequired": true, "allowedRoles": ["admin"], "redirectIfUnauthenticated": "/admin/login", "confidence": "high", "evidenceRefs": ["fe_details://lead_detail"] }
+  ],
+  "unmappedActions": [],
+  "signals": [
+    {
+      "type": "event",
+      "name": "lead_status_auto_advance",
+      "trigger": "enrollment/trial events",
+      "description": "Lead status auto-advances on enrollment events (GP-04). Admin can manually override.",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/leads/{leadId}/status.patch.x-policy-ref"]
+    },
+    {
+      "type": "event",
+      "name": "trial_booking_link_email",
+      "trigger": "sendTrialBookingLink",
+      "description": "Sends trial booking link email to lead (HO-01: lead_management -> enrollment_trial)",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/leads/{leadId}/send-trial-link.post.x-handoff-ref"]
+    }
+  ]
+}

@@ -1,0 +1,294 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Communication API",
+    "version": "v1.0.0",
+    "x-module-id": "communication",
+    "x-contract-status": "draft",
+    "x-change-type": "none"
+  },
+  "paths": {
+    "/api/communications/templates": {
+      "get": {
+        "operationId": "getTemplates",
+        "summary": "List all email templates",
+        "tags": ["templates"],
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": { "description": "Template list", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TemplateListResponse" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      },
+      "post": {
+        "operationId": "createTemplate",
+        "summary": "Create a custom email template",
+        "tags": ["templates"],
+        "security": [{ "cookieAuth": [] }],
+        "x-policy-ref": "GP-03: All parent-facing emails use admin-configurable templates",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TemplateRequest" } } }
+        },
+        "responses": {
+          "201": { "description": "Template created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TemplateResponse" } } } },
+          "400": { "description": "Validation error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/communications/templates/{templateId}": {
+      "get": {
+        "operationId": "getTemplate",
+        "summary": "Get single template with body and available variables",
+        "tags": ["templates"],
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          { "name": "templateId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Template details", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TemplateResponse" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "404": { "description": "Template not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      },
+      "put": {
+        "operationId": "updateTemplate",
+        "summary": "Update an email template",
+        "tags": ["templates"],
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          { "name": "templateId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TemplateRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Template updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TemplateResponse" } } } },
+          "400": { "description": "Validation error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "404": { "description": "Template not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/communications/automations": {
+      "get": {
+        "operationId": "getAutomations",
+        "summary": "List all automation rules",
+        "tags": ["automations"],
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": { "description": "Automation rules list", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AutomationListResponse" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/communications/automations/{automationId}": {
+      "put": {
+        "operationId": "updateAutomation",
+        "summary": "Update an automation rule (template, delay, enable/disable)",
+        "tags": ["automations"],
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          { "name": "automationId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AutomationRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Automation updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AutomationResponse" } } } },
+          "400": { "description": "Validation error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "404": { "description": "Automation not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/communications/log": {
+      "get": {
+        "operationId": "getCommunicationsLog",
+        "summary": "View sent/failed/pending email log with filters and pagination",
+        "tags": ["communications-log"],
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          { "name": "deliveryStatus", "in": "query", "schema": { "type": "string", "enum": ["sent", "failed", "pending"] } },
+          { "name": "triggerEvent", "in": "query", "schema": { "type": "string" } },
+          { "name": "search", "in": "query", "description": "Search by recipient name or email", "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "minimum": 1, "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 25 } }
+        ],
+        "responses": {
+          "200": { "description": "Communications log", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CommunicationsLogResponse" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/communications/log/{logId}/retry": {
+      "post": {
+        "operationId": "retryEmail",
+        "summary": "Retry sending a failed email",
+        "tags": ["communications-log"],
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          { "name": "logId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Retry queued", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RetryEmailResponse" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "404": { "description": "Log entry not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "409": { "description": "Email already sent or retry already queued", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TemplateListResponse": {
+        "type": "object",
+        "required": ["templates"],
+        "properties": {
+          "templates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["templateId", "name", "subject", "isDefault", "updatedAt"],
+              "properties": {
+                "templateId": { "type": "string" },
+                "name": { "type": "string" },
+                "subject": { "type": "string" },
+                "triggerEvent": { "type": "string", "nullable": true },
+                "isDefault": { "type": "boolean" },
+                "updatedAt": { "type": "string", "format": "date-time" }
+              }
+            }
+          }
+        },
+        "x-zod-schema": "TemplateListResponse"
+      },
+      "TemplateResponse": {
+        "type": "object",
+        "required": ["templateId", "name", "subject", "body", "availableVariables", "isDefault", "createdAt", "updatedAt"],
+        "properties": {
+          "templateId": { "type": "string" },
+          "name": { "type": "string" },
+          "subject": { "type": "string" },
+          "body": { "type": "string" },
+          "availableVariables": { "type": "array", "items": { "type": "string" } },
+          "isDefault": { "type": "boolean" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "x-zod-schema": "TemplateResponse"
+      },
+      "TemplateRequest": {
+        "type": "object",
+        "required": ["name", "subject", "body"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "subject": { "type": "string", "minLength": 1 },
+          "body": { "type": "string", "minLength": 1 }
+        },
+        "x-zod-schema": "TemplateRequest"
+      },
+      "AutomationListResponse": {
+        "type": "object",
+        "required": ["automations"],
+        "properties": {
+          "automations": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/AutomationResponse" }
+          }
+        },
+        "x-zod-schema": "AutomationListResponse"
+      },
+      "AutomationRequest": {
+        "type": "object",
+        "required": ["triggerEvent", "templateId", "enabled"],
+        "properties": {
+          "triggerEvent": { "type": "string", "enum": ["lead_created", "trial_scheduled", "trial_approaching", "enrollment_completed", "payment_overdue", "class_start_approaching"] },
+          "templateId": { "type": "string" },
+          "delayMinutes": { "type": "integer", "minimum": 0 },
+          "enabled": { "type": "boolean" }
+        },
+        "x-zod-schema": "AutomationRequest"
+      },
+      "AutomationResponse": {
+        "type": "object",
+        "required": ["automationId", "triggerEvent", "templateId", "templateName", "enabled", "updatedAt"],
+        "properties": {
+          "automationId": { "type": "string" },
+          "triggerEvent": { "type": "string" },
+          "templateId": { "type": "string" },
+          "templateName": { "type": "string" },
+          "delayMinutes": { "type": "integer", "nullable": true },
+          "enabled": { "type": "boolean" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "x-zod-schema": "AutomationResponse"
+      },
+      "CommunicationsLogResponse": {
+        "type": "object",
+        "required": ["communications", "total", "page", "limit"],
+        "properties": {
+          "communications": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["logId", "recipientEmail", "recipientName", "subject", "templateName", "triggerEvent", "deliveryStatus"],
+              "properties": {
+                "logId": { "type": "string" },
+                "recipientEmail": { "type": "string" },
+                "recipientName": { "type": "string" },
+                "subject": { "type": "string" },
+                "templateName": { "type": "string" },
+                "triggerEvent": { "type": "string" },
+                "deliveryStatus": { "type": "string", "enum": ["sent", "failed", "pending"] },
+                "sentAt": { "type": "string", "format": "date-time", "nullable": true },
+                "failureReason": { "type": "string", "nullable": true }
+              }
+            }
+          },
+          "total": { "type": "integer" },
+          "page": { "type": "integer" },
+          "limit": { "type": "integer" }
+        },
+        "x-zod-schema": "CommunicationsLogResponse"
+      },
+      "RetryEmailResponse": {
+        "type": "object",
+        "required": ["logId", "message", "retryQueued"],
+        "properties": {
+          "logId": { "type": "string" },
+          "message": { "type": "string" },
+          "retryQueued": { "type": "boolean" }
+        },
+        "x-zod-schema": "RetryEmailResponse"
+      },
+      "ApiError": {
+        "type": "object",
+        "required": ["error", "message", "statusCode"],
+        "properties": {
+          "error": { "type": "string" },
+          "message": { "type": "string" },
+          "statusCode": { "type": "integer" }
+        },
+        "x-zod-schema": "ApiError"
+      }
+    },
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "session"
+      }
+    }
+  }
+}

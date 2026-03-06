@@ -1,0 +1,430 @@
+{
+  "version": "1.0.0",
+  "generatedFrom": "architect_output/modules/*/fe_flow.json + contract_output/modules/*/fe_details.json + contract_output/global/fe_global_contract.json",
+  "layouts": {
+    "auth": {
+      "description": "Minimal centered layout for login/password screens. No sidebar, no header nav.",
+      "components": ["AuthFormContainer"]
+    },
+    "public": {
+      "description": "Public-facing layout for parent pages. Minimal header with logo, optional footer.",
+      "components": ["PublicHeader", "PublicFooter", "MainContent"]
+    },
+    "admin": {
+      "description": "Full admin layout with sidebar navigation, header with user menu, breadcrumbs.",
+      "components": ["AdminHeader", "AdminSidebar", "Breadcrumbs", "MainContent"]
+    }
+  },
+  "routes": {
+    "auth": [
+      {
+        "path": "/admin/login",
+        "name": "Admin Login",
+        "screenId": "admin_login",
+        "module": "auth_accounts",
+        "layout": "auth",
+        "meta": {
+          "title": "Login",
+          "requiresAuth": false,
+          "redirectIfAuthenticated": "/admin/dashboard",
+          "allowedRoles": []
+        }
+      },
+      {
+        "path": "/admin/forgot-password",
+        "name": "Forgot Password",
+        "screenId": "password_reset_request",
+        "module": "auth_accounts",
+        "layout": "auth",
+        "meta": {
+          "title": "Forgot Password",
+          "requiresAuth": false,
+          "allowedRoles": []
+        }
+      },
+      {
+        "path": "/admin/reset-password/:token",
+        "name": "Reset Password",
+        "screenId": "set_new_password",
+        "module": "auth_accounts",
+        "layout": "auth",
+        "dynamic": true,
+        "meta": {
+          "title": "Reset Password",
+          "requiresAuth": false,
+          "allowedRoles": []
+        }
+      },
+      {
+        "path": "/login",
+        "name": "Parent Login (Phase 2)",
+        "screenId": "parent_login_stub",
+        "module": "auth_accounts",
+        "layout": "auth",
+        "phase": 2,
+        "meta": {
+          "title": "Parent Login",
+          "requiresAuth": false,
+          "allowedRoles": []
+        }
+      }
+    ],
+    "public": [
+      {
+        "path": "/programs",
+        "name": "Program Discovery",
+        "screenId": "program_discovery",
+        "module": "enrollment_trial",
+        "layout": "public",
+        "meta": {
+          "title": "Programs",
+          "requiresAuth": false,
+          "allowedRoles": ["parent"]
+        }
+      },
+      {
+        "path": "/programs/:programId/book-trial",
+        "name": "Trial Booking Form",
+        "screenId": "trial_booking_form",
+        "module": "enrollment_trial",
+        "layout": "public",
+        "dynamic": true,
+        "meta": {
+          "title": "Book a Trial",
+          "requiresAuth": false,
+          "allowedRoles": ["parent"]
+        }
+      },
+      {
+        "path": "/programs/:programId/enroll",
+        "name": "Direct Enrollment Form",
+        "screenId": "enrollment_form",
+        "module": "enrollment_trial",
+        "layout": "public",
+        "dynamic": true,
+        "meta": {
+          "title": "Enroll",
+          "requiresAuth": false,
+          "allowedRoles": ["parent"]
+        }
+      },
+      {
+        "path": "/programs/:programId/trial-dates",
+        "name": "Trial Date Selection",
+        "screenId": "parent_calendar",
+        "module": "calendar_scheduling",
+        "layout": "public",
+        "dynamic": true,
+        "meta": {
+          "title": "Available Trial Dates",
+          "requiresAuth": false,
+          "allowedRoles": ["parent"]
+        }
+      },
+      {
+        "path": "/enrollment/:enrollmentId/confirmation",
+        "name": "Enrollment Confirmation",
+        "screenId": "enrollment_confirmation",
+        "module": "enrollment_trial",
+        "layout": "public",
+        "dynamic": true,
+        "meta": {
+          "title": "Enrollment Confirmed",
+          "requiresAuth": false,
+          "allowedRoles": ["parent"]
+        }
+      },
+      {
+        "path": "/enrollment/:enrollmentId/pay",
+        "name": "Zelle Payment Instructions",
+        "screenId": "zelle_instructions",
+        "module": "payment_tracking",
+        "layout": "public",
+        "dynamic": true,
+        "meta": {
+          "title": "Payment Instructions",
+          "requiresAuth": false,
+          "allowedRoles": ["parent"]
+        }
+      }
+    ],
+    "admin": [
+      {
+        "path": "/admin/dashboard",
+        "name": "Dashboard",
+        "screenId": "dashboard_overview",
+        "module": "admin_dashboard",
+        "layout": "admin",
+        "meta": {
+          "title": "Dashboard",
+          "requiresAuth": true,
+          "allowedRoles": ["admin"],
+          "sidebarItem": "nav_dashboard"
+        }
+      },
+      {
+        "path": "/admin/leads",
+        "name": "Lead List",
+        "screenId": "lead_list",
+        "module": "lead_management",
+        "layout": "admin",
+        "meta": {
+          "title": "Leads",
+          "requiresAuth": true,
+          "allowedRoles": ["admin"],
+          "sidebarItem": "nav_leads"
+        }
+      },
+      {
+        "path": "/admin/leads/:leadId",
+        "name": "Lead Detail",
+        "screenId": "lead_detail",
+        "module": "lead_management",
+        "layout": "admin",
+        "dynamic": true,
+        "meta": {
+          "title": "Lead Detail",
+          "requiresAuth": true,
+          "allowedRoles": ["admin"],
+          "sidebarItem": "nav_leads",
+          "parentRoute": "/admin/leads"
+        }
+      },
+      {
+        "path": "/admin/programs",
+        "name": "Program List",
+        "screenId": "program_list",
+        "module": "program_pricing",
+        "layout": "admin",
+        "meta": {
+          "title": "Programs",
+          "requiresAuth": true,
+          "allowedRoles": ["admin"],
+          "sidebarItem": "nav_programs"
+        }
+      },
+      {
+        "path": "/admin/programs/:programId",
+        "name": "Program Setup / Edit",
+        "screenId": "program_setup",
+        "module": "program_pricing",
+        "layout": "admin",
+        "dynamic": true,
+        "meta": {
+          "title": "Program Setup",
+          "requiresAuth": true,
+          "allowedRoles": ["admin"],
+          "sidebarItem": "nav_programs",
+          "parentRoute": "/admin/programs"
+        }
+      },
+      {
+        "path": "/admin/programs/coupons",
+        "name": "Coupon Management",
+        "screenId": "coupon_management",
+        "module": "program_pricing",
+        "layout": "admin",
+        "meta": {
+          "title": "Coupons",
+          "requiresAuth": true,
+          "allowedRoles": ["admin"],
+          "sidebarItem": "nav_programs"
+        }
+      },
+      {
+        "path": "/admin/enrollments",
+        "name": "Enrollment List",
+        "screenId": "admin_enrollment_list",
+        "module": "enrollment_trial",
+        "layout": "admin",
+        "meta": {
+          "title": "Enrollments",
+          "requiresAuth": true,
+          "allowedRoles": ["admin"],
+          "sidebarItem": "nav_enrollments"
+        }
+      },
+      {
+        "path": "/admin/enrollments/:enrollmentId",
+        "name": "Enrollment Detail",
+        "screenId": "admin_enrollment_detail",
+        "module": "enrollment_trial",
+        "layout": "admin",
+        "dynamic": true,
+        "meta": {
+          "title": "Enrollment Detail",
+          "requiresAuth": true,
+          "allowedRoles": ["admin"],
+          "sidebarItem": "nav_enrollments",
+          "parentRoute": "/admin/enrollments"
+        }
+      },
+      {
+        "path": "/admin/calendar",
+        "name": "Calendar Management",
+        "screenId": "admin_calendar",
+        "module": "calendar_scheduling",
+        "layout": "admin",
+        "meta": {
+          "title": "Calendar",
+          "requiresAuth": true,
+          "allowedRoles": ["admin"],
+          "sidebarItem": "nav_calendar"
+        }
+      },
+      {
+        "path": "/admin/payments",
+        "name": "Payment Dashboard",
+        "screenId": "payment_dashboard",
+        "module": "payment_tracking",
+        "layout": "admin",
+        "meta": {
+          "title": "Payments",
+          "requiresAuth": true,
+          "allowedRoles": ["admin"],
+          "sidebarItem": "nav_payments"
+        }
+      },
+      {
+        "path": "/admin/payments/:paymentId",
+        "name": "Payment Detail",
+        "screenId": "payment_detail",
+        "module": "payment_tracking",
+        "layout": "admin",
+        "dynamic": true,
+        "meta": {
+          "title": "Payment Detail",
+          "requiresAuth": true,
+          "allowedRoles": ["admin"],
+          "sidebarItem": "nav_payments",
+          "parentRoute": "/admin/payments"
+        }
+      },
+      {
+        "path": "/admin/communications/templates",
+        "name": "Template Manager",
+        "screenId": "template_manager",
+        "module": "communication",
+        "layout": "admin",
+        "meta": {
+          "title": "Email Templates",
+          "requiresAuth": true,
+          "allowedRoles": ["admin"],
+          "sidebarItem": "nav_communications"
+        }
+      },
+      {
+        "path": "/admin/communications/automations",
+        "name": "Automation Rules",
+        "screenId": "automation_rules",
+        "module": "communication",
+        "layout": "admin",
+        "meta": {
+          "title": "Automations",
+          "requiresAuth": true,
+          "allowedRoles": ["admin"],
+          "sidebarItem": "nav_communications"
+        }
+      },
+      {
+        "path": "/admin/communications/log",
+        "name": "Communications Log",
+        "screenId": "communications_log",
+        "module": "communication",
+        "layout": "admin",
+        "meta": {
+          "title": "Communications Log",
+          "requiresAuth": true,
+          "allowedRoles": ["admin"],
+          "sidebarItem": "nav_communications"
+        }
+      },
+      {
+        "path": "/admin/settings",
+        "name": "General Settings",
+        "screenId": "general_settings",
+        "module": "settings",
+        "layout": "admin",
+        "meta": {
+          "title": "Settings",
+          "requiresAuth": true,
+          "allowedRoles": ["admin"],
+          "sidebarItem": "nav_settings"
+        }
+      },
+      {
+        "path": "/admin/settings/staff",
+        "name": "Staff & Roles (Phase 2)",
+        "screenId": "staff_roles_stub",
+        "module": "settings",
+        "layout": "admin",
+        "phase": 2,
+        "meta": {
+          "title": "Staff & Roles",
+          "requiresAuth": true,
+          "allowedRoles": ["admin"],
+          "sidebarItem": "nav_settings"
+        }
+      }
+    ]
+  },
+  "redirects": [
+    {
+      "from": "/admin/login",
+      "to": "/admin/dashboard",
+      "condition": "User is already authenticated as admin"
+    },
+    {
+      "from": "/admin/*",
+      "to": "/admin/login",
+      "condition": "User is not authenticated (route guard)"
+    },
+    {
+      "from": "/",
+      "to": "/programs",
+      "condition": "Default public landing"
+    }
+  ],
+  "entryPoints": {
+    "admin": {
+      "postLogin": "/admin/dashboard",
+      "description": "Admin lands on dashboard after login. Dashboard has widgets linking to leads, enrollments, and payments."
+    },
+    "parent": {
+      "primary": "/programs",
+      "description": "Parents enter via program discovery page. No auth required in MVP."
+    },
+    "email": {
+      "trialBooking": "/programs/:programId/book-trial",
+      "enrollmentConfirmation": "/enrollment/:enrollmentId/confirmation",
+      "paymentInstructions": "/enrollment/:enrollmentId/pay",
+      "description": "Parents may arrive via email links to booking, confirmation, or payment pages."
+    }
+  },
+  "crossModuleHandoffs": [
+    {
+      "id": "HO-01",
+      "from": { "module": "lead_management", "screen": "lead_detail", "trigger": "sendTrialBookingLink" },
+      "to": { "module": "enrollment_trial", "screen": "trial_booking_form", "route": "/programs/:programId/book-trial" },
+      "dataPassed": ["leadId", "programId"]
+    },
+    {
+      "id": "HO-02",
+      "from": { "module": "enrollment_trial", "screen": "enrollment_confirmation", "trigger": "proceedToPayClick" },
+      "to": { "module": "payment_tracking", "screen": "zelle_instructions", "route": "/enrollment/:enrollmentId/pay" },
+      "dataPassed": ["enrollmentId"]
+    },
+    {
+      "id": "HO-05",
+      "from": { "module": "calendar_scheduling", "screen": "parent_calendar", "trigger": "trialDateSelected" },
+      "to": { "module": "enrollment_trial", "screen": "trial_booking_form", "route": "/programs/:programId/book-trial" },
+      "dataPassed": ["dateId", "programId"]
+    }
+  ],
+  "routeCount": {
+    "auth": 4,
+    "public": 6,
+    "admin": 16,
+    "total": 26
+  }
+}

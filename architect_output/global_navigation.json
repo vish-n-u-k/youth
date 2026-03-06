@@ -1,0 +1,287 @@
+{
+  "version": "1.0.0",
+  "navigationPattern": "hybrid_navigation",
+  "description": "Admin portal uses sidebar + header layout; parent-facing pages use minimal public layout",
+  "header": {
+    "admin": {
+      "left": [
+        {
+          "id": "admin_logo",
+          "label": "Platform Logo",
+          "route": "/admin/dashboard",
+          "type": "logo",
+          "requiresAuth": true,
+          "order": 1,
+          "confidence": "high",
+          "evidenceRefs": ["fe_global_contract://navigation/entryPoints/0"]
+        }
+      ],
+      "center": [],
+      "right": [
+        {
+          "id": "admin_user_menu",
+          "label": "User Menu",
+          "type": "dropdown",
+          "icon": "user-circle",
+          "requiresAuth": true,
+          "requiredRoles": ["admin"],
+          "order": 1,
+          "confidence": "high",
+          "evidenceRefs": ["fe_flow://auth_accounts#/unmappedActions/adminLogout"],
+          "items": [
+            {
+              "id": "admin_profile",
+              "label": "Settings",
+              "route": "/admin/settings",
+              "icon": "gear"
+            },
+            {
+              "id": "admin_logout",
+              "label": "Logout",
+              "action": "logout",
+              "icon": "log-out",
+              "apiEndpoint": "POST /api/auth/logout"
+            }
+          ]
+        }
+      ]
+    },
+    "public": {
+      "left": [
+        {
+          "id": "public_logo",
+          "label": "Platform Logo",
+          "route": "/programs",
+          "type": "logo",
+          "requiresAuth": false,
+          "order": 1,
+          "confidence": "high",
+          "evidenceRefs": ["fe_global_contract://navigation/entryPoints/1"]
+        }
+      ],
+      "center": [],
+      "right": []
+    }
+  },
+  "sidebar": {
+    "position": "left",
+    "collapsible": true,
+    "requiresAuth": true,
+    "requiredRoles": ["admin"],
+    "confidence": "high",
+    "evidenceRefs": [
+      "fe_global_contract://navigation/roleVisibilityRules/admin",
+      "fe_flow://lead_management#/screens/lead_list/entryPoints",
+      "fe_flow://calendar_scheduling#/screens/admin_calendar/entryPoints",
+      "fe_flow://program_pricing#/screens/program_list/entryPoints",
+      "fe_flow://payment_tracking#/screens/payment_dashboard/entryPoints",
+      "fe_flow://settings#/screens/general_settings/entryPoints"
+    ],
+    "sections": [
+      {
+        "id": "main_nav",
+        "title": "Main",
+        "items": [
+          {
+            "id": "nav_dashboard",
+            "label": "Dashboard",
+            "route": "/admin/dashboard",
+            "icon": "layout-dashboard",
+            "order": 1,
+            "badge": null,
+            "children": []
+          },
+          {
+            "id": "nav_leads",
+            "label": "Leads",
+            "route": "/admin/leads",
+            "icon": "users",
+            "order": 2,
+            "badge": null,
+            "children": []
+          },
+          {
+            "id": "nav_programs",
+            "label": "Programs",
+            "route": "/admin/programs",
+            "icon": "book-open",
+            "order": 3,
+            "badge": null,
+            "children": [
+              {
+                "id": "nav_programs_list",
+                "label": "All Programs",
+                "route": "/admin/programs"
+              },
+              {
+                "id": "nav_programs_coupons",
+                "label": "Coupons",
+                "route": "/admin/programs/coupons"
+              }
+            ]
+          },
+          {
+            "id": "nav_enrollments",
+            "label": "Enrollments",
+            "route": "/admin/enrollments",
+            "icon": "clipboard-check",
+            "order": 4,
+            "badge": null,
+            "children": []
+          },
+          {
+            "id": "nav_calendar",
+            "label": "Calendar",
+            "route": "/admin/calendar",
+            "icon": "calendar",
+            "order": 5,
+            "badge": null,
+            "children": []
+          },
+          {
+            "id": "nav_payments",
+            "label": "Payments",
+            "route": "/admin/payments",
+            "icon": "credit-card",
+            "order": 6,
+            "badge": null,
+            "children": []
+          },
+          {
+            "id": "nav_communications",
+            "label": "Communications",
+            "route": "/admin/communications/templates",
+            "icon": "mail",
+            "order": 7,
+            "badge": null,
+            "children": [
+              {
+                "id": "nav_comm_templates",
+                "label": "Templates",
+                "route": "/admin/communications/templates"
+              },
+              {
+                "id": "nav_comm_automations",
+                "label": "Automations",
+                "route": "/admin/communications/automations"
+              },
+              {
+                "id": "nav_comm_log",
+                "label": "Log",
+                "route": "/admin/communications/log"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "system_nav",
+        "title": "System",
+        "items": [
+          {
+            "id": "nav_settings",
+            "label": "Settings",
+            "route": "/admin/settings",
+            "icon": "settings",
+            "order": 8,
+            "badge": null,
+            "children": [
+              {
+                "id": "nav_settings_general",
+                "label": "General",
+                "route": "/admin/settings"
+              },
+              {
+                "id": "nav_settings_staff",
+                "label": "Staff & Roles",
+                "route": "/admin/settings/staff",
+                "phase": 2,
+                "disabled": false,
+                "stubMessage": "Staff & Roles management coming in Phase 2"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "roleVisibility": {
+      "admin": {
+        "visibleItems": ["nav_dashboard", "nav_leads", "nav_programs", "nav_enrollments", "nav_calendar", "nav_payments", "nav_communications", "nav_settings"],
+        "hiddenItems": []
+      },
+      "staff": {
+        "visibleItems": ["nav_calendar", "nav_enrollments"],
+        "hiddenItems": ["nav_dashboard", "nav_leads", "nav_programs", "nav_payments", "nav_communications", "nav_settings"]
+      }
+    }
+  },
+  "footer": {
+    "showOn": ["public", "auth"],
+    "hideOn": ["admin"],
+    "confidence": "low",
+    "note": "No footer defined in module specs. Minimal placeholder for public/auth pages.",
+    "sections": [
+      {
+        "title": "Legal",
+        "items": [
+          { "label": "Privacy Policy", "route": "/privacy" },
+          { "label": "Terms of Service", "route": "/terms" }
+        ]
+      },
+      {
+        "title": "Support",
+        "items": [
+          { "label": "Contact Us", "route": "/contact" }
+        ]
+      }
+    ]
+  },
+  "breadcrumbs": {
+    "enabled": true,
+    "showOn": "admin",
+    "excludeRoutes": ["/admin/login", "/admin/forgot-password", "/admin/reset-password/:token", "/login", "/programs", "/programs/:programId/book-trial", "/programs/:programId/enroll", "/enrollment/:enrollmentId/confirmation", "/enrollment/:enrollmentId/pay"],
+    "separator": "/",
+    "confidence": "medium",
+    "note": "Inferred from Back-to-List patterns across lead_management, payment_tracking, enrollment_trial, and program_pricing modules.",
+    "mappings": [
+      { "route": "/admin/dashboard", "breadcrumb": ["Dashboard"] },
+      { "route": "/admin/leads", "breadcrumb": ["Leads"] },
+      { "route": "/admin/leads/:leadId", "breadcrumb": ["Leads", "Lead Detail"] },
+      { "route": "/admin/programs", "breadcrumb": ["Programs"] },
+      { "route": "/admin/programs/:programId", "breadcrumb": ["Programs", "Program Setup"] },
+      { "route": "/admin/programs/coupons", "breadcrumb": ["Programs", "Coupons"] },
+      { "route": "/admin/enrollments", "breadcrumb": ["Enrollments"] },
+      { "route": "/admin/enrollments/:enrollmentId", "breadcrumb": ["Enrollments", "Enrollment Detail"] },
+      { "route": "/admin/calendar", "breadcrumb": ["Calendar"] },
+      { "route": "/admin/payments", "breadcrumb": ["Payments"] },
+      { "route": "/admin/payments/:paymentId", "breadcrumb": ["Payments", "Payment Detail"] },
+      { "route": "/admin/communications/templates", "breadcrumb": ["Communications", "Templates"] },
+      { "route": "/admin/communications/automations", "breadcrumb": ["Communications", "Automations"] },
+      { "route": "/admin/communications/log", "breadcrumb": ["Communications", "Log"] },
+      { "route": "/admin/settings", "breadcrumb": ["Settings", "General"] },
+      { "route": "/admin/settings/staff", "breadcrumb": ["Settings", "Staff & Roles"] }
+    ]
+  },
+  "mobile": {
+    "type": "hamburger",
+    "breakpoint": "768px",
+    "minWidth": "375px",
+    "items": "inherit_from_sidebar",
+    "headerVisible": true,
+    "confidence": "medium",
+    "evidenceRefs": ["fe_global_contract://globalPolicies/GP-07"],
+    "note": "GP-07 mandates mobile-responsive from 375px. Hamburger menu inferred as standard pattern for sidebar-based admin layouts."
+  },
+  "authGuard": {
+    "strategy": "route_guard",
+    "sessionEndpoint": "GET /api/auth/me",
+    "redirectOnUnauthenticated": "/admin/login",
+    "redirectOnAuthenticated": "/admin/dashboard",
+    "confidence": "high",
+    "evidenceRefs": [
+      "fe_flow://auth_accounts#/unmappedActions/getSession",
+      "fe_global_contract://globalPolicies/GP-05",
+      "fe_global_contract://globalPolicies/GP-06"
+    ]
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "moduleId": "lead_management",
+  "generatedAt": "2026-03-06",
+  "policyVersion": "v1.0.0",
+  "endpoints": [
+    {
+      "operationId": "getLeads",
+      "method": "GET",
+      "path": "/api/leads",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" },
+        { "order": 4, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: LeadListQuery with queryParams" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "getLead",
+      "method": "GET",
+      "path": "/api/leads/{leadId}",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "updateLead",
+      "method": "PUT",
+      "path": "/api/leads/{leadId}",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" },
+        { "order": 4, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: UpdateLeadRequest" },
+        { "order": 5, "middleware": "audit_log", "inferred": true, "confidence": "medium", "evidence": "State-changing write on lead record" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "updateLeadStatus",
+      "method": "PATCH",
+      "path": "/api/leads/{leadId}/status",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" },
+        { "order": 4, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: UpdateLeadStatusRequest" },
+        { "order": 5, "middleware": "business_rule_guard", "inferred": true, "confidence": "medium", "evidence": "GP-04: Lead status auto-advance rules; admin manual override must respect valid transitions" },
+        { "order": 6, "middleware": "audit_log", "inferred": true, "confidence": "medium", "evidence": "Status change is a tracked state transition (LeadActivity record)" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "getLeadNotes",
+      "method": "GET",
+      "path": "/api/leads/{leadId}/notes",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "addLeadNote",
+      "method": "POST",
+      "path": "/api/leads/{leadId}/notes",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" },
+        { "order": 4, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: AddLeadNoteRequest" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "getLeadActivity",
+      "method": "GET",
+      "path": "/api/leads/{leadId}/activity",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "sendTrialBookingLink",
+      "method": "POST",
+      "path": "/api/leads/{leadId}/send-trial-link",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" },
+        { "order": 4, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: SendTrialLinkRequest" },
+        { "order": 5, "middleware": "audit_log", "inferred": true, "confidence": "medium", "evidence": "Sends external email — sensitive operation with cross-module handoff (HO-01)" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    }
+  ],
+  "moduleGaps": [
+    {
+      "id": "LM-GAP-01",
+      "description": "All admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles on all endpoints.",
+      "severity": "low"
+    },
+    {
+      "id": "LM-GAP-02",
+      "description": "No explicit lead status transition validation rules in OpenAPI. Business rule guard on updateLeadStatus inferred from GP-04 policy ref.",
+      "severity": "medium"
+    }
+  ],
+  "defaults": {}
+}

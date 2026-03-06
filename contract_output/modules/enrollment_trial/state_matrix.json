@@ -3,6 +3,68 @@
   "contractVersion": "v1.0.0",
   "screens": [
     {
+      "screenId": "admin_enrollment_list",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Loading enrollments..."
+        },
+        "empty": {
+          "applicability": "required",
+          "message": "No enrollments yet. Enrollments will appear here after parents sign up."
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Failed to load enrollments. Please refresh.",
+          "retryAction": "Refresh page"
+        },
+        "success": {
+          "applicability": "not_applicable",
+          "message": null
+        }
+      },
+      "sourceRef": "fe_details://screens/admin_enrollment_list/states",
+      "x-added-by": "be_contract_agent"
+    },
+    {
+      "screenId": "admin_enrollment_detail",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Loading enrollment details..."
+        },
+        "empty": {
+          "applicability": "not_applicable",
+          "message": ""
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Failed to load enrollment details. Please try again.",
+          "retryAction": "Refresh page"
+        },
+        "success": {
+          "applicability": "required",
+          "message": "Enrollment updated successfully."
+        },
+        "custom_states": [
+          {
+            "stateId": "enrollment_cancelled",
+            "message": "This enrollment has been cancelled.",
+            "errorType": "info",
+            "retryAction": null
+          },
+          {
+            "stateId": "invalid_status_transition",
+            "message": "This enrollment cannot be changed to the selected status.",
+            "errorType": "validation",
+            "retryAction": "Select a valid status"
+          }
+        ]
+      },
+      "sourceRef": "fe_details://screens/admin_enrollment_detail/states",
+      "x-added-by": "be_contract_agent"
+    },
+    {
       "screenId": "program_discovery",
       "states": {
         "loading": {

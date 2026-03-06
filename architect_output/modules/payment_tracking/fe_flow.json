@@ -1,0 +1,103 @@
+{
+  "moduleId": "payment_tracking",
+  "flowVersion": "v1.0.0",
+  "generatedAt": "2026-03-06",
+  "routeGraph": {
+    "entryPoints": [
+      { "route": "/admin/payments", "screenId": "payment_dashboard", "context": "Sidebar navigation / dashboard widget click", "confidence": "high", "evidenceRefs": ["fe_details://payment_dashboard"] },
+      { "route": "/enrollment/{enrollmentId}/pay", "screenId": "zelle_instructions", "context": "Parent flow: post-enrollment payment link", "confidence": "high", "evidenceRefs": ["fe_details://zelle_instructions"] }
+    ],
+    "transitions": [
+      { "from": "/admin/payments", "to": "/admin/payments/{paymentId}", "trigger": "paymentRowClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://payment_dashboard", "fe_details://payment_detail"] },
+      { "from": "/admin/payments/{paymentId}", "to": "/admin/payments", "trigger": "backToListClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://payment_detail"] }
+    ]
+  },
+  "screenGraph": [
+    {
+      "screenId": "payment_dashboard",
+      "route": "/admin/payments",
+      "components": ["PaymentFilters", "PaymentTable", "Pagination"],
+      "actions": [
+        {
+          "actionId": "loadPayments",
+          "flowType": "http",
+          "trigger": "onMount+onFilterChange",
+          "apiEdge": { "method": "GET", "path": "/api/payments", "operationId": "getPayments" },
+          "queryParams": ["status", "search", "page", "limit"],
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/payments.get", "fe_details://payment_dashboard.endpointProposals[0]"]
+        },
+        {
+          "actionId": "navigateToPaymentDetail",
+          "flowType": "event",
+          "target": "/admin/payments/{paymentId}",
+          "confidence": "high",
+          "evidenceRefs": ["fe_details://payment_dashboard"]
+        }
+      ]
+    },
+    {
+      "screenId": "payment_detail",
+      "route": "/admin/payments/{paymentId}",
+      "components": ["PaymentInfoPanel", "PaymentUpdateForm"],
+      "actions": [
+        {
+          "actionId": "loadPayment",
+          "flowType": "http",
+          "trigger": "onMount",
+          "apiEdge": { "method": "GET", "path": "/api/payments/{paymentId}", "operationId": "getPayment" },
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/payments/{paymentId}.get", "fe_details://payment_detail.endpointProposals[0]"]
+        },
+        {
+          "actionId": "updatePayment",
+          "flowType": "http",
+          "apiEdge": { "method": "PUT", "path": "/api/payments/{paymentId}", "operationId": "updatePayment" },
+          "onSuccess": "showSuccessToast+refreshPayment",
+          "onError": "showValidationError",
+          "note": "Admin records payment received — HO-04 may trigger communication on status change",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/payments/{paymentId}.put", "fe_details://payment_detail.endpointProposals[1]"]
+        },
+        {
+          "actionId": "navigateBackToList",
+          "flowType": "event",
+          "target": "/admin/payments",
+          "confidence": "high",
+          "evidenceRefs": ["fe_details://payment_detail"]
+        }
+      ]
+    },
+    {
+      "screenId": "zelle_instructions",
+      "route": "/enrollment/{enrollmentId}/pay",
+      "components": ["ZelleInstructionsCard", "PaymentAmountSummary"],
+      "actions": [
+        {
+          "actionId": "loadZelleInstructions",
+          "flowType": "http",
+          "trigger": "onMount",
+          "apiEdge": { "method": "GET", "path": "/api/public/enrollments/{enrollmentId}/payment-instructions", "operationId": "getZelleInstructions" },
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/public/enrollments/{enrollmentId}/payment-instructions.get", "fe_details://zelle_instructions.endpointProposals[0]"]
+        }
+      ]
+    }
+  ],
+  "guards": [
+    { "route": "/admin/payments", "authRequired": true, "allowedRoles": ["admin"], "redirectIfUnauthenticated": "/admin/login", "confidence": "high", "evidenceRefs": ["fe_details://payment_dashboard"] },
+    { "route": "/admin/payments/{paymentId}", "authRequired": true, "allowedRoles": ["admin"], "redirectIfUnauthenticated": "/admin/login", "confidence": "high", "evidenceRefs": ["fe_details://payment_detail"] },
+    { "route": "/enrollment/{enrollmentId}/pay", "authRequired": false, "allowedRoles": ["parent"], "confidence": "high", "evidenceRefs": ["fe_details://zelle_instructions"] }
+  ],
+  "unmappedActions": [],
+  "signals": [
+    {
+      "type": "job",
+      "name": "payment_overdue_check",
+      "trigger": "scheduled/background",
+      "description": "Background job checks payment overdue threshold (default 3 days) and triggers reminder email (HO-04: payment_tracking -> communication)",
+      "confidence": "medium",
+      "evidenceRefs": ["prisma_contract://dbNotes.overdueThreshold"]
+    }
+  ]
+}

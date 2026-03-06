@@ -1,0 +1,312 @@
+{
+  "moduleId": "lead_management",
+  "contractVersion": "v1.0.0",
+  "status": "draft",
+  "changeType": "none",
+  "models": [
+    {
+      "model": "Lead",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@id", "@default(cuid())"],
+          "sourceRefs": ["openapi://LeadResponse.leadId"]
+        },
+        {
+          "name": "parentName",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://UpdateLeadRequest.parentName", "fe://lead_detail.parentName"]
+        },
+        {
+          "name": "email",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://UpdateLeadRequest.email", "fe://lead_detail.email", "global://GP-02"]
+        },
+        {
+          "name": "phone",
+          "type": "String",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://UpdateLeadRequest.phone", "fe://lead_detail.phone"]
+        },
+        {
+          "name": "childName",
+          "type": "String",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://UpdateLeadRequest.childName", "fe://lead_detail.childName"]
+        },
+        {
+          "name": "childAge",
+          "type": "Int",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://UpdateLeadRequest.childAge", "fe://lead_detail.childAge"]
+        },
+        {
+          "name": "source",
+          "type": "LeadSource",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://LeadResponse.source", "fe://lead_list.source"]
+        },
+        {
+          "name": "status",
+          "type": "LeadStatus",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(NEW)"],
+          "sourceRefs": ["zod://UpdateLeadStatusRequest.status", "fe://lead_list.status", "global://GP-04"]
+        },
+        {
+          "name": "interestedProgramId",
+          "type": "String",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://UpdateLeadRequest.interestedProgram", "fe://lead_detail.interestedProgram"]
+        },
+        {
+          "name": "locationId",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://LeadResponse.locationId", "analysis://A-09"]
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(now())"],
+          "sourceRefs": ["openapi://LeadResponse.createdAt"]
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@updatedAt"],
+          "sourceRefs": ["openapi://LeadResponse.updatedAt"]
+        }
+      ],
+      "indexes": [
+        "@@index([status])",
+        "@@index([source])",
+        "@@index([locationId])",
+        "@@index([createdAt])",
+        "@@index([locationId, status])"
+      ],
+      "uniques": ["@@unique([email])"],
+      "relations": [
+        {
+          "name": "location",
+          "kind": "manyToOne",
+          "target": "LocationSettings",
+          "fkFields": ["locationId"],
+          "references": ["id"]
+        },
+        {
+          "name": "interestedProgram",
+          "kind": "manyToOne",
+          "target": "Program",
+          "fkFields": ["interestedProgramId"],
+          "references": ["id"]
+        },
+        {
+          "name": "notes",
+          "kind": "oneToMany",
+          "target": "LeadNote",
+          "fkFields": [],
+          "references": []
+        },
+        {
+          "name": "activities",
+          "kind": "oneToMany",
+          "target": "LeadActivity",
+          "fkFields": [],
+          "references": []
+        },
+        {
+          "name": "trials",
+          "kind": "oneToMany",
+          "target": "Trial",
+          "fkFields": [],
+          "references": []
+        },
+        {
+          "name": "enrollments",
+          "kind": "oneToMany",
+          "target": "Enrollment",
+          "fkFields": [],
+          "references": []
+        }
+      ]
+    },
+    {
+      "model": "LeadNote",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@id", "@default(cuid())"],
+          "sourceRefs": ["openapi://LeadNoteResponse.noteId"]
+        },
+        {
+          "name": "leadId",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://addLeadNote.path.leadId"]
+        },
+        {
+          "name": "text",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://AddLeadNoteRequest.text"]
+        },
+        {
+          "name": "author",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://LeadNoteResponse.author"]
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(now())"],
+          "sourceRefs": ["openapi://LeadNoteResponse.createdAt"]
+        }
+      ],
+      "indexes": ["@@index([leadId])"],
+      "uniques": [],
+      "relations": [
+        {
+          "name": "lead",
+          "kind": "manyToOne",
+          "target": "Lead",
+          "fkFields": ["leadId"],
+          "references": ["id"]
+        }
+      ]
+    },
+    {
+      "model": "LeadActivity",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@id", "@default(cuid())"],
+          "sourceRefs": ["openapi://LeadActivityResponse.activityId"]
+        },
+        {
+          "name": "leadId",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://getLeadActivity.path.leadId"]
+        },
+        {
+          "name": "type",
+          "type": "ActivityType",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://LeadActivityResponse.type"]
+        },
+        {
+          "name": "description",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://LeadActivityResponse.description"]
+        },
+        {
+          "name": "metadata",
+          "type": "Json",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://LeadActivityResponse.metadata"]
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(now())"],
+          "sourceRefs": ["openapi://LeadActivityResponse.timestamp"]
+        }
+      ],
+      "indexes": [
+        "@@index([leadId])",
+        "@@index([leadId, createdAt])",
+        "@@index([type])"
+      ],
+      "uniques": [],
+      "relations": [
+        {
+          "name": "lead",
+          "kind": "manyToOne",
+          "target": "Lead",
+          "fkFields": ["leadId"],
+          "references": ["id"]
+        }
+      ]
+    }
+  ],
+  "enumDefs": [
+    {
+      "name": "LeadSource",
+      "values": ["FACEBOOK", "GOOGLE", "WEBSITE", "MANUAL"],
+      "volatilityClassification": "stable",
+      "reason": "Lead sources are integration-specific. Adding a new source requires new integration code. Not admin-manageable."
+    },
+    {
+      "name": "LeadStatus",
+      "values": ["NEW", "CONTACTED", "TRIAL_SCHEDULED", "TRIAL_ATTENDED", "ENROLLED", "DROPPED", "NOT_INTERESTED"],
+      "volatilityClassification": "stable",
+      "reason": "Lifecycle states are fixed by business workflow (LM-BR-04). Changes require workflow redesign, not admin configuration."
+    },
+    {
+      "name": "ActivityType",
+      "values": ["STATUS_CHANGE", "EMAIL_SENT", "ENROLLMENT_EVENT", "NOTE_ADDED", "LEAD_CREATED"],
+      "volatilityClassification": "stable",
+      "reason": "Activity types map to system events. New types require new code paths."
+    }
+  ],
+  "dbNotes": {
+    "emailUniqueness": "A-01/LM-A-01: Returning parents identified by email match. Email is unique constraint — different email = new lead. Pending human review but proceeding as default.",
+    "leadAutoAdvance": "GP-04/LM-BR-02: Lead status auto-advances on enrollment events (trial booked → TRIAL_SCHEDULED, enrolled → ENROLLED). Admin can always manually override.",
+    "immutableRecords": "LeadNote and LeadActivity are append-only (no update/delete). They serve as audit trail.",
+    "cascadeDelete": "Deleting a Lead cascades to LeadNote and LeadActivity records.",
+    "noCreateEndpoint": "LM-BF-01: No POST /api/leads endpoint for manual lead creation in current FE contract. Lead records are created via enrollment/trial flows or external integrations."
+  }
+}

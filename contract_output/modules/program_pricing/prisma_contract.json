@@ -1,0 +1,321 @@
+{
+  "moduleId": "program_pricing",
+  "contractVersion": "v1.0.0",
+  "status": "draft",
+  "changeType": "none",
+  "models": [
+    {
+      "model": "Program",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@id", "@default(cuid())"],
+          "sourceRefs": ["openapi://ProgramResponse.programId"]
+        },
+        {
+          "name": "name",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CreateProgramRequest.name", "fe://program_setup.name"]
+        },
+        {
+          "name": "ageGroupMin",
+          "type": "Int",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CreateProgramRequest.ageGroupMin", "fe://program_setup.ageGroupMin"]
+        },
+        {
+          "name": "ageGroupMax",
+          "type": "Int",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CreateProgramRequest.ageGroupMax", "fe://program_setup.ageGroupMax"]
+        },
+        {
+          "name": "totalSessions",
+          "type": "Int",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CreateProgramRequest.totalSessions", "fe://program_setup.totalSessions"]
+        },
+        {
+          "name": "sessionDuration",
+          "type": "Float",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CreateProgramRequest.sessionDuration", "fe://program_setup.sessionDuration"]
+        },
+        {
+          "name": "location",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CreateProgramRequest.location", "fe://program_setup.location"]
+        },
+        {
+          "name": "locationId",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://ProgramResponse.locationId", "analysis://A-09"]
+        },
+        {
+          "name": "startDate",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CreateProgramRequest.startDate", "fe://program_setup.startDate"]
+        },
+        {
+          "name": "endDate",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CreateProgramRequest.endDate", "fe://program_setup.endDate"]
+        },
+        {
+          "name": "capacity",
+          "type": "Int",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CreateProgramRequest.capacity", "fe://program_setup.capacity", "analysis://A-12"]
+        },
+        {
+          "name": "status",
+          "type": "ProgramStatus",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(DRAFT)"],
+          "sourceRefs": ["openapi://ProgramResponse.status", "fe://program_list.status"]
+        },
+        {
+          "name": "baseFee",
+          "type": "Float",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CreateProgramRequest.baseFee", "fe://program_setup.baseFee"]
+        },
+        {
+          "name": "feeType",
+          "type": "FeeType",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CreateProgramRequest.feeType", "fe://program_setup.feeType"]
+        },
+        {
+          "name": "registrationFee",
+          "type": "Float",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CreateProgramRequest.registrationFee", "fe://program_setup.registrationFee"]
+        },
+        {
+          "name": "registrationFeeRequired",
+          "type": "Boolean",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(false)"],
+          "sourceRefs": ["zod://CreateProgramRequest.registrationFeeRequired", "fe://program_setup.registrationFeeRequired"]
+        },
+        {
+          "name": "trialAvailable",
+          "type": "Boolean",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(false)"],
+          "sourceRefs": ["zod://CreateProgramRequest.trialAvailable", "fe://program_setup.trialAvailable"]
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(now())"],
+          "sourceRefs": ["openapi://ProgramResponse.createdAt"]
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@updatedAt"],
+          "sourceRefs": ["openapi://ProgramResponse.updatedAt"]
+        }
+      ],
+      "indexes": [
+        "@@index([status])",
+        "@@index([locationId])",
+        "@@index([status, startDate])"
+      ],
+      "uniques": [],
+      "relations": [
+        {
+          "name": "locationSettings",
+          "kind": "manyToOne",
+          "target": "LocationSettings",
+          "fkFields": ["locationId"],
+          "references": ["id"]
+        },
+        {
+          "name": "calendarDates",
+          "kind": "oneToMany",
+          "target": "CalendarDate",
+          "fkFields": [],
+          "references": []
+        },
+        {
+          "name": "trials",
+          "kind": "oneToMany",
+          "target": "Trial",
+          "fkFields": [],
+          "references": []
+        },
+        {
+          "name": "enrollments",
+          "kind": "oneToMany",
+          "target": "Enrollment",
+          "fkFields": [],
+          "references": []
+        },
+        {
+          "name": "interestedLeads",
+          "kind": "oneToMany",
+          "target": "Lead",
+          "fkFields": [],
+          "references": []
+        }
+      ]
+    },
+    {
+      "model": "Coupon",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@id", "@default(cuid())"],
+          "sourceRefs": ["openapi://CouponResponse.couponId"]
+        },
+        {
+          "name": "code",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CreateCouponRequest.code", "fe://coupon_management.code"]
+        },
+        {
+          "name": "discountType",
+          "type": "DiscountType",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CreateCouponRequest.discountType", "fe://coupon_management.discountType"]
+        },
+        {
+          "name": "discountValue",
+          "type": "Float",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CreateCouponRequest.discountValue", "fe://coupon_management.discountValue"]
+        },
+        {
+          "name": "scope",
+          "type": "CouponScope",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CreateCouponRequest.scope", "fe://coupon_management.scope"]
+        },
+        {
+          "name": "expiresAt",
+          "type": "DateTime",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CreateCouponRequest.expiresAt", "fe://coupon_management.expiresAt"]
+        },
+        {
+          "name": "usageLimit",
+          "type": "Int",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CreateCouponRequest.usageLimit", "fe://coupon_management.usageLimit"]
+        },
+        {
+          "name": "usageCount",
+          "type": "Int",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(0)"],
+          "sourceRefs": ["openapi://CouponResponse.usageCount"]
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(now())"],
+          "sourceRefs": ["openapi://CouponResponse.createdAt"]
+        }
+      ],
+      "indexes": ["@@index([expiresAt])"],
+      "uniques": ["@@unique([code])"],
+      "relations": []
+    }
+  ],
+  "enumDefs": [
+    {
+      "name": "ProgramStatus",
+      "values": ["DRAFT", "ACTIVE", "CLOSED"],
+      "volatilityClassification": "stable",
+      "reason": "Lifecycle states (draft/active/closed) are workflow-defined. Changes require business process redesign."
+    },
+    {
+      "name": "FeeType",
+      "values": ["TOTAL", "PER_SESSION"],
+      "volatilityClassification": "stable",
+      "reason": "Pricing models are structurally different. Adding new types requires pricing engine changes."
+    },
+    {
+      "name": "DiscountType",
+      "values": ["PERCENTAGE", "FLAT"],
+      "volatilityClassification": "stable",
+      "reason": "Standard discount calculation types. Adding a new type requires calculation logic changes."
+    },
+    {
+      "name": "CouponScope",
+      "values": ["PROGRAM_FEE", "REGISTRATION_FEE", "BOTH"],
+      "volatilityClassification": "stable",
+      "reason": "Scope maps to the two fee components in the pricing model. Stable unless fee structure changes."
+    }
+  ],
+  "dbNotes": {
+    "computedFields": "enrollmentCount and totalFee are computed at query time, not stored. enrollmentCount = COUNT(Enrollment WHERE programId AND status=ACTIVE). totalFee = baseFee if TOTAL, else baseFee * totalSessions.",
+    "capacityModel": "A-12/PP-A-02: Capacity is per-program (not per-session). Pending human review but proceeding as default. Capacity field is at program level; keep isolated for future per-session migration.",
+    "couponUniqueness": "Coupon code uniqueness enforced at DB level. 409 Conflict returned on duplicate (GF-10).",
+    "couponBelowZero": "PP-BR-02: Coupons cannot reduce total below zero. Enforced at application level, not DB constraint.",
+    "publishPrerequisite": "PP-BR-04/ST-BR-01: Only ACTIVE programs visible to parents. Zelle config must exist before program can be set to ACTIVE. Application-level check."
+  }
+}

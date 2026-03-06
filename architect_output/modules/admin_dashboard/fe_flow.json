@@ -1,0 +1,85 @@
+{
+  "moduleId": "admin_dashboard",
+  "flowVersion": "v1.0.0",
+  "generatedAt": "2026-03-06",
+  "routeGraph": {
+    "entryPoints": [
+      { "route": "/admin/dashboard", "screenId": "dashboard_overview", "context": "Post-login landing page / sidebar navigation", "confidence": "high", "evidenceRefs": ["fe_details://dashboard_overview"] }
+    ],
+    "transitions": [
+      { "from": "/admin/dashboard", "to": "/admin/leads", "trigger": "recentLeadsWidgetClick", "flowType": "event", "note": "Cross-module: navigate to lead_management", "confidence": "high", "evidenceRefs": ["fe_details://dashboard_overview"] },
+      { "from": "/admin/dashboard", "to": "/admin/enrollments", "trigger": "upcomingTrialsWidgetClick", "flowType": "event", "note": "Cross-module: navigate to enrollment_trial", "confidence": "high", "evidenceRefs": ["fe_details://dashboard_overview"] },
+      { "from": "/admin/dashboard", "to": "/admin/payments", "trigger": "pendingPaymentsWidgetClick", "flowType": "event", "note": "Cross-module: navigate to payment_tracking", "confidence": "high", "evidenceRefs": ["fe_details://dashboard_overview"] }
+    ]
+  },
+  "screenGraph": [
+    {
+      "screenId": "dashboard_overview",
+      "route": "/admin/dashboard",
+      "components": ["MetricsCards", "RecentLeadsWidget", "UpcomingTrialsWidget", "PendingPaymentsWidget"],
+      "actions": [
+        {
+          "actionId": "loadMetrics",
+          "flowType": "http",
+          "trigger": "onMount",
+          "apiEdge": { "method": "GET", "path": "/api/dashboard/metrics", "operationId": "getDashboardMetrics" },
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/dashboard/metrics.get", "fe_details://dashboard_overview.endpointProposals[0]"]
+        },
+        {
+          "actionId": "loadRecentLeads",
+          "flowType": "http",
+          "trigger": "onMount",
+          "apiEdge": { "method": "GET", "path": "/api/dashboard/recent-leads", "operationId": "getDashboardRecentLeads" },
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/dashboard/recent-leads.get", "fe_details://dashboard_overview.endpointProposals[1]"]
+        },
+        {
+          "actionId": "loadUpcomingTrials",
+          "flowType": "http",
+          "trigger": "onMount",
+          "apiEdge": { "method": "GET", "path": "/api/dashboard/upcoming-trials", "operationId": "getDashboardUpcomingTrials" },
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/dashboard/upcoming-trials.get", "fe_details://dashboard_overview.endpointProposals[2]"]
+        },
+        {
+          "actionId": "loadPendingPayments",
+          "flowType": "http",
+          "trigger": "onMount",
+          "apiEdge": { "method": "GET", "path": "/api/dashboard/pending-payments", "operationId": "getDashboardPendingPayments" },
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/dashboard/pending-payments.get", "fe_details://dashboard_overview.endpointProposals[3]"]
+        },
+        {
+          "actionId": "navigateToRecentLead",
+          "flowType": "event",
+          "target": "/admin/leads/{leadId}",
+          "note": "Cross-module: row click navigates to lead_management detail",
+          "confidence": "high",
+          "evidenceRefs": ["fe_details://dashboard_overview"]
+        },
+        {
+          "actionId": "navigateToUpcomingTrial",
+          "flowType": "event",
+          "target": "/admin/enrollments",
+          "note": "Cross-module: widget click navigates to enrollment_trial list",
+          "confidence": "high",
+          "evidenceRefs": ["fe_details://dashboard_overview"]
+        },
+        {
+          "actionId": "navigateToPendingPayment",
+          "flowType": "event",
+          "target": "/admin/payments/{paymentId}",
+          "note": "Cross-module: row click navigates to payment_tracking detail",
+          "confidence": "high",
+          "evidenceRefs": ["fe_details://dashboard_overview"]
+        }
+      ]
+    }
+  ],
+  "guards": [
+    { "route": "/admin/dashboard", "authRequired": true, "allowedRoles": ["admin"], "redirectIfUnauthenticated": "/admin/login", "confidence": "high", "evidenceRefs": ["fe_details://dashboard_overview"] }
+  ],
+  "unmappedActions": [],
+  "signals": []
+}

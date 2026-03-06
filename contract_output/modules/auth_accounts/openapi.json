@@ -1,0 +1,304 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Auth & Accounts API",
+    "version": "v1.0.0",
+    "x-module-id": "auth_accounts",
+    "x-contract-status": "draft",
+    "x-change-type": "none"
+  },
+  "paths": {
+    "/api/auth/login": {
+      "post": {
+        "operationId": "adminLogin",
+        "summary": "Admin login with email and password",
+        "tags": ["auth"],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AdminLoginRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful. Session cookie set.",
+            "headers": {
+              "Set-Cookie": {
+                "description": "Session cookie for authenticated requests",
+                "schema": { "type": "string" }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AdminLoginResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid email or password",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiError" }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many login attempts. Try again later.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiError" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "operationId": "adminLogout",
+        "summary": "Admin logout — clears session",
+        "tags": ["auth"],
+        "x-be-addition": "Required by AA-REQ-02 (admin can log out from any page) but absent from FE endpoint proposals",
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Logout successful. Session cookie cleared.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Logged out successfully" }
+                  },
+                  "required": ["message"]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "operationId": "getSession",
+        "summary": "Validate current session and return logged-in user",
+        "tags": ["auth"],
+        "x-be-addition": "Required for FE session validation on app load (GP-05: unauthenticated access redirects to login)",
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Session is valid",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AdminLoginResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated — session expired or missing",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/forgot-password": {
+      "post": {
+        "operationId": "requestPasswordReset",
+        "summary": "Request a password reset link via email",
+        "tags": ["auth"],
+        "security": [],
+        "x-security-note": "Always returns success message regardless of email existence to prevent information leakage (AA-A-03)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PasswordResetRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reset link sent (same response whether email exists or not)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PasswordResetResponse" }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many reset requests. Try again later.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiError" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/reset-password": {
+      "post": {
+        "operationId": "setNewPassword",
+        "summary": "Set a new password using a reset token",
+        "tags": ["auth"],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SetNewPasswordRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password updated successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SetNewPasswordResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or expired token, or passwords do not match",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiError" }
+              }
+            }
+          },
+          "410": {
+            "description": "Reset link has expired (AA-A-02: 24-hour expiry)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiError" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiError" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AdminLoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 8 }
+        },
+        "x-zod-schema": "AdminLoginRequest"
+      },
+      "AdminLoginResponse": {
+        "type": "object",
+        "required": ["user"],
+        "properties": {
+          "user": {
+            "type": "object",
+            "required": ["id", "email", "role", "name"],
+            "properties": {
+              "id": { "type": "string" },
+              "email": { "type": "string", "format": "email" },
+              "role": { "type": "string", "enum": ["admin"] },
+              "name": { "type": "string" }
+            }
+          }
+        },
+        "x-zod-schema": "AdminLoginResponse",
+        "x-be-note": "FE schema includes 'token' field. BE uses httpOnly session cookie instead — token field removed from response. Session is managed server-side."
+      },
+      "PasswordResetRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": { "type": "string", "format": "email" }
+        },
+        "x-zod-schema": "PasswordResetRequest"
+      },
+      "PasswordResetResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "message": { "type": "string" }
+        },
+        "x-zod-schema": "PasswordResetResponse"
+      },
+      "SetNewPasswordRequest": {
+        "type": "object",
+        "required": ["token", "newPassword", "confirmPassword"],
+        "properties": {
+          "token": { "type": "string" },
+          "newPassword": { "type": "string", "minLength": 8 },
+          "confirmPassword": { "type": "string", "minLength": 8 }
+        },
+        "x-zod-schema": "SetNewPasswordRequest",
+        "x-validation": "newPassword must equal confirmPassword"
+      },
+      "SetNewPasswordResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "message": { "type": "string" }
+        },
+        "x-zod-schema": "SetNewPasswordResponse"
+      },
+      "ApiError": {
+        "type": "object",
+        "required": ["error", "message", "statusCode"],
+        "properties": {
+          "error": { "type": "string" },
+          "message": { "type": "string" },
+          "statusCode": { "type": "integer" }
+        },
+        "x-zod-schema": "ApiError"
+      }
+    },
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "session"
+      }
+    }
+  }
+}

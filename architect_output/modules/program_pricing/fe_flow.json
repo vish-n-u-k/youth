@@ -1,0 +1,142 @@
+{
+  "moduleId": "program_pricing",
+  "flowVersion": "v1.0.0",
+  "generatedAt": "2026-03-06",
+  "routeGraph": {
+    "entryPoints": [
+      { "route": "/admin/programs", "screenId": "program_list", "context": "Sidebar navigation", "confidence": "high", "evidenceRefs": ["fe_details://program_list"] },
+      { "route": "/admin/programs/coupons", "screenId": "coupon_management", "context": "Programs sub-navigation", "confidence": "high", "evidenceRefs": ["fe_details://coupon_management"] }
+    ],
+    "transitions": [
+      { "from": "/admin/programs", "to": "/admin/programs/{programId}", "trigger": "programRowClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://program_list", "fe_details://program_setup"] },
+      { "from": "/admin/programs", "to": "/admin/programs/new", "trigger": "createProgramClick", "flowType": "event", "note": "New program uses same screen with programId=new", "confidence": "high", "evidenceRefs": ["fe_details://program_setup"] },
+      { "from": "/admin/programs/{programId}", "to": "/admin/programs", "trigger": "saveSuccess+backClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://program_setup"] },
+      { "from": "/admin/programs", "to": "/admin/programs/coupons", "trigger": "couponsTabClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://program_list", "fe_details://coupon_management"] },
+      { "from": "/admin/programs/coupons", "to": "/admin/programs", "trigger": "programsTabClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://coupon_management", "fe_details://program_list"] }
+    ]
+  },
+  "screenGraph": [
+    {
+      "screenId": "program_list",
+      "route": "/admin/programs",
+      "components": ["ProgramTable", "StatusFilter", "CreateProgramButton", "Pagination"],
+      "actions": [
+        {
+          "actionId": "loadPrograms",
+          "flowType": "http",
+          "trigger": "onMount+onFilterChange",
+          "apiEdge": { "method": "GET", "path": "/api/programs", "operationId": "getPrograms" },
+          "queryParams": ["status", "page", "limit"],
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/programs.get", "fe_details://program_list.endpointProposals[0]"]
+        },
+        {
+          "actionId": "navigateToProgramDetail",
+          "flowType": "event",
+          "target": "/admin/programs/{programId}",
+          "confidence": "high",
+          "evidenceRefs": ["fe_details://program_list"]
+        },
+        {
+          "actionId": "navigateToCreateProgram",
+          "flowType": "event",
+          "target": "/admin/programs/new",
+          "confidence": "high",
+          "evidenceRefs": ["fe_details://program_list"]
+        }
+      ]
+    },
+    {
+      "screenId": "program_setup",
+      "route": "/admin/programs/{programId}",
+      "components": ["ProgramForm", "PricingSection", "TrialToggle"],
+      "actions": [
+        {
+          "actionId": "loadProgram",
+          "flowType": "http",
+          "trigger": "onMount",
+          "apiEdge": { "method": "GET", "path": "/api/programs/{programId}", "operationId": "getProgram" },
+          "note": "Skipped when programId=new",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/programs/{programId}.get", "fe_details://program_setup.endpointProposals[0]"]
+        },
+        {
+          "actionId": "createProgram",
+          "flowType": "http",
+          "apiEdge": { "method": "POST", "path": "/api/programs", "operationId": "createProgram" },
+          "onSuccess": "navigateTo:/admin/programs",
+          "onError": "showValidationError",
+          "note": "Used when programId=new",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/programs.post", "fe_details://program_setup.endpointProposals[1]"]
+        },
+        {
+          "actionId": "updateProgram",
+          "flowType": "http",
+          "apiEdge": { "method": "PUT", "path": "/api/programs/{programId}", "operationId": "updateProgram" },
+          "onSuccess": "showSuccessToast",
+          "onError": "showValidationError",
+          "note": "Used when editing existing program",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/programs/{programId}.put", "fe_details://program_setup.endpointProposals[2]"]
+        },
+        {
+          "actionId": "navigateBackToList",
+          "flowType": "event",
+          "target": "/admin/programs",
+          "confidence": "high",
+          "evidenceRefs": ["fe_details://program_setup"]
+        }
+      ]
+    },
+    {
+      "screenId": "coupon_management",
+      "route": "/admin/programs/coupons",
+      "components": ["CouponTable", "CouponFormModal"],
+      "actions": [
+        {
+          "actionId": "loadCoupons",
+          "flowType": "http",
+          "trigger": "onMount",
+          "apiEdge": { "method": "GET", "path": "/api/coupons", "operationId": "getCoupons" },
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/coupons.get", "fe_details://coupon_management.endpointProposals[0]"]
+        },
+        {
+          "actionId": "createCoupon",
+          "flowType": "http",
+          "apiEdge": { "method": "POST", "path": "/api/coupons", "operationId": "createCoupon" },
+          "onSuccess": "closeModal+refreshCoupons",
+          "onError": "showValidationError",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/coupons.post", "fe_details://coupon_management.endpointProposals[1]"]
+        },
+        {
+          "actionId": "updateCoupon",
+          "flowType": "http",
+          "apiEdge": { "method": "PUT", "path": "/api/coupons/{couponId}", "operationId": "updateCoupon" },
+          "onSuccess": "closeModal+refreshCoupons",
+          "onError": "showValidationError",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/coupons/{couponId}.put", "fe_details://coupon_management.endpointProposals[2]"]
+        },
+        {
+          "actionId": "deleteCoupon",
+          "flowType": "http",
+          "apiEdge": { "method": "DELETE", "path": "/api/coupons/{couponId}", "operationId": "deleteCoupon" },
+          "onSuccess": "refreshCoupons",
+          "onError": "showError",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/coupons/{couponId}.delete", "fe_details://coupon_management.endpointProposals[3]"]
+        }
+      ]
+    }
+  ],
+  "guards": [
+    { "route": "/admin/programs", "authRequired": true, "allowedRoles": ["admin"], "redirectIfUnauthenticated": "/admin/login", "confidence": "high", "evidenceRefs": ["fe_details://program_list"] },
+    { "route": "/admin/programs/{programId}", "authRequired": true, "allowedRoles": ["admin"], "redirectIfUnauthenticated": "/admin/login", "confidence": "high", "evidenceRefs": ["fe_details://program_setup"] },
+    { "route": "/admin/programs/coupons", "authRequired": true, "allowedRoles": ["admin"], "redirectIfUnauthenticated": "/admin/login", "confidence": "high", "evidenceRefs": ["fe_details://coupon_management"] }
+  ],
+  "unmappedActions": [],
+  "signals": []
+}

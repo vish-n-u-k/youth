@@ -1,0 +1,188 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Calendar & Scheduling API",
+    "version": "v1.0.0",
+    "x-module-id": "calendar_scheduling",
+    "x-contract-status": "draft",
+    "x-change-type": "none"
+  },
+  "paths": {
+    "/api/calendar": {
+      "get": {
+        "operationId": "getCalendarDates",
+        "summary": "Get calendar dates with optional program and month filters",
+        "tags": ["calendar"],
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          { "name": "programId", "in": "query", "schema": { "type": "string" } },
+          { "name": "month", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 12 } },
+          { "name": "year", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Calendar dates", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CalendarDatesResponse" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      },
+      "post": {
+        "operationId": "addCalendarDate",
+        "summary": "Add a class date for a program",
+        "tags": ["calendar"],
+        "security": [{ "cookieAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CalendarDateRequest" } } }
+        },
+        "responses": {
+          "201": { "description": "Date added", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CalendarDateResponse" } } } },
+          "400": { "description": "Validation error (e.g. date in past, invalid program)", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/calendar/{dateId}": {
+      "put": {
+        "operationId": "updateCalendarDate",
+        "summary": "Update an existing class date",
+        "tags": ["calendar"],
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          { "name": "dateId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CalendarDateRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Date updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CalendarDateResponse" } } } },
+          "400": { "description": "Validation error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "404": { "description": "Date not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      },
+      "delete": {
+        "operationId": "deleteCalendarDate",
+        "summary": "Remove a class date",
+        "tags": ["calendar"],
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          { "name": "dateId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Date removed", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DeleteResponse" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "404": { "description": "Date not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/programs/{programId}/trial-dates": {
+      "get": {
+        "operationId": "getAvailableTrialDates",
+        "summary": "Get available trial dates for a program (parent-facing, no auth)",
+        "tags": ["calendar-public"],
+        "security": [],
+        "x-handoff-ref": "HO-05: calendar_scheduling -> enrollment_trial",
+        "parameters": [
+          { "name": "programId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Available trial dates", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AvailableTrialDatesResponse" } } } },
+          "404": { "description": "Program not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CalendarDatesResponse": {
+        "type": "object",
+        "required": ["dates"],
+        "properties": {
+          "dates": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/CalendarDateResponse" }
+          }
+        },
+        "x-zod-schema": "CalendarDatesResponse"
+      },
+      "CalendarDateRequest": {
+        "type": "object",
+        "required": ["date", "programId", "trialEligible"],
+        "properties": {
+          "date": { "type": "string", "format": "date-time" },
+          "programId": { "type": "string" },
+          "trialEligible": { "type": "boolean" },
+          "notes": { "type": "string" }
+        },
+        "x-zod-schema": "CalendarDateRequest"
+      },
+      "CalendarDateResponse": {
+        "type": "object",
+        "required": ["dateId", "date", "programId", "programName", "trialEligible", "spotsRemaining", "capacity"],
+        "properties": {
+          "dateId": { "type": "string" },
+          "date": { "type": "string", "format": "date-time" },
+          "programId": { "type": "string" },
+          "programName": { "type": "string" },
+          "trialEligible": { "type": "boolean" },
+          "spotsRemaining": { "type": "integer" },
+          "capacity": { "type": "integer" },
+          "notes": { "type": "string", "nullable": true }
+        },
+        "x-zod-schema": "CalendarDateResponse"
+      },
+      "AvailableTrialDatesResponse": {
+        "type": "object",
+        "required": ["programId", "programName", "dates"],
+        "properties": {
+          "programId": { "type": "string" },
+          "programName": { "type": "string" },
+          "dates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["dateId", "date", "spotsRemaining"],
+              "properties": {
+                "dateId": { "type": "string" },
+                "date": { "type": "string", "format": "date-time" },
+                "spotsRemaining": { "type": "integer" }
+              }
+            }
+          }
+        },
+        "x-zod-schema": "AvailableTrialDatesResponse"
+      },
+      "DeleteResponse": {
+        "type": "object",
+        "required": ["message", "deleted"],
+        "properties": {
+          "message": { "type": "string" },
+          "deleted": { "type": "boolean" }
+        },
+        "x-zod-schema": "DeleteResponse"
+      },
+      "ApiError": {
+        "type": "object",
+        "required": ["error", "message", "statusCode"],
+        "properties": {
+          "error": { "type": "string" },
+          "message": { "type": "string" },
+          "statusCode": { "type": "integer" }
+        },
+        "x-zod-schema": "ApiError"
+      }
+    },
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "session"
+      }
+    }
+  }
+}

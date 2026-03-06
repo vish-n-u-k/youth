@@ -1,0 +1,122 @@
+{
+  "moduleId": "settings",
+  "contractVersion": "v1.0.0",
+  "normalizedAt": "2026-03-06",
+  "routes": [
+    {
+      "screenId": "general_settings",
+      "name": "General Settings",
+      "feRoute": "/admin/settings",
+      "normalizedRoute": "/admin/settings",
+      "type": "input_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "endpointProposals": [
+        { "operationId": "getSettings", "method": "GET", "path": "/api/settings" },
+        { "operationId": "updateSettings", "method": "PUT", "path": "/api/settings" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://general_settings"]
+    },
+    {
+      "screenId": "staff_roles_stub",
+      "name": "Staff & Roles (Phase 2)",
+      "feRoute": "/admin/settings/staff",
+      "normalizedRoute": "/admin/settings/staff",
+      "type": "static",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "endpointProposals": [],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://staff_roles_stub"],
+      "note": "Phase 2 stub — no endpoints"
+    }
+  ],
+  "endpoints": [
+    {
+      "operationId": "getSettings",
+      "method": "GET",
+      "path": "/api/settings",
+      "tags": ["settings"],
+      "security": ["cookieAuth"],
+      "requestSchema": null,
+      "responseSchema": "SettingsResponse",
+      "errorSchema": "ApiError",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/settings.get", "fe_details://general_settings.endpointProposals[0]"]
+    },
+    {
+      "operationId": "updateSettings",
+      "method": "PUT",
+      "path": "/api/settings",
+      "tags": ["settings"],
+      "security": ["cookieAuth"],
+      "requestSchema": "UpdateSettingsRequest",
+      "responseSchema": "SettingsResponse",
+      "errorSchema": "ApiError",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/settings.put", "fe_details://general_settings.endpointProposals[1]"]
+    }
+  ],
+  "rbac": [
+    {
+      "endpointId": "getSettings",
+      "roles": ["admin"],
+      "permissions": [],
+      "confidence": "medium",
+      "sourceRefs": ["fe_details://general_settings.allowedRoles", "openapi://security.cookieAuth"]
+    },
+    {
+      "endpointId": "updateSettings",
+      "roles": ["admin"],
+      "permissions": [],
+      "confidence": "medium",
+      "sourceRefs": ["fe_details://general_settings.allowedRoles", "openapi://security.cookieAuth"]
+    }
+  ],
+  "db": {
+    "models": [
+      {
+        "model": "LocationSettings",
+        "fields": [
+          { "name": "id", "type": "String", "isOptional": false, "attributes": ["@id", "@default(cuid())"] },
+          { "name": "businessName", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "address", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "phone", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "email", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "websiteUrl", "type": "String", "isOptional": true, "attributes": [] },
+          { "name": "zelleRecipientName", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "zelleContactInfo", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "zelleInstructions", "type": "String", "isOptional": true, "attributes": [] },
+          { "name": "notifyNewLead", "type": "Boolean", "isOptional": false, "attributes": ["@default(false)"] },
+          { "name": "notifyNewEnrollment", "type": "Boolean", "isOptional": false, "attributes": ["@default(false)"] },
+          { "name": "notifyPaymentReceived", "type": "Boolean", "isOptional": false, "attributes": ["@default(false)"] },
+          { "name": "createdAt", "type": "DateTime", "isOptional": false, "attributes": ["@default(now())"] },
+          { "name": "updatedAt", "type": "DateTime", "isOptional": false, "attributes": ["@updatedAt"] }
+        ],
+        "indexes": [],
+        "uniques": [],
+        "relations": [
+          { "name": "leads", "kind": "oneToMany", "target": "Lead" },
+          { "name": "programs", "kind": "oneToMany", "target": "Program" }
+        ],
+        "confidence": "high",
+        "sourceRefs": ["prisma_contract://models.LocationSettings"]
+      }
+    ],
+    "enums": [],
+    "notes": "Single location in MVP (ST-A-01). Zelle config must be completed before first program can be published (ST-A-02)."
+  },
+  "signals": [],
+  "unknowns": [],
+  "evidence": {
+    "sourcesUsed": ["fe_details.json", "openapi.json", "prisma_contract.json", "zod_patch.json"],
+    "decisions": [
+      {
+        "id": "ST-D-01",
+        "description": "Applied admin role to both endpoints based on FE allowedRoles",
+        "confidence": "medium"
+      }
+    ]
+  }
+}

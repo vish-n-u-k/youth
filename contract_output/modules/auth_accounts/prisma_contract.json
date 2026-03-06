@@ -1,0 +1,214 @@
+{
+  "moduleId": "auth_accounts",
+  "contractVersion": "v1.0.0",
+  "status": "draft",
+  "changeType": "none",
+  "models": [
+    {
+      "model": "Admin",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@id", "@default(cuid())"],
+          "sourceRefs": ["openapi://AdminLoginResponse.user.id"]
+        },
+        {
+          "name": "email",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://AdminLoginRequest.email", "openapi://AdminLoginResponse.user.email"]
+        },
+        {
+          "name": "passwordHash",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://AdminLoginRequest.password"]
+        },
+        {
+          "name": "name",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://AdminLoginResponse.user.name"]
+        },
+        {
+          "name": "role",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(\"admin\")"],
+          "sourceRefs": ["openapi://AdminLoginResponse.user.role"]
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(now())"],
+          "sourceRefs": ["db_internal"]
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@updatedAt"],
+          "sourceRefs": ["db_internal"]
+        }
+      ],
+      "indexes": [],
+      "uniques": ["@@unique([email])"],
+      "relations": [
+        {
+          "name": "sessions",
+          "kind": "oneToMany",
+          "target": "Session",
+          "fkFields": [],
+          "references": []
+        },
+        {
+          "name": "resetTokens",
+          "kind": "oneToMany",
+          "target": "PasswordResetToken",
+          "fkFields": [],
+          "references": []
+        }
+      ]
+    },
+    {
+      "model": "Session",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@id", "@default(cuid())"],
+          "sourceRefs": ["db_internal"]
+        },
+        {
+          "name": "adminId",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://getSession", "global://GP-05"]
+        },
+        {
+          "name": "expiresAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["db_internal"]
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(now())"],
+          "sourceRefs": ["db_internal"]
+        }
+      ],
+      "indexes": ["@@index([adminId])", "@@index([expiresAt])"],
+      "uniques": [],
+      "relations": [
+        {
+          "name": "admin",
+          "kind": "manyToOne",
+          "target": "Admin",
+          "fkFields": ["adminId"],
+          "references": ["id"]
+        }
+      ]
+    },
+    {
+      "model": "PasswordResetToken",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@id", "@default(cuid())"],
+          "sourceRefs": ["db_internal"]
+        },
+        {
+          "name": "adminId",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://AdminLoginResponse.user.id"]
+        },
+        {
+          "name": "email",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://PasswordResetRequest.email"]
+        },
+        {
+          "name": "token",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://SetNewPasswordRequest.token"]
+        },
+        {
+          "name": "expiresAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["analysis://AA-A-02"]
+        },
+        {
+          "name": "used",
+          "type": "Boolean",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(false)"],
+          "sourceRefs": ["db_internal"]
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(now())"],
+          "sourceRefs": ["db_internal"]
+        }
+      ],
+      "indexes": ["@@index([email])", "@@index([expiresAt])"],
+      "uniques": ["@@unique([token])"],
+      "relations": [
+        {
+          "name": "admin",
+          "kind": "manyToOne",
+          "target": "Admin",
+          "fkFields": ["adminId"],
+          "references": ["id"]
+        }
+      ]
+    }
+  ],
+  "enumDefs": [],
+  "dbNotes": {
+    "roleField": "Admin.role uses String (not enum) because only 'admin' exists in MVP. Staff and parent roles are Phase 2 additions that will require code changes; enum migration can happen then.",
+    "sessionStrategy": "Sessions stored server-side per GF-01 (httpOnly cookies, no JWT). FE token field removed from BE response.",
+    "resetTokenExpiry": "24-hour expiry per AA-A-02. Always return success on forgot-password to prevent email enumeration (AA-A-03).",
+    "parentAuth": "Parent flows are public/link-based in MVP (A-02). No parent user entity needed until Phase 2 portal."
+  }
+}

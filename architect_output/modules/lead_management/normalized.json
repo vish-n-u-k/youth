@@ -1,0 +1,270 @@
+{
+  "moduleId": "lead_management",
+  "contractVersion": "v1.0.0",
+  "normalizedAt": "2026-03-06",
+  "routes": [
+    {
+      "screenId": "lead_list",
+      "name": "Lead List",
+      "feRoute": "/admin/leads",
+      "normalizedRoute": "/admin/leads",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "endpointProposals": [
+        { "operationId": "getLeads", "method": "GET", "path": "/api/leads" },
+        { "operationId": "updateLeadStatus", "method": "PATCH", "path": "/api/leads/{leadId}/status" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://lead_list"]
+    },
+    {
+      "screenId": "lead_detail",
+      "name": "Lead Detail",
+      "feRoute": "/admin/leads/:leadId",
+      "normalizedRoute": "/admin/leads/{leadId}",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "endpointProposals": [
+        { "operationId": "getLead", "method": "GET", "path": "/api/leads/{leadId}" },
+        { "operationId": "updateLead", "method": "PUT", "path": "/api/leads/{leadId}" },
+        { "operationId": "getLeadNotes", "method": "GET", "path": "/api/leads/{leadId}/notes" },
+        { "operationId": "addLeadNote", "method": "POST", "path": "/api/leads/{leadId}/notes" },
+        { "operationId": "getLeadActivity", "method": "GET", "path": "/api/leads/{leadId}/activity" },
+        { "operationId": "sendTrialBookingLink", "method": "POST", "path": "/api/leads/{leadId}/send-trial-link" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://lead_detail"],
+      "pathNormalization": { "original": "/admin/leads/:leadId", "normalized": "/admin/leads/{leadId}", "confidence": "medium" }
+    }
+  ],
+  "endpoints": [
+    {
+      "operationId": "getLeads",
+      "method": "GET",
+      "path": "/api/leads",
+      "tags": ["leads"],
+      "security": ["cookieAuth"],
+      "requestSchema": "LeadListQuery",
+      "responseSchema": "LeadListResponse",
+      "errorSchema": "ApiError",
+      "queryParams": ["status", "source", "programId", "search", "page", "limit"],
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/leads.get", "fe_details://lead_list.endpointProposals[0]"]
+    },
+    {
+      "operationId": "getLead",
+      "method": "GET",
+      "path": "/api/leads/{leadId}",
+      "tags": ["leads"],
+      "security": ["cookieAuth"],
+      "requestSchema": null,
+      "responseSchema": "LeadResponse",
+      "errorSchema": "ApiError",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/leads/{leadId}.get", "fe_details://lead_detail.endpointProposals[0]"]
+    },
+    {
+      "operationId": "updateLead",
+      "method": "PUT",
+      "path": "/api/leads/{leadId}",
+      "tags": ["leads"],
+      "security": ["cookieAuth"],
+      "requestSchema": "UpdateLeadRequest",
+      "responseSchema": "LeadResponse",
+      "errorSchema": "ApiError",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/leads/{leadId}.put", "fe_details://lead_detail.endpointProposals[1]"]
+    },
+    {
+      "operationId": "updateLeadStatus",
+      "method": "PATCH",
+      "path": "/api/leads/{leadId}/status",
+      "tags": ["leads"],
+      "security": ["cookieAuth"],
+      "requestSchema": "UpdateLeadStatusRequest",
+      "responseSchema": "LeadResponse",
+      "errorSchema": "ApiError",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/leads/{leadId}/status.patch", "fe_details://lead_list.endpointProposals[1]"],
+      "policyRefs": ["GP-04"]
+    },
+    {
+      "operationId": "getLeadNotes",
+      "method": "GET",
+      "path": "/api/leads/{leadId}/notes",
+      "tags": ["leads"],
+      "security": ["cookieAuth"],
+      "requestSchema": null,
+      "responseSchema": "LeadNotesResponse",
+      "errorSchema": "ApiError",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/leads/{leadId}/notes.get", "fe_details://lead_detail.endpointProposals[2]"]
+    },
+    {
+      "operationId": "addLeadNote",
+      "method": "POST",
+      "path": "/api/leads/{leadId}/notes",
+      "tags": ["leads"],
+      "security": ["cookieAuth"],
+      "requestSchema": "AddLeadNoteRequest",
+      "responseSchema": "LeadNoteResponse",
+      "errorSchema": "ApiError",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/leads/{leadId}/notes.post", "fe_details://lead_detail.endpointProposals[3]"]
+    },
+    {
+      "operationId": "getLeadActivity",
+      "method": "GET",
+      "path": "/api/leads/{leadId}/activity",
+      "tags": ["leads"],
+      "security": ["cookieAuth"],
+      "requestSchema": null,
+      "responseSchema": "LeadActivityResponse",
+      "errorSchema": "ApiError",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/leads/{leadId}/activity.get", "fe_details://lead_detail.endpointProposals[4]"]
+    },
+    {
+      "operationId": "sendTrialBookingLink",
+      "method": "POST",
+      "path": "/api/leads/{leadId}/send-trial-link",
+      "tags": ["leads"],
+      "security": ["cookieAuth"],
+      "requestSchema": "SendTrialLinkRequest",
+      "responseSchema": "SendTrialLinkResponse",
+      "errorSchema": "ApiError",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/leads/{leadId}/send-trial-link.post", "fe_details://lead_detail.endpointProposals[5]"],
+      "handoffRefs": ["HO-01"]
+    }
+  ],
+  "rbac": [
+    { "endpointId": "getLeads", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://lead_list.allowedRoles"] },
+    { "endpointId": "getLead", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://lead_detail.allowedRoles"] },
+    { "endpointId": "updateLead", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://lead_detail.allowedRoles"] },
+    { "endpointId": "updateLeadStatus", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://lead_list.allowedRoles"] },
+    { "endpointId": "getLeadNotes", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://lead_detail.allowedRoles"] },
+    { "endpointId": "addLeadNote", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://lead_detail.allowedRoles"] },
+    { "endpointId": "getLeadActivity", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://lead_detail.allowedRoles"] },
+    { "endpointId": "sendTrialBookingLink", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://lead_detail.allowedRoles"] }
+  ],
+  "db": {
+    "models": [
+      {
+        "model": "Lead",
+        "fields": [
+          { "name": "id", "type": "String", "isOptional": false, "attributes": ["@id", "@default(cuid())"] },
+          { "name": "parentName", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "email", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "phone", "type": "String", "isOptional": true, "attributes": [] },
+          { "name": "childName", "type": "String", "isOptional": true, "attributes": [] },
+          { "name": "childAge", "type": "Int", "isOptional": true, "attributes": [] },
+          { "name": "source", "type": "LeadSource", "isOptional": false, "attributes": [] },
+          { "name": "status", "type": "LeadStatus", "isOptional": false, "attributes": ["@default(NEW)"] },
+          { "name": "interestedProgramId", "type": "String", "isOptional": true, "attributes": [] },
+          { "name": "locationId", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "createdAt", "type": "DateTime", "isOptional": false, "attributes": ["@default(now())"] },
+          { "name": "updatedAt", "type": "DateTime", "isOptional": false, "attributes": ["@updatedAt"] }
+        ],
+        "indexes": ["@@index([status])", "@@index([source])", "@@index([locationId])", "@@index([createdAt])", "@@index([locationId, status])"],
+        "uniques": ["@@unique([email])"],
+        "relations": [
+          { "name": "location", "kind": "manyToOne", "target": "LocationSettings", "fkFields": ["locationId"] },
+          { "name": "interestedProgram", "kind": "manyToOne", "target": "Program", "fkFields": ["interestedProgramId"] },
+          { "name": "notes", "kind": "oneToMany", "target": "LeadNote" },
+          { "name": "activities", "kind": "oneToMany", "target": "LeadActivity" },
+          { "name": "trials", "kind": "oneToMany", "target": "Trial" },
+          { "name": "enrollments", "kind": "oneToMany", "target": "Enrollment" }
+        ],
+        "confidence": "high",
+        "sourceRefs": ["prisma_contract://models.Lead"]
+      },
+      {
+        "model": "LeadNote",
+        "fields": [
+          { "name": "id", "type": "String", "isOptional": false, "attributes": ["@id", "@default(cuid())"] },
+          { "name": "leadId", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "text", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "author", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "createdAt", "type": "DateTime", "isOptional": false, "attributes": ["@default(now())"] }
+        ],
+        "indexes": ["@@index([leadId])"],
+        "uniques": [],
+        "relations": [
+          { "name": "lead", "kind": "manyToOne", "target": "Lead", "fkFields": ["leadId"] }
+        ],
+        "confidence": "high",
+        "sourceRefs": ["prisma_contract://models.LeadNote"]
+      },
+      {
+        "model": "LeadActivity",
+        "fields": [
+          { "name": "id", "type": "String", "isOptional": false, "attributes": ["@id", "@default(cuid())"] },
+          { "name": "leadId", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "type", "type": "ActivityType", "isOptional": false, "attributes": [] },
+          { "name": "description", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "metadata", "type": "Json", "isOptional": true, "attributes": [] },
+          { "name": "createdAt", "type": "DateTime", "isOptional": false, "attributes": ["@default(now())"] }
+        ],
+        "indexes": ["@@index([leadId])", "@@index([leadId, createdAt])", "@@index([type])"],
+        "uniques": [],
+        "relations": [
+          { "name": "lead", "kind": "manyToOne", "target": "Lead", "fkFields": ["leadId"] }
+        ],
+        "confidence": "high",
+        "sourceRefs": ["prisma_contract://models.LeadActivity"]
+      }
+    ],
+    "enums": [
+      { "name": "LeadSource", "values": ["FACEBOOK", "GOOGLE", "WEBSITE", "MANUAL"], "volatility": "stable" },
+      { "name": "LeadStatus", "values": ["NEW", "CONTACTED", "TRIAL_SCHEDULED", "TRIAL_ATTENDED", "ENROLLED", "DROPPED", "NOT_INTERESTED"], "volatility": "stable" },
+      { "name": "ActivityType", "values": ["STATUS_CHANGE", "EMAIL_SENT", "ENROLLMENT_EVENT", "NOTE_ADDED", "LEAD_CREATED"], "volatility": "stable" }
+    ],
+    "notes": "Email unique constraint (LM-A-01). LeadNote and LeadActivity are append-only. No POST /api/leads endpoint — leads created via enrollment/trial flows or external integrations."
+  },
+  "signals": [
+    {
+      "type": "event",
+      "name": "lead_status_auto_advance",
+      "trigger": "enrollment/trial events",
+      "description": "Lead status auto-advances on enrollment events (GP-04). Admin can manually override.",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/leads/{leadId}/status.patch.x-policy-ref", "prisma_contract://dbNotes.leadAutoAdvance"]
+    },
+    {
+      "type": "event",
+      "name": "trial_booking_link_email",
+      "trigger": "sendTrialBookingLink",
+      "description": "Sends trial booking link email to lead (HO-01: lead_management -> enrollment_trial)",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/leads/{leadId}/send-trial-link.post.x-handoff-ref"]
+    }
+  ],
+  "unknowns": [
+    {
+      "id": "LM-U-01",
+      "description": "No POST /api/leads endpoint for manual lead creation. Leads only created via enrollment/trial flows or external integrations.",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://dbNotes.noCreateEndpoint"],
+      "decision": "Accepted per FE contract — no manual create screen"
+    },
+    {
+      "id": "LM-U-02",
+      "description": "Facebook/Google lead ingestion method (webhook vs polling) deferred to implementation (LM-A-02, LM-A-03).",
+      "confidence": "low",
+      "sourceRefs": ["fe_details://assumptions.LM-A-02", "fe_details://assumptions.LM-A-03"]
+    }
+  ],
+  "evidence": {
+    "sourcesUsed": ["fe_details.json", "openapi.json", "prisma_contract.json", "zod_patch.json"],
+    "decisions": [
+      {
+        "id": "LM-D-01",
+        "description": "FE paths with :leadId normalized to {leadId} for OpenAPI consistency",
+        "confidence": "medium"
+      }
+    ]
+  }
+}

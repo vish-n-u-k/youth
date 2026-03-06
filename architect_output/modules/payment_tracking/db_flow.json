@@ -1,0 +1,201 @@
+{
+  "moduleId": "payment_tracking",
+  "generatedAt": "2026-03-06",
+  "dbFlowVersion": "v1.0.0",
+  "endpoints": [
+    {
+      "operationId": "getPayments",
+      "method": "GET",
+      "path": "/api/payments",
+      "dbOperations": [
+        {
+          "model": "Payment",
+          "operation": "READ",
+          "description": "Paginated list of payments with filters (status, search), includes computed remainingBalance",
+          "queryType": "list",
+          "filters": ["status", "search (via enrollment parentName/parentEmail)"],
+          "pagination": true,
+          "computedFields": ["remainingBalance (amountDue - amountReceived)"],
+          "joins": ["Enrollment (for parent info)", "Program (for program name via enrollment)"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/payments.get", "prisma_contract://models.Payment"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "billing",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "getPayment",
+      "method": "GET",
+      "path": "/api/payments/{paymentId}",
+      "dbOperations": [
+        {
+          "model": "Payment",
+          "operation": "READ",
+          "description": "Fetch single payment with full enrollment and program details",
+          "filters": ["id"],
+          "computedFields": ["remainingBalance"],
+          "joins": ["Enrollment", "Program (via enrollment)"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/payments/{paymentId}.get", "prisma_contract://models.Payment"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "billing",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "updatePayment",
+      "method": "PUT",
+      "path": "/api/payments/{paymentId}",
+      "dbOperations": [
+        {
+          "model": "Payment",
+          "operation": "READ",
+          "description": "Read current payment state for validation (amountReceived <= amountDue, valid status transition)",
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.Payment"]
+        },
+        {
+          "model": "Payment",
+          "operation": "UPDATE",
+          "description": "Update payment status, amountReceived, paymentMethod, notes. Status auto-computed: PAID if amountReceived >= amountDue, PARTIAL if partial, WAIVED if admin sets.",
+          "fields": ["status", "amountReceived", "paymentMethod", "notes", "updatedAt"],
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/payments/{paymentId}.put", "prisma_contract://models.Payment"]
+        }
+      ],
+      "transactionBoundary": "single-write",
+      "dataCriticality": "billing",
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_payment_update",
+          "description": "Audit log records payment status change (financially sensitive)",
+          "confidence": "high",
+          "inferred": true,
+          "sourceRefs": ["be_policy_flow://updatePayment.middlewareChain.audit_log"]
+        }
+      ],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "getZelleInstructions",
+      "method": "GET",
+      "path": "/api/public/enrollments/{enrollmentId}/payment-instructions",
+      "dbOperations": [
+        {
+          "model": "Enrollment",
+          "operation": "READ",
+          "description": "Fetch enrollment to get programId for location lookup",
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/public/enrollments/{enrollmentId}/payment-instructions.get"]
+        },
+        {
+          "model": "Program",
+          "operation": "READ",
+          "description": "Fetch program to get locationId",
+          "filters": ["id (via enrollment.programId)"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.Program"]
+        },
+        {
+          "model": "LocationSettings",
+          "operation": "READ",
+          "description": "Fetch Zelle payment config (zelleRecipientName, zelleContactInfo, zelleInstructions)",
+          "filters": ["id (via program.locationId)"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.LocationSettings"]
+        },
+        {
+          "model": "Payment",
+          "operation": "READ",
+          "description": "Fetch payment record for amount due display",
+          "filters": ["enrollmentId"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.Payment"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "billing",
+      "sideEffects": [],
+      "dbTriggers": []
+    }
+  ],
+  "modelSummary": {
+    "Payment": {
+      "operations": ["READ", "UPDATE"],
+      "dataCriticality": "billing",
+      "note": "No CREATE endpoint — payments auto-created by enrollment_trial (HO-02). No DELETE.",
+      "sourceRefs": ["prisma_contract://models.Payment"]
+    }
+  },
+  "crossModuleDependencies": [
+    {
+      "targetModule": "enrollment_trial",
+      "models": ["Enrollment"],
+      "accessType": "READ",
+      "reason": "Payment references enrollment for parent/program context",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.Payment.relations.enrollment"]
+    },
+    {
+      "targetModule": "program_pricing",
+      "models": ["Program"],
+      "accessType": "READ",
+      "reason": "Program name for payment display; locationId for Zelle instructions",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.Enrollment.relations.program"]
+    },
+    {
+      "targetModule": "settings",
+      "models": ["LocationSettings"],
+      "accessType": "READ",
+      "reason": "Zelle payment config for public payment instructions",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.LocationSettings"]
+    }
+  ],
+  "scheduledJobs": [
+    {
+      "name": "payment_overdue_check",
+      "schedule": "daily",
+      "description": "Background job checks payments with status PENDING where createdAt > overdueThreshold (default 3 days). Triggers PAYMENT_OVERDUE automation for reminder emails (HO-04: payment_tracking -> communication).",
+      "dbOperations": [
+        {
+          "model": "Payment",
+          "operation": "READ",
+          "description": "Query payments with status PENDING and createdAt older than overdue threshold",
+          "filters": ["status == PENDING", "createdAt < (now - overdueThreshold)"],
+          "joins": ["Enrollment (for parent email/name)"]
+        }
+      ],
+      "sideEffects": [
+        {
+          "type": "email",
+          "name": "payment_overdue_reminder",
+          "description": "Triggers PAYMENT_OVERDUE automation to send reminder email via communication module",
+          "confidence": "medium",
+          "sourceRefs": ["normalized://signals.payment_overdue_check"]
+        }
+      ],
+      "confidence": "medium",
+      "sourceRefs": ["prisma_contract://dbNotes.overdueThreshold", "normalized://signals.payment_overdue_check"]
+    }
+  ],
+  "dbTriggers": [],
+  "unresolved": [
+    {
+      "id": "PT-DB-U-01",
+      "description": "Payment overdue threshold storage location not specified — LocationSettings vs app env config. Recommend LocationSettings for admin configurability.",
+      "confidence": "low",
+      "decision": "deferred_to_implementation"
+    }
+  ]
+}

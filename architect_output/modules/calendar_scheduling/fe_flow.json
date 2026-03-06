@@ -1,0 +1,89 @@
+{
+  "moduleId": "calendar_scheduling",
+  "flowVersion": "v1.0.0",
+  "generatedAt": "2026-03-06",
+  "routeGraph": {
+    "entryPoints": [
+      { "route": "/admin/calendar", "screenId": "admin_calendar", "context": "Sidebar navigation", "confidence": "high", "evidenceRefs": ["fe_details://admin_calendar"] },
+      { "route": "/programs/{programId}/trial-dates", "screenId": "parent_calendar", "context": "Parent flow: trial date selection during booking", "confidence": "high", "evidenceRefs": ["fe_details://parent_calendar"] }
+    ],
+    "transitions": [
+      { "from": "/programs/{programId}/trial-dates", "to": "/programs/{programId}/book-trial", "trigger": "trialDateSelected", "flowType": "event", "note": "Cross-module: navigates to enrollment_trial booking form", "confidence": "high", "evidenceRefs": ["fe_details://parent_calendar"] }
+    ]
+  },
+  "screenGraph": [
+    {
+      "screenId": "admin_calendar",
+      "route": "/admin/calendar",
+      "components": ["ProgramFilter", "CalendarGrid", "DateFormModal"],
+      "actions": [
+        {
+          "actionId": "loadCalendarDates",
+          "flowType": "http",
+          "trigger": "onMount+onFilterChange",
+          "apiEdge": { "method": "GET", "path": "/api/calendar", "operationId": "getCalendarDates" },
+          "queryParams": ["programId", "month", "year"],
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/calendar.get", "fe_details://admin_calendar.endpointProposals[0]"]
+        },
+        {
+          "actionId": "addCalendarDate",
+          "flowType": "http",
+          "apiEdge": { "method": "POST", "path": "/api/calendar", "operationId": "addCalendarDate" },
+          "onSuccess": "closeModal+refreshCalendar",
+          "onError": "showValidationError",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/calendar.post", "fe_details://admin_calendar.endpointProposals[1]"]
+        },
+        {
+          "actionId": "updateCalendarDate",
+          "flowType": "http",
+          "apiEdge": { "method": "PUT", "path": "/api/calendar/{dateId}", "operationId": "updateCalendarDate" },
+          "onSuccess": "closeModal+refreshCalendar",
+          "onError": "showValidationError",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/calendar/{dateId}.put", "fe_details://admin_calendar.endpointProposals[2]"]
+        },
+        {
+          "actionId": "deleteCalendarDate",
+          "flowType": "http",
+          "apiEdge": { "method": "DELETE", "path": "/api/calendar/{dateId}", "operationId": "deleteCalendarDate" },
+          "onSuccess": "refreshCalendar",
+          "onError": "showError",
+          "note": "Hard delete — FK constraint prevents deleting dates with booked trials",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/calendar/{dateId}.delete", "fe_details://admin_calendar.endpointProposals[3]"]
+        }
+      ]
+    },
+    {
+      "screenId": "parent_calendar",
+      "route": "/programs/{programId}/trial-dates",
+      "components": ["AvailableDatesList"],
+      "actions": [
+        {
+          "actionId": "loadAvailableTrialDates",
+          "flowType": "http",
+          "trigger": "onMount",
+          "apiEdge": { "method": "GET", "path": "/api/programs/{programId}/trial-dates", "operationId": "getAvailableTrialDates" },
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/programs/{programId}/trial-dates.get", "fe_details://parent_calendar.endpointProposals[0]"]
+        },
+        {
+          "actionId": "selectTrialDate",
+          "flowType": "event",
+          "target": "/programs/{programId}/book-trial",
+          "note": "Cross-module: passes selected dateId to enrollment_trial booking form",
+          "confidence": "high",
+          "evidenceRefs": ["fe_details://parent_calendar"]
+        }
+      ]
+    }
+  ],
+  "guards": [
+    { "route": "/admin/calendar", "authRequired": true, "allowedRoles": ["admin"], "redirectIfUnauthenticated": "/admin/login", "confidence": "high", "evidenceRefs": ["fe_details://admin_calendar"] },
+    { "route": "/programs/{programId}/trial-dates", "authRequired": false, "allowedRoles": ["parent"], "confidence": "high", "evidenceRefs": ["fe_details://parent_calendar"] }
+  ],
+  "unmappedActions": [],
+  "signals": []
+}

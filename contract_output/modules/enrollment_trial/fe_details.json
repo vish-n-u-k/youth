@@ -2,7 +2,7 @@
   "moduleId": "enrollment_trial",
   "contractVersion": "v1.0.0",
   "status": "agreed",
-  "changeType": "none",
+  "changeType": "non_breaking",
   "globalBindings": {
     "globalContractRef": "contract_output/global/fe_global_contract.json",
     "inheritedDecisionIds": [
@@ -22,6 +22,107 @@
     "moduleOverrides": []
   },
   "screens": [
+    {
+      "screenId": "admin_enrollment_list",
+      "name": "Admin Enrollment List",
+      "route": "/admin/enrollments",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "dataDisplayed": [
+        {
+          "field": "enrollments",
+          "source": "api",
+          "schemaRef": "zod://AdminEnrollmentListResponse"
+        }
+      ],
+      "dataCaptured": [],
+      "interactions": [
+        "Filter by enrollment status (active/cancelled/completed)",
+        "Filter by program",
+        "Filter by payment status (pending/paid/partial/waived)",
+        "Search by parent name, child name, or email",
+        "Click enrollment row to open detail",
+        "Paginate through results"
+      ],
+      "states": {
+        "loading": "Loading enrollments...",
+        "empty": "No enrollments yet. Enrollments will appear here after parents sign up.",
+        "error": "Failed to load enrollments. Please refresh."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "getEnrollments",
+          "method": "GET",
+          "path": "/api/enrollments",
+          "requestSchemaRef": "zod://AdminEnrollmentListQuery",
+          "responseSchemaRef": "zod://AdminEnrollmentListResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ],
+      "x-added-by": "be_contract_agent",
+      "x-added-reason": "BLK-01: Global nav lists Enrollments for admin but no screen existed"
+    },
+    {
+      "screenId": "admin_enrollment_detail",
+      "name": "Admin Enrollment Detail",
+      "route": "/admin/enrollments/:enrollmentId",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "dataDisplayed": [
+        {
+          "field": "enrollment",
+          "source": "api",
+          "schemaRef": "zod://AdminEnrollmentDetailResponse"
+        }
+      ],
+      "dataCaptured": [
+        {
+          "field": "status",
+          "required": true,
+          "schemaRef": "zod://UpdateEnrollmentStatusRequest"
+        },
+        {
+          "field": "cancellationReason",
+          "required": false,
+          "schemaRef": "zod://UpdateEnrollmentStatusRequest"
+        }
+      ],
+      "interactions": [
+        "View full enrollment details (parent, child, program, payment, timeline)",
+        "Cancel enrollment with reason",
+        "Mark enrollment as completed",
+        "Navigate to linked payment detail",
+        "Navigate to linked lead detail",
+        "Navigate back to enrollment list"
+      ],
+      "states": {
+        "loading": "Loading enrollment details...",
+        "empty": "N/A",
+        "error": "Failed to load enrollment details. Please try again."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "getEnrollment",
+          "method": "GET",
+          "path": "/api/enrollments/:enrollmentId",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://AdminEnrollmentDetailResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "updateEnrollmentStatus",
+          "method": "PATCH",
+          "path": "/api/enrollments/:enrollmentId/status",
+          "requestSchemaRef": "zod://UpdateEnrollmentStatusRequest",
+          "responseSchemaRef": "zod://AdminEnrollmentDetailResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ],
+      "x-added-by": "be_contract_agent",
+      "x-added-reason": "BLK-01: Admin needs enrollment detail view with cancel/complete actions"
+    },
     {
       "screenId": "program_discovery",
       "name": "Program Discovery",
@@ -269,11 +370,11 @@
     },
     {
       "id": "ET-A-02",
-      "text": "Enrollment is instant on form submission; admin can cancel/modify after the fact",
+      "text": "Enrollment is instant on form submission; admin can cancel/modify after the fact via PATCH /api/enrollments/:enrollmentId/status",
       "severity": "high",
-      "state": "open",
+      "state": "confirmed",
       "assumptionSource": "ai_assumed",
-      "approvalState": "pending_human_review",
+      "approvalState": "user_approved",
       "rewriteRisk": "medium",
       "isolationRecommended": true,
       "isolationNote": "If approval flow is added later, insert approval step between submit and confirmation without rewriting enrollment form",

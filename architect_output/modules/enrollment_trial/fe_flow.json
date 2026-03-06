@@ -1,0 +1,226 @@
+{
+  "moduleId": "enrollment_trial",
+  "flowVersion": "v1.0.0",
+  "generatedAt": "2026-03-06",
+  "routeGraph": {
+    "entryPoints": [
+      { "route": "/admin/enrollments", "screenId": "admin_enrollment_list", "context": "Sidebar navigation / dashboard widget click", "confidence": "high", "evidenceRefs": ["fe_details://admin_enrollment_list"] },
+      { "route": "/programs", "screenId": "program_discovery", "context": "Parent-facing: public landing for program browsing", "confidence": "high", "evidenceRefs": ["fe_details://program_discovery"] },
+      { "route": "/enrollment/{enrollmentId}/confirmation", "screenId": "enrollment_confirmation", "context": "Post-enrollment redirect / email link", "confidence": "high", "evidenceRefs": ["fe_details://enrollment_confirmation"] }
+    ],
+    "transitions": [
+      { "from": "/admin/enrollments", "to": "/admin/enrollments/{enrollmentId}", "trigger": "enrollmentRowClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://admin_enrollment_list", "fe_details://admin_enrollment_detail"] },
+      { "from": "/admin/enrollments/{enrollmentId}", "to": "/admin/enrollments", "trigger": "backToListClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://admin_enrollment_detail"] },
+      { "from": "/programs", "to": "/programs/{programId}/book-trial", "trigger": "bookTrialClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://program_discovery", "fe_details://trial_booking_form"] },
+      { "from": "/programs", "to": "/programs/{programId}/enroll", "trigger": "enrollNowClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://program_discovery", "fe_details://enrollment_form"] },
+      { "from": "/programs/{programId}/book-trial", "to": "/programs", "trigger": "backToProgramsClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://trial_booking_form"] },
+      { "from": "/programs/{programId}/book-trial", "to": "/programs/{programId}/trial-dates", "trigger": "selectTrialDate", "flowType": "event", "note": "Cross-module: navigates to calendar_scheduling for date selection", "confidence": "high", "evidenceRefs": ["fe_details://trial_booking_form"] },
+      { "from": "/programs/{programId}/enroll", "to": "/enrollment/{enrollmentId}/confirmation", "trigger": "enrollmentSubmitSuccess", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://enrollment_form", "fe_details://enrollment_confirmation"] },
+      { "from": "/enrollment/{enrollmentId}/confirmation", "to": "/enrollment/{enrollmentId}/pay", "trigger": "proceedToPayClick", "flowType": "event", "note": "Cross-module: navigates to payment_tracking Zelle instructions", "confidence": "high", "evidenceRefs": ["fe_details://enrollment_confirmation"] }
+    ]
+  },
+  "screenGraph": [
+    {
+      "screenId": "admin_enrollment_list",
+      "route": "/admin/enrollments",
+      "components": ["EnrollmentFilters", "EnrollmentTable", "Pagination"],
+      "actions": [
+        {
+          "actionId": "loadEnrollments",
+          "flowType": "http",
+          "trigger": "onMount+onFilterChange",
+          "apiEdge": { "method": "GET", "path": "/api/enrollments", "operationId": "getEnrollments" },
+          "queryParams": ["status", "programId", "paymentStatus", "search", "page", "limit"],
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/enrollments.get", "fe_details://admin_enrollment_list.endpointProposals[0]"]
+        },
+        {
+          "actionId": "navigateToEnrollmentDetail",
+          "flowType": "event",
+          "target": "/admin/enrollments/{enrollmentId}",
+          "confidence": "high",
+          "evidenceRefs": ["fe_details://admin_enrollment_list"]
+        }
+      ]
+    },
+    {
+      "screenId": "admin_enrollment_detail",
+      "route": "/admin/enrollments/{enrollmentId}",
+      "components": ["EnrollmentInfoPanel", "StatusActions", "PaymentSummary"],
+      "actions": [
+        {
+          "actionId": "loadEnrollment",
+          "flowType": "http",
+          "trigger": "onMount",
+          "apiEdge": { "method": "GET", "path": "/api/enrollments/{enrollmentId}", "operationId": "getEnrollment" },
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/enrollments/{enrollmentId}.get", "fe_details://admin_enrollment_detail.endpointProposals[0]"]
+        },
+        {
+          "actionId": "updateEnrollmentStatus",
+          "flowType": "http",
+          "apiEdge": { "method": "PATCH", "path": "/api/enrollments/{enrollmentId}/status", "operationId": "updateEnrollmentStatus" },
+          "onSuccess": "showSuccessToast+refreshEnrollment",
+          "onError": "showValidationError",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/enrollments/{enrollmentId}/status.patch", "fe_details://admin_enrollment_detail.endpointProposals[1]"]
+        },
+        {
+          "actionId": "navigateBackToList",
+          "flowType": "event",
+          "target": "/admin/enrollments",
+          "confidence": "high",
+          "evidenceRefs": ["fe_details://admin_enrollment_detail"]
+        }
+      ]
+    },
+    {
+      "screenId": "program_discovery",
+      "route": "/programs",
+      "components": ["PublicProgramGrid", "ProgramCard"],
+      "actions": [
+        {
+          "actionId": "loadPublicPrograms",
+          "flowType": "http",
+          "trigger": "onMount",
+          "apiEdge": { "method": "GET", "path": "/api/public/programs", "operationId": "getPublicPrograms" },
+          "note": "Only returns ACTIVE programs (GP-06)",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/public/programs.get", "fe_details://program_discovery.endpointProposals[0]"]
+        },
+        {
+          "actionId": "navigateToBookTrial",
+          "flowType": "event",
+          "target": "/programs/{programId}/book-trial",
+          "note": "Only shown if program.trialAvailable=true",
+          "confidence": "high",
+          "evidenceRefs": ["fe_details://program_discovery"]
+        },
+        {
+          "actionId": "navigateToEnroll",
+          "flowType": "event",
+          "target": "/programs/{programId}/enroll",
+          "confidence": "high",
+          "evidenceRefs": ["fe_details://program_discovery"]
+        }
+      ]
+    },
+    {
+      "screenId": "trial_booking_form",
+      "route": "/programs/{programId}/book-trial",
+      "components": ["TrialBookingForm", "TrialDatePicker", "ProgramSummary"],
+      "actions": [
+        {
+          "actionId": "loadPublicProgram",
+          "flowType": "http",
+          "trigger": "onMount",
+          "apiEdge": { "method": "GET", "path": "/api/public/programs/{programId}", "operationId": "getPublicProgram" },
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/public/programs/{programId}.get", "fe_details://trial_booking_form.endpointProposals[0]"]
+        },
+        {
+          "actionId": "submitTrialBooking",
+          "flowType": "http",
+          "apiEdge": { "method": "POST", "path": "/api/public/trials", "operationId": "bookTrial" },
+          "onSuccess": "showConfirmationMessage",
+          "onError": "showValidationError",
+          "note": "GP-01: one trial per child per program. HO-03: triggers confirmation email",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/public/trials.post", "fe_details://trial_booking_form.endpointProposals[1]"]
+        }
+      ]
+    },
+    {
+      "screenId": "enrollment_form",
+      "route": "/programs/{programId}/enroll",
+      "components": ["EnrollmentForm", "CouponInput", "PriceBreakdownPanel"],
+      "actions": [
+        {
+          "actionId": "getPriceBreakdown",
+          "flowType": "http",
+          "trigger": "onCouponApply+onMount",
+          "apiEdge": { "method": "POST", "path": "/api/public/programs/{programId}/price", "operationId": "getPriceBreakdown" },
+          "note": "Computes price with optional coupon code",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/public/programs/{programId}/price.post", "fe_details://enrollment_form.endpointProposals[0]"]
+        },
+        {
+          "actionId": "submitEnrollment",
+          "flowType": "http",
+          "apiEdge": { "method": "POST", "path": "/api/public/enrollments", "operationId": "submitEnrollment" },
+          "onSuccess": "navigateTo:/enrollment/{enrollmentId}/confirmation",
+          "onError": "showValidationError",
+          "note": "GP-01: duplicate check. GP-02/GP-04: auto-creates/links lead. HO-02: creates Payment record. HO-03: sends confirmation email",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/public/enrollments.post", "fe_details://enrollment_form.endpointProposals[1]"]
+        }
+      ]
+    },
+    {
+      "screenId": "enrollment_confirmation",
+      "route": "/enrollment/{enrollmentId}/confirmation",
+      "components": ["ConfirmationCard", "PaymentCTA"],
+      "actions": [
+        {
+          "actionId": "loadConfirmation",
+          "flowType": "http",
+          "trigger": "onMount",
+          "apiEdge": { "method": "GET", "path": "/api/public/enrollments/{enrollmentId}/confirmation", "operationId": "getEnrollmentConfirmation" },
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/public/enrollments/{enrollmentId}/confirmation.get", "fe_details://enrollment_confirmation.endpointProposals[0]"]
+        },
+        {
+          "actionId": "navigateToPayment",
+          "flowType": "event",
+          "target": "/enrollment/{enrollmentId}/pay",
+          "note": "Cross-module: navigates to payment_tracking Zelle instructions",
+          "confidence": "high",
+          "evidenceRefs": ["fe_details://enrollment_confirmation"]
+        }
+      ]
+    }
+  ],
+  "guards": [
+    { "route": "/admin/enrollments", "authRequired": true, "allowedRoles": ["admin"], "redirectIfUnauthenticated": "/admin/login", "confidence": "high", "evidenceRefs": ["fe_details://admin_enrollment_list"] },
+    { "route": "/admin/enrollments/{enrollmentId}", "authRequired": true, "allowedRoles": ["admin"], "redirectIfUnauthenticated": "/admin/login", "confidence": "high", "evidenceRefs": ["fe_details://admin_enrollment_detail"] },
+    { "route": "/programs", "authRequired": false, "allowedRoles": ["parent"], "confidence": "high", "evidenceRefs": ["fe_details://program_discovery"] },
+    { "route": "/programs/{programId}/book-trial", "authRequired": false, "allowedRoles": ["parent"], "confidence": "high", "evidenceRefs": ["fe_details://trial_booking_form"] },
+    { "route": "/programs/{programId}/enroll", "authRequired": false, "allowedRoles": ["parent"], "confidence": "high", "evidenceRefs": ["fe_details://enrollment_form"] },
+    { "route": "/enrollment/{enrollmentId}/confirmation", "authRequired": false, "allowedRoles": ["parent"], "confidence": "high", "evidenceRefs": ["fe_details://enrollment_confirmation"] }
+  ],
+  "unmappedActions": [],
+  "signals": [
+    {
+      "type": "event",
+      "name": "trial_booked_email",
+      "trigger": "bookTrial",
+      "description": "Fires confirmation email on trial booking (HO-03: enrollment_trial -> communication)",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/public/trials.post.x-handoff-ref"]
+    },
+    {
+      "type": "event",
+      "name": "enrollment_confirmation_email",
+      "trigger": "submitEnrollment",
+      "description": "Fires confirmation email on enrollment (HO-03: enrollment_trial -> communication)",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/public/enrollments.post.x-handoff-refs"]
+    },
+    {
+      "type": "event",
+      "name": "payment_record_creation",
+      "trigger": "submitEnrollment",
+      "description": "Creates Payment record on enrollment (HO-02: enrollment_trial -> payment_tracking)",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/public/enrollments.post.x-handoff-refs"]
+    },
+    {
+      "type": "event",
+      "name": "lead_auto_advance",
+      "trigger": "bookTrial / submitEnrollment",
+      "description": "Lead status auto-advances on trial/enrollment events (GP-04)",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/public/enrollments.post.x-policy-refs"]
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "moduleId": "admin_dashboard",
+  "generatedAt": "2026-03-06",
+  "policyVersion": "v1.0.0",
+  "endpoints": [
+    {
+      "operationId": "getDashboardMetrics",
+      "method": "GET",
+      "path": "/api/dashboard/metrics",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles; OpenAPI only specifies cookieAuth" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "getDashboardRecentLeads",
+      "method": "GET",
+      "path": "/api/dashboard/recent-leads",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "getDashboardUpcomingTrials",
+      "method": "GET",
+      "path": "/api/dashboard/upcoming-trials",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "getDashboardPendingPayments",
+      "method": "GET",
+      "path": "/api/dashboard/pending-payments",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    }
+  ],
+  "moduleGaps": [
+    {
+      "id": "AD-GAP-01",
+      "description": "Role 'admin' inferred from FE allowedRoles, not from explicit x-required-roles in OpenAPI. Applies to all 4 endpoints.",
+      "severity": "low"
+    },
+    {
+      "id": "AD-GAP-02",
+      "description": "No query parameters defined — if date-range filtering is added later, input_validation middleware will be needed.",
+      "severity": "low"
+    }
+  ],
+  "defaults": {}
+}

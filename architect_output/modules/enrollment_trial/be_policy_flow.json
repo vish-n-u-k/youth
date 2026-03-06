@@ -1,0 +1,155 @@
+{
+  "moduleId": "enrollment_trial",
+  "generatedAt": "2026-03-06",
+  "policyVersion": "v1.0.0",
+  "endpoints": [
+    {
+      "operationId": "getEnrollments",
+      "method": "GET",
+      "path": "/api/enrollments",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" },
+        { "order": 4, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: AdminEnrollmentListQuery with queryParams" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "getEnrollment",
+      "method": "GET",
+      "path": "/api/enrollments/{enrollmentId}",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "updateEnrollmentStatus",
+      "method": "PATCH",
+      "path": "/api/enrollments/{enrollmentId}/status",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" },
+        { "order": 4, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: UpdateEnrollmentStatusRequest" },
+        { "order": 5, "middleware": "business_rule_guard", "inferred": true, "confidence": "medium", "evidence": "Enrollment status transitions must be validated (ACTIVE->CANCELLED requires cancellationReason)" },
+        { "order": 6, "middleware": "audit_log", "inferred": true, "confidence": "medium", "evidence": "Enrollment status change is a critical state transition" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "getPublicPrograms",
+      "method": "GET",
+      "path": "/api/public/programs",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "rate_limit", "inferred": true, "confidence": "medium", "evidence": "Public endpoint — general rate limit to prevent scraping", "config": { "scope": "ip", "limit": 60, "windowSeconds": 60 } }
+      ],
+      "auth": { "type": "none", "source": "openapi", "note": "Public endpoint — GP-06: only ACTIVE programs returned" },
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "getPublicProgram",
+      "method": "GET",
+      "path": "/api/public/programs/{programId}",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "rate_limit", "inferred": true, "confidence": "medium", "evidence": "Public endpoint — general rate limit", "config": { "scope": "ip", "limit": 60, "windowSeconds": 60 } }
+      ],
+      "auth": { "type": "none", "source": "openapi", "note": "Public endpoint" },
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "getPriceBreakdown",
+      "method": "POST",
+      "path": "/api/public/programs/{programId}/price",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "rate_limit", "inferred": true, "confidence": "medium", "evidence": "Public endpoint — coupon code validation can be abused", "config": { "scope": "ip", "limit": 30, "windowSeconds": 60 } },
+        { "order": 3, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: PriceBreakdownRequest" }
+      ],
+      "auth": { "type": "none", "source": "openapi", "note": "Public endpoint" },
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "bookTrial",
+      "method": "POST",
+      "path": "/api/public/trials",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "rate_limit", "inferred": true, "confidence": "high", "evidence": "Public write endpoint — spam risk", "config": { "scope": "ip", "limit": 5, "windowSeconds": 900 } },
+        { "order": 3, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: TrialBookingRequest" },
+        { "order": 4, "middleware": "business_rule_guard", "inferred": true, "confidence": "high", "evidence": "GP-01: one enrollment per child per program; capacity check on CalendarDate; trialDate must be trialEligible" },
+        { "order": 5, "middleware": "audit_log", "inferred": true, "confidence": "medium", "evidence": "Creates Trial record, auto-creates/links Lead (GP-04), triggers HO-03 email" }
+      ],
+      "auth": { "type": "none", "source": "openapi", "note": "Public endpoint" },
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "submitEnrollment",
+      "method": "POST",
+      "path": "/api/public/enrollments",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "rate_limit", "inferred": true, "confidence": "high", "evidence": "Public write endpoint — abuse risk", "config": { "scope": "ip", "limit": 5, "windowSeconds": 900 } },
+        { "order": 3, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: EnrollmentRequest" },
+        { "order": 4, "middleware": "business_rule_guard", "inferred": true, "confidence": "high", "evidence": "GP-01: duplicate enrollment check; GP-02: lead auto-create/link; GP-04: lead status auto-advance; capacity check; coupon validation" },
+        { "order": 5, "middleware": "audit_log", "inferred": true, "confidence": "high", "evidence": "Creates Enrollment + Payment records (HO-02), triggers confirmation email (HO-03), advances lead status (GP-04)" }
+      ],
+      "auth": { "type": "none", "source": "openapi", "note": "Public endpoint — instant enrollment (ET-A-02)" },
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "getEnrollmentConfirmation",
+      "method": "GET",
+      "path": "/api/public/enrollments/{enrollmentId}/confirmation",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "rate_limit", "inferred": true, "confidence": "medium", "evidence": "Public endpoint — general rate limit", "config": { "scope": "ip", "limit": 60, "windowSeconds": 60 } }
+      ],
+      "auth": { "type": "none", "source": "openapi", "note": "Public endpoint — accessed via enrollment confirmation link" },
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" },
+      "policyGaps": [
+        {
+          "id": "ET-GAP-01",
+          "description": "Enrollment confirmation is accessible by anyone with the enrollmentId (unguessable CUID). No additional auth — relies on ID obscurity. Acceptable for MVP.",
+          "severity": "low"
+        }
+      ]
+    }
+  ],
+  "moduleGaps": [
+    {
+      "id": "ET-GAP-02",
+      "description": "Admin roles on getEnrollments/getEnrollment/updateEnrollmentStatus inferred from FE allowedRoles — OpenAPI lacks x-required-roles.",
+      "severity": "low"
+    },
+    {
+      "id": "ET-GAP-03",
+      "description": "No explicit enrollment status transition rules in OpenAPI. Business rule guard on updateEnrollmentStatus is inferred.",
+      "severity": "medium"
+    },
+    {
+      "id": "ET-GAP-04",
+      "description": "Public write endpoints (bookTrial, submitEnrollment) have no CAPTCHA or bot-protection specified. Rate limiting applied as mitigation.",
+      "severity": "medium"
+    }
+  ],
+  "defaults": {
+    "publicRateLimit": "60 req/min for reads, 5 req/15min for writes (per IP)"
+  }
+}

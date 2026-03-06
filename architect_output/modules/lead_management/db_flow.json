@@ -1,0 +1,279 @@
+{
+  "moduleId": "lead_management",
+  "generatedAt": "2026-03-06",
+  "dbFlowVersion": "v1.0.0",
+  "endpoints": [
+    {
+      "operationId": "getLeads",
+      "method": "GET",
+      "path": "/api/leads",
+      "dbOperations": [
+        {
+          "model": "Lead",
+          "operation": "READ",
+          "description": "Paginated list of leads with filters (status, source, programId, search) and sorting",
+          "queryType": "list",
+          "filters": ["status", "source", "interestedProgramId", "search (parentName, email)"],
+          "pagination": true,
+          "joins": ["Program (for interested program name)"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/leads.get", "prisma_contract://models.Lead"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "getLead",
+      "method": "GET",
+      "path": "/api/leads/{leadId}",
+      "dbOperations": [
+        {
+          "model": "Lead",
+          "operation": "READ",
+          "description": "Fetch single lead with related program, location info",
+          "filters": ["id"],
+          "joins": ["Program", "LocationSettings"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/leads/{leadId}.get", "prisma_contract://models.Lead"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "updateLead",
+      "method": "PUT",
+      "path": "/api/leads/{leadId}",
+      "dbOperations": [
+        {
+          "model": "Lead",
+          "operation": "UPDATE",
+          "description": "Update lead details (parentName, email, phone, childName, childAge, source, interestedProgramId)",
+          "fields": ["parentName", "email", "phone", "childName", "childAge", "source", "interestedProgramId", "updatedAt"],
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/leads/{leadId}.put", "prisma_contract://models.Lead"]
+        }
+      ],
+      "transactionBoundary": "single-write",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_lead_update",
+          "description": "Audit log records lead data change",
+          "confidence": "medium",
+          "inferred": true,
+          "sourceRefs": ["be_policy_flow://updateLead.middlewareChain.audit_log"]
+        }
+      ],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "updateLeadStatus",
+      "method": "PATCH",
+      "path": "/api/leads/{leadId}/status",
+      "dbOperations": [
+        {
+          "model": "Lead",
+          "operation": "READ",
+          "description": "Read current lead status for transition validation",
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.Lead"]
+        },
+        {
+          "model": "Lead",
+          "operation": "UPDATE",
+          "description": "Update lead status (with business rule validation for valid transitions per GP-04)",
+          "fields": ["status", "updatedAt"],
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/leads/{leadId}/status.patch", "prisma_contract://models.Lead"]
+        },
+        {
+          "model": "LeadActivity",
+          "operation": "CREATE",
+          "description": "Create STATUS_CHANGE activity record to track the transition",
+          "fields": ["id", "leadId", "type", "description", "metadata", "createdAt"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.LeadActivity"]
+        }
+      ],
+      "transactionBoundary": "multi-entity",
+      "transactionNote": "Lead status update + LeadActivity creation must be atomic",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_status_change",
+          "description": "Audit log records status transition",
+          "confidence": "medium",
+          "inferred": true,
+          "sourceRefs": ["be_policy_flow://updateLeadStatus.middlewareChain.audit_log"]
+        }
+      ],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "getLeadNotes",
+      "method": "GET",
+      "path": "/api/leads/{leadId}/notes",
+      "dbOperations": [
+        {
+          "model": "LeadNote",
+          "operation": "READ",
+          "description": "Fetch all notes for a lead, ordered by createdAt DESC",
+          "filters": ["leadId"],
+          "orderBy": "createdAt DESC",
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/leads/{leadId}/notes.get", "prisma_contract://models.LeadNote"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "addLeadNote",
+      "method": "POST",
+      "path": "/api/leads/{leadId}/notes",
+      "dbOperations": [
+        {
+          "model": "LeadNote",
+          "operation": "CREATE",
+          "description": "Create new note for the lead (append-only)",
+          "fields": ["id", "leadId", "text", "author", "createdAt"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/leads/{leadId}/notes.post", "prisma_contract://models.LeadNote"]
+        },
+        {
+          "model": "LeadActivity",
+          "operation": "CREATE",
+          "description": "Create NOTE_ADDED activity record",
+          "fields": ["id", "leadId", "type", "description", "createdAt"],
+          "confidence": "high",
+          "inferred": true,
+          "sourceRefs": ["prisma_contract://models.LeadActivity", "prisma_contract://enumDefs.ActivityType.NOTE_ADDED"]
+        }
+      ],
+      "transactionBoundary": "multi-entity",
+      "transactionNote": "Note creation + activity log in single transaction",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "getLeadActivity",
+      "method": "GET",
+      "path": "/api/leads/{leadId}/activity",
+      "dbOperations": [
+        {
+          "model": "LeadActivity",
+          "operation": "READ",
+          "description": "Fetch all activity records for a lead, ordered by createdAt DESC",
+          "filters": ["leadId"],
+          "orderBy": "createdAt DESC",
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/leads/{leadId}/activity.get", "prisma_contract://models.LeadActivity"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "sendTrialBookingLink",
+      "method": "POST",
+      "path": "/api/leads/{leadId}/send-trial-link",
+      "dbOperations": [
+        {
+          "model": "Lead",
+          "operation": "READ",
+          "description": "Fetch lead details (email, name) for composing email",
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/leads/{leadId}/send-trial-link.post", "prisma_contract://models.Lead"]
+        },
+        {
+          "model": "LeadActivity",
+          "operation": "CREATE",
+          "description": "Create EMAIL_SENT activity record",
+          "fields": ["id", "leadId", "type", "description", "metadata", "createdAt"],
+          "confidence": "high",
+          "inferred": true,
+          "sourceRefs": ["prisma_contract://models.LeadActivity", "prisma_contract://enumDefs.ActivityType.EMAIL_SENT"]
+        }
+      ],
+      "transactionBoundary": "multi-entity",
+      "transactionNote": "Lead read + activity creation; email sent async after commit",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [
+        {
+          "type": "email",
+          "name": "trial_booking_link_email",
+          "description": "Sends trial booking link email to lead (HO-01: lead_management -> enrollment_trial)",
+          "confidence": "high",
+          "inferred": false,
+          "sourceRefs": ["normalized://signals.trial_booking_link_email"]
+        }
+      ],
+      "dbTriggers": []
+    }
+  ],
+  "modelSummary": {
+    "Lead": {
+      "operations": ["READ", "UPDATE"],
+      "dataCriticality": "workspace_data",
+      "note": "No CREATE endpoint — leads auto-created via enrollment_trial module (GP-02)",
+      "sourceRefs": ["prisma_contract://models.Lead"]
+    },
+    "LeadNote": {
+      "operations": ["CREATE", "READ"],
+      "dataCriticality": "workspace_data",
+      "note": "Append-only, no update/delete",
+      "sourceRefs": ["prisma_contract://models.LeadNote"]
+    },
+    "LeadActivity": {
+      "operations": ["CREATE", "READ"],
+      "dataCriticality": "audit",
+      "note": "Append-only, no update/delete",
+      "sourceRefs": ["prisma_contract://models.LeadActivity"]
+    }
+  },
+  "crossModuleDependencies": [
+    {
+      "targetModule": "program_pricing",
+      "models": ["Program"],
+      "accessType": "READ",
+      "reason": "Join for interestedProgram name on lead detail/list",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.Lead.relations.interestedProgram"]
+    },
+    {
+      "targetModule": "settings",
+      "models": ["LocationSettings"],
+      "accessType": "READ",
+      "reason": "Join for location name on lead detail",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.Lead.relations.location"]
+    }
+  ],
+  "scheduledJobs": [],
+  "dbTriggers": [],
+  "unresolved": [
+    {
+      "id": "LM-DB-U-01",
+      "description": "Facebook/Google lead ingestion method (webhook vs polling) deferred to implementation (LM-A-02, LM-A-03). Will create leads + LEAD_CREATED activity records.",
+      "confidence": "low",
+      "decision": "deferred_to_implementation"
+    }
+  ]
+}

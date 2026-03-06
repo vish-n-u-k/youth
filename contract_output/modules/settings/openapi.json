@@ -1,0 +1,152 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Settings API",
+    "version": "v1.0.0",
+    "x-module-id": "settings",
+    "x-contract-status": "draft",
+    "x-change-type": "none"
+  },
+  "paths": {
+    "/api/settings": {
+      "get": {
+        "operationId": "getSettings",
+        "summary": "Get current location settings",
+        "tags": ["settings"],
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Current settings",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SettingsResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiError" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiError" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateSettings",
+        "summary": "Update location settings",
+        "tags": ["settings"],
+        "security": [{ "cookieAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateSettingsRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Settings updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SettingsResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiError" }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiError" }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiError" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SettingsResponse": {
+        "type": "object",
+        "required": ["locationId", "businessName", "address", "phone", "email", "zelleRecipientName", "zelleContactInfo", "notifyNewLead", "notifyNewEnrollment", "notifyPaymentReceived"],
+        "properties": {
+          "locationId": { "type": "string" },
+          "businessName": { "type": "string" },
+          "address": { "type": "string" },
+          "phone": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "websiteUrl": { "type": "string", "format": "uri", "nullable": true },
+          "zelleRecipientName": { "type": "string" },
+          "zelleContactInfo": { "type": "string" },
+          "zelleInstructions": { "type": "string", "nullable": true },
+          "notifyNewLead": { "type": "boolean" },
+          "notifyNewEnrollment": { "type": "boolean" },
+          "notifyPaymentReceived": { "type": "boolean" }
+        },
+        "x-zod-schema": "SettingsResponse"
+      },
+      "UpdateSettingsRequest": {
+        "type": "object",
+        "required": ["businessName", "address", "phone", "email", "zelleRecipientName", "zelleContactInfo", "notifyNewLead", "notifyNewEnrollment", "notifyPaymentReceived"],
+        "properties": {
+          "businessName": { "type": "string", "minLength": 1 },
+          "address": { "type": "string", "minLength": 1 },
+          "phone": { "type": "string", "minLength": 1 },
+          "email": { "type": "string", "format": "email" },
+          "websiteUrl": { "type": "string", "format": "uri" },
+          "zelleRecipientName": { "type": "string", "minLength": 1 },
+          "zelleContactInfo": { "type": "string", "minLength": 1 },
+          "zelleInstructions": { "type": "string" },
+          "notifyNewLead": { "type": "boolean" },
+          "notifyNewEnrollment": { "type": "boolean" },
+          "notifyPaymentReceived": { "type": "boolean" }
+        },
+        "x-zod-schema": "UpdateSettingsRequest"
+      },
+      "ApiError": {
+        "type": "object",
+        "required": ["error", "message", "statusCode"],
+        "properties": {
+          "error": { "type": "string" },
+          "message": { "type": "string" },
+          "statusCode": { "type": "integer" }
+        },
+        "x-zod-schema": "ApiError"
+      }
+    },
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "session"
+      }
+    }
+  }
+}

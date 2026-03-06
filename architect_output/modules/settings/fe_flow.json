@@ -1,0 +1,54 @@
+{
+  "moduleId": "settings",
+  "flowVersion": "v1.0.0",
+  "generatedAt": "2026-03-06",
+  "routeGraph": {
+    "entryPoints": [
+      { "route": "/admin/settings", "screenId": "general_settings", "context": "Sidebar navigation", "confidence": "high", "evidenceRefs": ["fe_details://general_settings"] },
+      { "route": "/admin/settings/staff", "screenId": "staff_roles_stub", "context": "Settings sub-navigation (Phase 2 stub)", "confidence": "high", "evidenceRefs": ["fe_details://staff_roles_stub"] }
+    ],
+    "transitions": [
+      { "from": "/admin/settings", "to": "/admin/settings/staff", "trigger": "staffTabClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://general_settings", "fe_details://staff_roles_stub"] },
+      { "from": "/admin/settings/staff", "to": "/admin/settings", "trigger": "generalTabClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://staff_roles_stub", "fe_details://general_settings"] }
+    ]
+  },
+  "screenGraph": [
+    {
+      "screenId": "general_settings",
+      "route": "/admin/settings",
+      "components": ["SettingsForm", "ZelleConfigSection", "NotificationPreferences"],
+      "actions": [
+        {
+          "actionId": "loadSettings",
+          "flowType": "http",
+          "trigger": "onMount",
+          "apiEdge": { "method": "GET", "path": "/api/settings", "operationId": "getSettings" },
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/settings.get", "fe_details://general_settings.endpointProposals[0]"]
+        },
+        {
+          "actionId": "saveSettings",
+          "flowType": "http",
+          "apiEdge": { "method": "PUT", "path": "/api/settings", "operationId": "updateSettings" },
+          "onSuccess": "showSuccessToast",
+          "onError": "showValidationError",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/settings.put", "fe_details://general_settings.endpointProposals[1]"]
+        }
+      ]
+    },
+    {
+      "screenId": "staff_roles_stub",
+      "route": "/admin/settings/staff",
+      "components": ["Phase2StubMessage"],
+      "actions": [],
+      "note": "Phase 2 stub — no endpoints"
+    }
+  ],
+  "guards": [
+    { "route": "/admin/settings", "authRequired": true, "allowedRoles": ["admin"], "redirectIfUnauthenticated": "/admin/login", "confidence": "high", "evidenceRefs": ["fe_details://general_settings"] },
+    { "route": "/admin/settings/staff", "authRequired": true, "allowedRoles": ["admin"], "redirectIfUnauthenticated": "/admin/login", "confidence": "high", "evidenceRefs": ["fe_details://staff_roles_stub"] }
+  ],
+  "unmappedActions": [],
+  "signals": []
+}

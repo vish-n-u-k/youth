@@ -1,0 +1,167 @@
+{
+  "moduleId": "calendar_scheduling",
+  "generatedAt": "2026-03-06",
+  "dbFlowVersion": "v1.0.0",
+  "endpoints": [
+    {
+      "operationId": "getCalendarDates",
+      "method": "GET",
+      "path": "/api/calendar",
+      "dbOperations": [
+        {
+          "model": "CalendarDate",
+          "operation": "READ",
+          "description": "Fetch calendar dates filtered by programId, month, year. Includes computed spotsRemaining.",
+          "queryType": "list",
+          "filters": ["programId", "month/year (date range)"],
+          "computedFields": ["spotsRemaining (capacity - COUNT of Trial where trialDateId and status != CANCELLED)"],
+          "joins": ["Program (for programName)", "Trial (for count aggregate)"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/calendar.get", "prisma_contract://models.CalendarDate"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "addCalendarDate",
+      "method": "POST",
+      "path": "/api/calendar",
+      "dbOperations": [
+        {
+          "model": "Program",
+          "operation": "READ",
+          "description": "Validate programId exists",
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.CalendarDate.relations.program"]
+        },
+        {
+          "model": "CalendarDate",
+          "operation": "CREATE",
+          "description": "Create new calendar date (unique constraint on programId+date enforced at DB level)",
+          "fields": ["id", "date", "programId", "trialEligible", "capacity", "notes", "createdAt"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/calendar.post", "prisma_contract://models.CalendarDate"]
+        }
+      ],
+      "transactionBoundary": "single-write",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "updateCalendarDate",
+      "method": "PUT",
+      "path": "/api/calendar/{dateId}",
+      "dbOperations": [
+        {
+          "model": "CalendarDate",
+          "operation": "UPDATE",
+          "description": "Update calendar date fields (date, trialEligible, capacity, notes)",
+          "fields": ["date", "trialEligible", "capacity", "notes", "updatedAt"],
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/calendar/{dateId}.put", "prisma_contract://models.CalendarDate"]
+        }
+      ],
+      "transactionBoundary": "single-write",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "deleteCalendarDate",
+      "method": "DELETE",
+      "path": "/api/calendar/{dateId}",
+      "dbOperations": [
+        {
+          "model": "Trial",
+          "operation": "READ",
+          "description": "Check for existing trial bookings on this date (FK constraint guard)",
+          "queryType": "count",
+          "filters": ["trialDateId", "status != CANCELLED"],
+          "confidence": "high",
+          "inferred": true,
+          "sourceRefs": ["be_policy_flow://deleteCalendarDate.middlewareChain.business_rule_guard"]
+        },
+        {
+          "model": "CalendarDate",
+          "operation": "DELETE",
+          "description": "Hard delete calendar date (only if no active trial bookings)",
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/calendar/{dateId}.delete", "prisma_contract://models.CalendarDate"]
+        }
+      ],
+      "transactionBoundary": "multi-entity",
+      "transactionNote": "Trial booking check + delete must be atomic to prevent race condition",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_calendar_date_deleted",
+          "description": "Audit log records calendar date deletion",
+          "confidence": "medium",
+          "inferred": true,
+          "sourceRefs": ["be_policy_flow://deleteCalendarDate.middlewareChain.audit_log"]
+        }
+      ],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "getAvailableTrialDates",
+      "method": "GET",
+      "path": "/api/programs/{programId}/trial-dates",
+      "dbOperations": [
+        {
+          "model": "CalendarDate",
+          "operation": "READ",
+          "description": "Fetch future trial-eligible dates with available spots for public booking form",
+          "queryType": "list",
+          "filters": ["programId", "trialEligible == true", "date >= now()"],
+          "computedFields": ["spotsRemaining (capacity - COUNT of Trial where trialDateId and status != CANCELLED)"],
+          "postFilter": "spotsRemaining > 0",
+          "orderBy": "date ASC",
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/programs/{programId}/trial-dates.get", "prisma_contract://models.CalendarDate"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    }
+  ],
+  "modelSummary": {
+    "CalendarDate": {
+      "operations": ["CREATE", "READ", "UPDATE", "DELETE"],
+      "dataCriticality": "workspace_data",
+      "note": "Hard delete allowed — FK constraint prevents orphaning trials",
+      "sourceRefs": ["prisma_contract://models.CalendarDate"]
+    }
+  },
+  "crossModuleDependencies": [
+    {
+      "targetModule": "program_pricing",
+      "models": ["Program"],
+      "accessType": "READ",
+      "reason": "Validate programId; program name for display",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.CalendarDate.relations.program"]
+    },
+    {
+      "targetModule": "enrollment_trial",
+      "models": ["Trial"],
+      "accessType": "READ",
+      "reason": "Trial count for spotsRemaining computation; FK check before delete",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.CalendarDate.relations.trials"]
+    }
+  ],
+  "scheduledJobs": [],
+  "dbTriggers": [],
+  "unresolved": []
+}

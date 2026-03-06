@@ -1,0 +1,243 @@
+{
+  "moduleId": "enrollment_trial",
+  "contractVersion": "v1.0.0",
+  "normalizedAt": "2026-03-06",
+  "routes": [
+    {
+      "screenId": "admin_enrollment_list",
+      "name": "Admin Enrollment List",
+      "feRoute": "/admin/enrollments",
+      "normalizedRoute": "/admin/enrollments",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "endpointProposals": [
+        { "operationId": "getEnrollments", "method": "GET", "path": "/api/enrollments" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://admin_enrollment_list"],
+      "note": "Added by be_contract_agent (BLK-01)"
+    },
+    {
+      "screenId": "admin_enrollment_detail",
+      "name": "Admin Enrollment Detail",
+      "feRoute": "/admin/enrollments/:enrollmentId",
+      "normalizedRoute": "/admin/enrollments/{enrollmentId}",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "endpointProposals": [
+        { "operationId": "getEnrollment", "method": "GET", "path": "/api/enrollments/{enrollmentId}" },
+        { "operationId": "updateEnrollmentStatus", "method": "PATCH", "path": "/api/enrollments/{enrollmentId}/status" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://admin_enrollment_detail"],
+      "pathNormalization": { "original": "/admin/enrollments/:enrollmentId", "normalized": "/admin/enrollments/{enrollmentId}", "confidence": "medium" }
+    },
+    {
+      "screenId": "program_discovery",
+      "name": "Program Discovery",
+      "feRoute": "/programs",
+      "normalizedRoute": "/programs",
+      "type": "api_driven",
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "endpointProposals": [
+        { "operationId": "getPublicPrograms", "method": "GET", "path": "/api/public/programs" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://program_discovery"]
+    },
+    {
+      "screenId": "trial_booking_form",
+      "name": "Trial Booking Form",
+      "feRoute": "/programs/:programId/book-trial",
+      "normalizedRoute": "/programs/{programId}/book-trial",
+      "type": "input_driven",
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "endpointProposals": [
+        { "operationId": "getPublicProgram", "method": "GET", "path": "/api/public/programs/{programId}" },
+        { "operationId": "bookTrial", "method": "POST", "path": "/api/public/trials" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://trial_booking_form"],
+      "pathNormalization": { "original": "/programs/:programId/book-trial", "normalized": "/programs/{programId}/book-trial", "confidence": "medium" }
+    },
+    {
+      "screenId": "enrollment_form",
+      "name": "Direct Enrollment Form",
+      "feRoute": "/programs/:programId/enroll",
+      "normalizedRoute": "/programs/{programId}/enroll",
+      "type": "input_driven",
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "endpointProposals": [
+        { "operationId": "getPriceBreakdown", "method": "POST", "path": "/api/public/programs/{programId}/price" },
+        { "operationId": "submitEnrollment", "method": "POST", "path": "/api/public/enrollments" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://enrollment_form"],
+      "pathNormalization": { "original": "/programs/:programId/enroll", "normalized": "/programs/{programId}/enroll", "confidence": "medium" }
+    },
+    {
+      "screenId": "enrollment_confirmation",
+      "name": "Enrollment Confirmation",
+      "feRoute": "/enrollment/:enrollmentId/confirmation",
+      "normalizedRoute": "/enrollment/{enrollmentId}/confirmation",
+      "type": "api_driven",
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "endpointProposals": [
+        { "operationId": "getEnrollmentConfirmation", "method": "GET", "path": "/api/public/enrollments/{enrollmentId}/confirmation" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://enrollment_confirmation"],
+      "pathNormalization": { "original": "/enrollment/:enrollmentId/confirmation", "normalized": "/enrollment/{enrollmentId}/confirmation", "confidence": "medium" }
+    }
+  ],
+  "endpoints": [
+    { "operationId": "getEnrollments", "method": "GET", "path": "/api/enrollments", "tags": ["admin-enrollments"], "security": ["cookieAuth"], "requestSchema": "AdminEnrollmentListQuery", "responseSchema": "AdminEnrollmentListResponse", "errorSchema": "ApiError", "queryParams": ["status", "programId", "paymentStatus", "search", "page", "limit"], "confidence": "high", "sourceRefs": ["openapi:///api/enrollments.get"] },
+    { "operationId": "getEnrollment", "method": "GET", "path": "/api/enrollments/{enrollmentId}", "tags": ["admin-enrollments"], "security": ["cookieAuth"], "requestSchema": null, "responseSchema": "AdminEnrollmentDetailResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/enrollments/{enrollmentId}.get"] },
+    { "operationId": "updateEnrollmentStatus", "method": "PATCH", "path": "/api/enrollments/{enrollmentId}/status", "tags": ["admin-enrollments"], "security": ["cookieAuth"], "requestSchema": "UpdateEnrollmentStatusRequest", "responseSchema": "AdminEnrollmentDetailResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/enrollments/{enrollmentId}/status.patch"] },
+    { "operationId": "getPublicPrograms", "method": "GET", "path": "/api/public/programs", "tags": ["public-programs"], "security": [], "requestSchema": null, "responseSchema": "PublicProgramListResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/public/programs.get"], "policyRefs": ["GP-06"] },
+    { "operationId": "getPublicProgram", "method": "GET", "path": "/api/public/programs/{programId}", "tags": ["public-programs"], "security": [], "requestSchema": null, "responseSchema": "PublicProgramResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/public/programs/{programId}.get"] },
+    { "operationId": "getPriceBreakdown", "method": "POST", "path": "/api/public/programs/{programId}/price", "tags": ["public-programs"], "security": [], "requestSchema": "PriceBreakdownRequest", "responseSchema": "PriceBreakdownResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/public/programs/{programId}/price.post"] },
+    { "operationId": "bookTrial", "method": "POST", "path": "/api/public/trials", "tags": ["public-trials"], "security": [], "requestSchema": "TrialBookingRequest", "responseSchema": "TrialBookingResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/public/trials.post"], "handoffRefs": ["HO-03"], "policyRefs": ["GP-01"] },
+    { "operationId": "submitEnrollment", "method": "POST", "path": "/api/public/enrollments", "tags": ["public-enrollments"], "security": [], "requestSchema": "EnrollmentRequest", "responseSchema": "EnrollmentResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/public/enrollments.post"], "handoffRefs": ["HO-02", "HO-03"], "policyRefs": ["GP-01", "GP-02", "GP-04"] },
+    { "operationId": "getEnrollmentConfirmation", "method": "GET", "path": "/api/public/enrollments/{enrollmentId}/confirmation", "tags": ["public-enrollments"], "security": [], "requestSchema": null, "responseSchema": "EnrollmentConfirmationResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/public/enrollments/{enrollmentId}/confirmation.get"] }
+  ],
+  "rbac": [
+    { "endpointId": "getEnrollments", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://admin_enrollment_list.allowedRoles"] },
+    { "endpointId": "getEnrollment", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://admin_enrollment_detail.allowedRoles"] },
+    { "endpointId": "updateEnrollmentStatus", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://admin_enrollment_detail.allowedRoles"] },
+    { "endpointId": "getPublicPrograms", "roles": [], "permissions": [], "confidence": "high", "sourceRefs": ["openapi://security.[]"], "note": "Public" },
+    { "endpointId": "getPublicProgram", "roles": [], "permissions": [], "confidence": "high", "sourceRefs": ["openapi://security.[]"], "note": "Public" },
+    { "endpointId": "getPriceBreakdown", "roles": [], "permissions": [], "confidence": "high", "sourceRefs": ["openapi://security.[]"], "note": "Public" },
+    { "endpointId": "bookTrial", "roles": [], "permissions": [], "confidence": "high", "sourceRefs": ["openapi://security.[]"], "note": "Public" },
+    { "endpointId": "submitEnrollment", "roles": [], "permissions": [], "confidence": "high", "sourceRefs": ["openapi://security.[]"], "note": "Public" },
+    { "endpointId": "getEnrollmentConfirmation", "roles": [], "permissions": [], "confidence": "high", "sourceRefs": ["openapi://security.[]"], "note": "Public" }
+  ],
+  "db": {
+    "models": [
+      {
+        "model": "Trial",
+        "fields": [
+          { "name": "id", "type": "String", "isOptional": false, "attributes": ["@id", "@default(cuid())"] },
+          { "name": "programId", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "trialDateId", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "parentName", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "parentEmail", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "parentPhone", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "childName", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "childAge", "type": "Int", "isOptional": false, "attributes": [] },
+          { "name": "status", "type": "TrialStatus", "isOptional": false, "attributes": ["@default(SCHEDULED)"] },
+          { "name": "leadId", "type": "String", "isOptional": true, "attributes": [] },
+          { "name": "bookedAt", "type": "DateTime", "isOptional": false, "attributes": ["@default(now())"] },
+          { "name": "updatedAt", "type": "DateTime", "isOptional": false, "attributes": ["@updatedAt"] }
+        ],
+        "indexes": ["@@index([programId])", "@@index([trialDateId])", "@@index([parentEmail])", "@@index([leadId])", "@@index([status])"],
+        "uniques": [],
+        "relations": [
+          { "name": "program", "kind": "manyToOne", "target": "Program", "fkFields": ["programId"] },
+          { "name": "trialDate", "kind": "manyToOne", "target": "CalendarDate", "fkFields": ["trialDateId"] },
+          { "name": "lead", "kind": "manyToOne", "target": "Lead", "fkFields": ["leadId"] },
+          { "name": "enrollment", "kind": "oneToOne", "target": "Enrollment" }
+        ],
+        "confidence": "high",
+        "sourceRefs": ["prisma_contract://models.Trial"]
+      },
+      {
+        "model": "Enrollment",
+        "fields": [
+          { "name": "id", "type": "String", "isOptional": false, "attributes": ["@id", "@default(cuid())"] },
+          { "name": "programId", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "parentName", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "parentEmail", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "parentPhone", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "childName", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "childAge", "type": "Int", "isOptional": false, "attributes": [] },
+          { "name": "status", "type": "EnrollmentStatus", "isOptional": false, "attributes": ["@default(ACTIVE)"] },
+          { "name": "totalDue", "type": "Float", "isOptional": false, "attributes": [] },
+          { "name": "priceBreakdown", "type": "Json", "isOptional": false, "attributes": [] },
+          { "name": "couponCode", "type": "String", "isOptional": true, "attributes": [] },
+          { "name": "leadId", "type": "String", "isOptional": true, "attributes": [] },
+          { "name": "trialId", "type": "String", "isOptional": true, "attributes": [] },
+          { "name": "cancellationReason", "type": "String", "isOptional": true, "attributes": [] },
+          { "name": "enrolledAt", "type": "DateTime", "isOptional": false, "attributes": ["@default(now())"] },
+          { "name": "updatedAt", "type": "DateTime", "isOptional": false, "attributes": ["@updatedAt"] }
+        ],
+        "indexes": ["@@index([programId])", "@@index([parentEmail])", "@@index([status])", "@@index([leadId])", "@@index([programId, status])", "@@index([enrolledAt])"],
+        "uniques": ["@@unique([trialId])"],
+        "relations": [
+          { "name": "program", "kind": "manyToOne", "target": "Program", "fkFields": ["programId"] },
+          { "name": "lead", "kind": "manyToOne", "target": "Lead", "fkFields": ["leadId"] },
+          { "name": "trial", "kind": "oneToOne", "target": "Trial", "fkFields": ["trialId"] },
+          { "name": "payment", "kind": "oneToOne", "target": "Payment" }
+        ],
+        "confidence": "high",
+        "sourceRefs": ["prisma_contract://models.Enrollment"]
+      }
+    ],
+    "enums": [
+      { "name": "TrialStatus", "values": ["SCHEDULED", "COMPLETED", "NO_SHOW", "CANCELLED"], "volatility": "stable" },
+      { "name": "EnrollmentStatus", "values": ["ACTIVE", "CANCELLED", "COMPLETED"], "volatility": "stable" }
+    ],
+    "notes": "Enrollment is instant (ET-A-02). One enrollment per child per program (GP-01, app-level). Lead auto-created/linked on submission (GP-02/GP-04). priceBreakdown stored as JSON snapshot. Parent info denormalized on both Trial and Enrollment."
+  },
+  "signals": [
+    {
+      "type": "event",
+      "name": "trial_booked_email",
+      "trigger": "bookTrial",
+      "description": "Fires confirmation email on trial booking (HO-03: enrollment_trial -> communication)",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/public/trials.post.x-handoff-ref"]
+    },
+    {
+      "type": "event",
+      "name": "enrollment_confirmation_email",
+      "trigger": "submitEnrollment",
+      "description": "Fires confirmation email on enrollment (HO-03: enrollment_trial -> communication)",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/public/enrollments.post.x-handoff-refs"]
+    },
+    {
+      "type": "event",
+      "name": "payment_record_creation",
+      "trigger": "submitEnrollment",
+      "description": "Creates Payment record on enrollment (HO-02: enrollment_trial -> payment_tracking)",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/public/enrollments.post.x-handoff-refs"]
+    },
+    {
+      "type": "event",
+      "name": "lead_auto_advance",
+      "trigger": "bookTrial / submitEnrollment",
+      "description": "Lead status auto-advances on trial/enrollment events (GP-04)",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/public/enrollments.post.x-policy-refs"]
+    }
+  ],
+  "unknowns": [
+    {
+      "id": "ET-U-01",
+      "description": "No waitlist in MVP. Full programs return 409. Admin can manually override (ET-A-04).",
+      "confidence": "low",
+      "sourceRefs": ["fe_details://assumptions.ET-A-04"]
+    },
+    {
+      "id": "ET-U-02",
+      "description": "Trials are free by default. Admin can set optional fee but not auto-deducted from program fee (ET-A-03).",
+      "confidence": "low",
+      "sourceRefs": ["fe_details://assumptions.ET-A-03"]
+    }
+  ],
+  "evidence": {
+    "sourcesUsed": ["fe_details.json", "openapi.json", "prisma_contract.json", "zod_patch.json"],
+    "decisions": [
+      { "id": "ET-D-01", "description": "FE paths with :enrollmentId/:programId normalized to OpenAPI {param} style", "confidence": "medium" },
+      { "id": "ET-D-02", "description": "admin_enrollment_list and admin_enrollment_detail screens accepted as BE-additions (BLK-01)", "confidence": "high" }
+    ]
+  }
+}

@@ -1,0 +1,195 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Payment Tracking API",
+    "version": "v1.0.0",
+    "x-module-id": "payment_tracking",
+    "x-contract-status": "draft",
+    "x-change-type": "none"
+  },
+  "paths": {
+    "/api/payments": {
+      "get": {
+        "operationId": "getPayments",
+        "summary": "List payments with optional filters, search, and pagination",
+        "tags": ["payments"],
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["pending", "paid", "partial", "waived"] } },
+          { "name": "search", "in": "query", "description": "Search by parent or child name", "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "minimum": 1, "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 25 } }
+        ],
+        "responses": {
+          "200": { "description": "Paginated payment list", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PaymentListResponse" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/payments/{paymentId}": {
+      "get": {
+        "operationId": "getPayment",
+        "summary": "Get payment details",
+        "tags": ["payments"],
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          { "name": "paymentId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Payment details", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PaymentDetailResponse" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "404": { "description": "Payment not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      },
+      "put": {
+        "operationId": "updatePayment",
+        "summary": "Update payment status and record amount received",
+        "tags": ["payments"],
+        "security": [{ "cookieAuth": [] }],
+        "x-handoff-ref": "HO-04: payment_tracking -> communication (payment overdue triggers reminder email)",
+        "parameters": [
+          { "name": "paymentId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdatePaymentRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Payment updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PaymentDetailResponse" } } } },
+          "400": { "description": "Validation error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "404": { "description": "Payment not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/public/enrollments/{enrollmentId}/payment-instructions": {
+      "get": {
+        "operationId": "getZelleInstructions",
+        "summary": "Get Zelle payment instructions for an enrollment (parent-facing, no auth)",
+        "tags": ["payments-public"],
+        "security": [],
+        "x-handoff-ref": "HO-02: enrollment_trial -> payment_tracking",
+        "parameters": [
+          { "name": "enrollmentId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Zelle payment instructions", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ZelleInstructionsResponse" } } } },
+          "404": { "description": "Enrollment not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PaymentListResponse": {
+        "type": "object",
+        "required": ["payments", "total", "page", "limit"],
+        "properties": {
+          "payments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["paymentId", "enrollmentId", "parentName", "childName", "programName", "amountDue", "amountReceived", "remainingBalance", "status", "lastUpdated"],
+              "properties": {
+                "paymentId": { "type": "string" },
+                "enrollmentId": { "type": "string" },
+                "parentName": { "type": "string" },
+                "childName": { "type": "string" },
+                "programName": { "type": "string" },
+                "amountDue": { "type": "number" },
+                "amountReceived": { "type": "number" },
+                "remainingBalance": { "type": "number" },
+                "status": { "type": "string", "enum": ["pending", "paid", "partial", "waived"] },
+                "paymentMethod": { "type": "string", "nullable": true },
+                "lastUpdated": { "type": "string", "format": "date-time" }
+              }
+            }
+          },
+          "total": { "type": "integer" },
+          "page": { "type": "integer" },
+          "limit": { "type": "integer" }
+        },
+        "x-zod-schema": "PaymentListResponse"
+      },
+      "PaymentDetailResponse": {
+        "type": "object",
+        "required": ["paymentId", "enrollmentId", "parentName", "parentEmail", "childName", "programName", "amountDue", "amountReceived", "remainingBalance", "status", "priceBreakdown", "createdAt", "lastUpdated"],
+        "properties": {
+          "paymentId": { "type": "string" },
+          "enrollmentId": { "type": "string" },
+          "parentName": { "type": "string" },
+          "parentEmail": { "type": "string", "format": "email" },
+          "childName": { "type": "string" },
+          "programName": { "type": "string" },
+          "amountDue": { "type": "number" },
+          "amountReceived": { "type": "number" },
+          "remainingBalance": { "type": "number" },
+          "status": { "type": "string", "enum": ["pending", "paid", "partial", "waived"] },
+          "paymentMethod": { "type": "string", "nullable": true },
+          "notes": { "type": "string", "nullable": true },
+          "priceBreakdown": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["label", "amount"],
+              "properties": {
+                "label": { "type": "string" },
+                "amount": { "type": "number" }
+              }
+            }
+          },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "lastUpdated": { "type": "string", "format": "date-time" }
+        },
+        "x-zod-schema": "PaymentDetailResponse"
+      },
+      "UpdatePaymentRequest": {
+        "type": "object",
+        "required": ["status", "amountReceived"],
+        "properties": {
+          "status": { "type": "string", "enum": ["pending", "paid", "partial", "waived"] },
+          "amountReceived": { "type": "number", "minimum": 0 },
+          "paymentMethod": { "type": "string" },
+          "notes": { "type": "string" }
+        },
+        "x-zod-schema": "UpdatePaymentRequest"
+      },
+      "ZelleInstructionsResponse": {
+        "type": "object",
+        "required": ["enrollmentId", "programName", "childName", "amountDue", "zelleRecipientName", "zelleContactInfo", "referenceNote"],
+        "properties": {
+          "enrollmentId": { "type": "string" },
+          "programName": { "type": "string" },
+          "childName": { "type": "string" },
+          "amountDue": { "type": "number" },
+          "zelleRecipientName": { "type": "string" },
+          "zelleContactInfo": { "type": "string" },
+          "referenceNote": { "type": "string" },
+          "customInstructions": { "type": "string", "nullable": true }
+        },
+        "x-zod-schema": "ZelleInstructionsResponse"
+      },
+      "ApiError": {
+        "type": "object",
+        "required": ["error", "message", "statusCode"],
+        "properties": {
+          "error": { "type": "string" },
+          "message": { "type": "string" },
+          "statusCode": { "type": "integer" }
+        },
+        "x-zod-schema": "ApiError"
+      }
+    },
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "session"
+      }
+    }
+  }
+}

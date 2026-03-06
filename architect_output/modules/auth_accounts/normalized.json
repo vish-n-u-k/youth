@@ -1,0 +1,268 @@
+{
+  "moduleId": "auth_accounts",
+  "contractVersion": "v1.0.0",
+  "normalizedAt": "2026-03-06",
+  "routes": [
+    {
+      "screenId": "admin_login",
+      "name": "Admin Login",
+      "feRoute": "/admin/login",
+      "normalizedRoute": "/admin/login",
+      "type": "input_driven",
+      "authRequired": false,
+      "allowedRoles": ["admin"],
+      "endpointProposals": [
+        { "operationId": "adminLogin", "method": "POST", "path": "/api/auth/login" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://admin_login"]
+    },
+    {
+      "screenId": "password_reset_request",
+      "name": "Password Reset Request",
+      "feRoute": "/admin/forgot-password",
+      "normalizedRoute": "/admin/forgot-password",
+      "type": "input_driven",
+      "authRequired": false,
+      "allowedRoles": ["admin"],
+      "endpointProposals": [
+        { "operationId": "requestPasswordReset", "method": "POST", "path": "/api/auth/forgot-password" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://password_reset_request"]
+    },
+    {
+      "screenId": "set_new_password",
+      "name": "Set New Password",
+      "feRoute": "/admin/reset-password/:token",
+      "normalizedRoute": "/admin/reset-password/{token}",
+      "type": "input_driven",
+      "authRequired": false,
+      "allowedRoles": ["admin"],
+      "endpointProposals": [
+        { "operationId": "setNewPassword", "method": "POST", "path": "/api/auth/reset-password" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://set_new_password"],
+      "pathNormalization": { "original": "/admin/reset-password/:token", "normalized": "/admin/reset-password/{token}", "confidence": "medium" }
+    },
+    {
+      "screenId": "parent_login_stub",
+      "name": "Parent Registration/Login (Phase 2)",
+      "feRoute": "/login",
+      "normalizedRoute": "/login",
+      "type": "static",
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "endpointProposals": [],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://parent_login_stub"],
+      "note": "Phase 2 stub — no endpoints"
+    }
+  ],
+  "endpoints": [
+    {
+      "operationId": "adminLogin",
+      "method": "POST",
+      "path": "/api/auth/login",
+      "tags": ["auth"],
+      "security": [],
+      "requestSchema": "AdminLoginRequest",
+      "responseSchema": "AdminLoginResponse",
+      "errorSchema": "ApiError",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/auth/login.post", "fe_details://admin_login.endpointProposals[0]"]
+    },
+    {
+      "operationId": "adminLogout",
+      "method": "POST",
+      "path": "/api/auth/logout",
+      "tags": ["auth"],
+      "security": ["cookieAuth"],
+      "requestSchema": null,
+      "responseSchema": null,
+      "errorSchema": "ApiError",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/auth/logout.post"],
+      "note": "BE-addition: Required by AA-REQ-02 but absent from FE endpoint proposals"
+    },
+    {
+      "operationId": "getSession",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "tags": ["auth"],
+      "security": ["cookieAuth"],
+      "requestSchema": null,
+      "responseSchema": "AdminLoginResponse",
+      "errorSchema": "ApiError",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/auth/me.get"],
+      "note": "BE-addition: Required for FE session validation on app load (GP-05)"
+    },
+    {
+      "operationId": "requestPasswordReset",
+      "method": "POST",
+      "path": "/api/auth/forgot-password",
+      "tags": ["auth"],
+      "security": [],
+      "requestSchema": "PasswordResetRequest",
+      "responseSchema": "PasswordResetResponse",
+      "errorSchema": "ApiError",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/auth/forgot-password.post", "fe_details://password_reset_request.endpointProposals[0]"]
+    },
+    {
+      "operationId": "setNewPassword",
+      "method": "POST",
+      "path": "/api/auth/reset-password",
+      "tags": ["auth"],
+      "security": [],
+      "requestSchema": "SetNewPasswordRequest",
+      "responseSchema": "SetNewPasswordResponse",
+      "errorSchema": "ApiError",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/auth/reset-password.post", "fe_details://set_new_password.endpointProposals[0]"]
+    }
+  ],
+  "rbac": [
+    {
+      "endpointId": "adminLogin",
+      "roles": [],
+      "permissions": [],
+      "confidence": "high",
+      "sourceRefs": ["openapi://security.[]"],
+      "note": "Public endpoint — no auth required"
+    },
+    {
+      "endpointId": "adminLogout",
+      "roles": ["admin"],
+      "permissions": [],
+      "confidence": "high",
+      "sourceRefs": ["openapi://security.cookieAuth"]
+    },
+    {
+      "endpointId": "getSession",
+      "roles": ["admin"],
+      "permissions": [],
+      "confidence": "high",
+      "sourceRefs": ["openapi://security.cookieAuth"]
+    },
+    {
+      "endpointId": "requestPasswordReset",
+      "roles": [],
+      "permissions": [],
+      "confidence": "high",
+      "sourceRefs": ["openapi://security.[]"],
+      "note": "Public endpoint — always returns success regardless of email existence (AA-A-03)"
+    },
+    {
+      "endpointId": "setNewPassword",
+      "roles": [],
+      "permissions": [],
+      "confidence": "high",
+      "sourceRefs": ["openapi://security.[]"],
+      "note": "Public endpoint — token-based auth"
+    }
+  ],
+  "db": {
+    "models": [
+      {
+        "model": "Admin",
+        "fields": [
+          { "name": "id", "type": "String", "isOptional": false, "attributes": ["@id", "@default(cuid())"] },
+          { "name": "email", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "passwordHash", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "name", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "role", "type": "String", "isOptional": false, "attributes": ["@default(\"admin\")"] },
+          { "name": "createdAt", "type": "DateTime", "isOptional": false, "attributes": ["@default(now())"] },
+          { "name": "updatedAt", "type": "DateTime", "isOptional": false, "attributes": ["@updatedAt"] }
+        ],
+        "indexes": [],
+        "uniques": ["@@unique([email])"],
+        "relations": [
+          { "name": "sessions", "kind": "oneToMany", "target": "Session" },
+          { "name": "resetTokens", "kind": "oneToMany", "target": "PasswordResetToken" }
+        ],
+        "confidence": "high",
+        "sourceRefs": ["prisma_contract://models.Admin"]
+      },
+      {
+        "model": "Session",
+        "fields": [
+          { "name": "id", "type": "String", "isOptional": false, "attributes": ["@id", "@default(cuid())"] },
+          { "name": "adminId", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "expiresAt", "type": "DateTime", "isOptional": false, "attributes": [] },
+          { "name": "createdAt", "type": "DateTime", "isOptional": false, "attributes": ["@default(now())"] }
+        ],
+        "indexes": ["@@index([adminId])", "@@index([expiresAt])"],
+        "uniques": [],
+        "relations": [
+          { "name": "admin", "kind": "manyToOne", "target": "Admin", "fkFields": ["adminId"] }
+        ],
+        "confidence": "high",
+        "sourceRefs": ["prisma_contract://models.Session"]
+      },
+      {
+        "model": "PasswordResetToken",
+        "fields": [
+          { "name": "id", "type": "String", "isOptional": false, "attributes": ["@id", "@default(cuid())"] },
+          { "name": "adminId", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "email", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "token", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "expiresAt", "type": "DateTime", "isOptional": false, "attributes": [] },
+          { "name": "used", "type": "Boolean", "isOptional": false, "attributes": ["@default(false)"] },
+          { "name": "createdAt", "type": "DateTime", "isOptional": false, "attributes": ["@default(now())"] }
+        ],
+        "indexes": ["@@index([email])", "@@index([expiresAt])"],
+        "uniques": ["@@unique([token])"],
+        "relations": [
+          { "name": "admin", "kind": "manyToOne", "target": "Admin", "fkFields": ["adminId"] }
+        ],
+        "confidence": "high",
+        "sourceRefs": ["prisma_contract://models.PasswordResetToken"]
+      }
+    ],
+    "enums": [],
+    "notes": "Admin.role uses String not enum (only 'admin' in MVP). Sessions server-side per GF-01. Reset tokens expire after 24h (AA-A-02)."
+  },
+  "signals": [
+    {
+      "type": "event",
+      "name": "password_reset_email",
+      "trigger": "requestPasswordReset",
+      "description": "Sends password reset link via email when requested",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/auth/forgot-password.post", "fe_details://password_reset_request"]
+    }
+  ],
+  "unknowns": [
+    {
+      "id": "AA-U-01",
+      "description": "Zod schema AdminLoginResponse includes 'token' field, but OpenAPI removes it in favor of httpOnly session cookie. Zod schema needs updating.",
+      "confidence": "high",
+      "sourceRefs": ["zod_patch://AdminLoginResponse", "openapi://components.schemas.AdminLoginResponse.x-be-note"],
+      "decision": "OpenAPI is authoritative — BE uses httpOnly cookies, FE token field will be removed"
+    },
+    {
+      "id": "AA-U-02",
+      "description": "Parent auth is Phase 2 stub. No endpoints or DB models for parent users.",
+      "confidence": "high",
+      "sourceRefs": ["fe_details://parent_login_stub", "analysis://AA-A-01"]
+    }
+  ],
+  "evidence": {
+    "sourcesUsed": ["fe_details.json", "openapi.json", "prisma_contract.json", "zod_patch.json"],
+    "decisions": [
+      {
+        "id": "AA-D-01",
+        "description": "OpenAPI adds adminLogout and getSession endpoints not in FE proposals — accepted as BE-additions",
+        "confidence": "high"
+      },
+      {
+        "id": "AA-D-02",
+        "description": "FE route /admin/reset-password/:token normalized to /admin/reset-password/{token}",
+        "confidence": "medium"
+      }
+    ]
+  }
+}

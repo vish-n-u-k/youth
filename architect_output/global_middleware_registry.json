@@ -1,0 +1,468 @@
+{
+  "middlewares": [
+    {
+      "id": "request_id",
+      "name": "Request ID Middleware",
+      "description": "Generates a unique request ID (UUID) for every incoming request and attaches it to the response header for distributed tracing and log correlation",
+      "order": 1,
+      "appliesTo": "all",
+      "countUsage": 53,
+      "dependencies": [],
+      "config": {
+        "headerName": "X-Request-ID",
+        "generateUUID": true
+      },
+      "sourceLocation": "src/server/middleware/requestId.ts",
+      "confidence": "high",
+      "evidenceRefs": [
+        "be_policy_flow://auth_accounts#/endpoints/*/middleware[0]",
+        "be_policy_flow://admin_dashboard#/endpoints/*/middleware[0]",
+        "be_policy_flow://lead_management#/endpoints/*/middleware[0]",
+        "be_policy_flow://enrollment_trial#/endpoints/*/middleware[0]",
+        "be_policy_flow://program_pricing#/endpoints/*/middleware[0]",
+        "be_policy_flow://payment_tracking#/endpoints/*/middleware[0]",
+        "be_policy_flow://calendar_scheduling#/endpoints/*/middleware[0]",
+        "be_policy_flow://communication#/endpoints/*/middleware[0]",
+        "be_policy_flow://settings#/endpoints/*/middleware[0]"
+      ]
+    },
+    {
+      "id": "cors",
+      "name": "CORS Middleware",
+      "description": "Handles Cross-Origin Resource Sharing headers. Required because the frontend SPA and backend API are served from different origins, and cookieAuth requires credentials support",
+      "order": 2,
+      "appliesTo": "all",
+      "countUsage": 53,
+      "dependencies": [],
+      "config": {
+        "allowedOrigins": ["${FRONTEND_URL}"],
+        "allowedMethods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        "allowedHeaders": ["Content-Type", "X-Request-ID"],
+        "credentials": true,
+        "maxAge": 86400
+      },
+      "sourceLocation": "src/server/middleware/cors.ts",
+      "confidence": "medium",
+      "evidenceRefs": [
+        "openapi://auth_accounts#/components/securitySchemes/cookieAuth (cookie-based auth requires credentials:true CORS)",
+        "inferred: standard infrastructure for SPA + API architecture with cookie authentication"
+      ]
+    },
+    {
+      "id": "helmet",
+      "name": "Security Headers Middleware",
+      "description": "Sets security-related HTTP headers (X-Content-Type-Options, X-Frame-Options, Strict-Transport-Security, etc.) to protect against common web vulnerabilities",
+      "order": 3,
+      "appliesTo": "all",
+      "countUsage": 53,
+      "dependencies": [],
+      "config": {
+        "contentSecurityPolicy": true,
+        "crossOriginEmbedderPolicy": false,
+        "xContentTypeOptions": "nosniff",
+        "xFrameOptions": "DENY",
+        "strictTransportSecurity": {
+          "maxAge": 31536000,
+          "includeSubDomains": true
+        }
+      },
+      "sourceLocation": "src/server/middleware/helmet.ts",
+      "confidence": "low",
+      "evidenceRefs": [
+        "inferred: standard security best practice for Express/Node.js APIs"
+      ]
+    },
+    {
+      "id": "rate_limit",
+      "name": "Rate Limiting Middleware",
+      "description": "Enforces request rate limits on public endpoints to prevent brute-force attacks, spam submissions, and abuse. Uses IP-based tracking with optional email scope for login",
+      "order": 4,
+      "appliesTo": "public",
+      "countUsage": 11,
+      "dependencies": [],
+      "config": {
+        "tiers": {
+          "auth_login": {
+            "windowMs": 900000,
+            "maxRequests": 5,
+            "scope": "ip+email",
+            "description": "Login endpoint — prevents brute-force credential attacks"
+          },
+          "auth_recovery": {
+            "windowMs": 900000,
+            "maxRequests": 3,
+            "scope": "ip",
+            "description": "Forgot-password — stricter limit to prevent email enumeration"
+          },
+          "auth_reset": {
+            "windowMs": 900000,
+            "maxRequests": 5,
+            "scope": "ip",
+            "description": "Password reset — prevents token brute-force"
+          },
+          "public_read": {
+            "windowMs": 60000,
+            "maxRequests": 60,
+            "scope": "ip",
+            "description": "Public read endpoints — generous limit for parent-facing browsing"
+          },
+          "public_write": {
+            "windowMs": 900000,
+            "maxRequests": 5,
+            "scope": "ip",
+            "description": "Public write endpoints (trial booking, enrollment) — prevents spam submissions"
+          },
+          "coupon_check": {
+            "windowMs": 60000,
+            "maxRequests": 30,
+            "scope": "ip",
+            "description": "Price breakdown with coupon validation — prevents coupon code brute-force"
+          }
+        },
+        "responseStatus": 429,
+        "responseMessage": "Too many requests, please try again later"
+      },
+      "sourceLocation": "src/server/middleware/rateLimit.ts",
+      "confidence": "high",
+      "evidenceRefs": [
+        "be_policy_flow://auth_accounts#/endpoints/adminLogin/middleware (rate_limit: 5/900s ip+email)",
+        "be_policy_flow://auth_accounts#/endpoints/requestPasswordReset/middleware (rate_limit: 3/900s ip)",
+        "be_policy_flow://auth_accounts#/endpoints/setNewPassword/middleware (rate_limit: 5/900s ip)",
+        "be_policy_flow://enrollment_trial#/endpoints/bookTrial/middleware (rate_limit: 5/900s ip)",
+        "be_policy_flow://enrollment_trial#/endpoints/submitEnrollment/middleware (rate_limit: 5/900s ip)",
+        "be_policy_flow://enrollment_trial#/endpoints/getPublicPrograms/middleware (rate_limit: 60/60s ip)",
+        "be_policy_flow://enrollment_trial#/endpoints/getPriceBreakdown/middleware (rate_limit: 30/60s ip)",
+        "be_policy_flow://payment_tracking#/endpoints/getZelleInstructions/middleware (rate_limit: 60/60s ip)",
+        "be_policy_flow://calendar_scheduling#/endpoints/getAvailableTrialDates/middleware (rate_limit: 60/60s ip)",
+        "openapi://auth_accounts#/paths/auth-login/responses/429",
+        "openapi://auth_accounts#/paths/auth-forgot-password/responses/429"
+      ]
+    },
+    {
+      "id": "auth_session",
+      "name": "Session Authentication Middleware",
+      "description": "Validates the user's session cookie (httpOnly, name: 'session') and attaches the authenticated user object to the request context. Rejects unauthenticated requests with 401",
+      "order": 5,
+      "appliesTo": "protected",
+      "countUsage": 42,
+      "dependencies": ["authService", "database"],
+      "config": {
+        "cookieName": "session",
+        "httpOnly": true,
+        "secure": true,
+        "sameSite": "lax",
+        "validateOnEveryRequest": true
+      },
+      "sourceLocation": "src/server/middleware/auth.ts",
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi://auth_accounts#/components/securitySchemes/cookieAuth",
+        "openapi://admin_dashboard#/components/securitySchemes/cookieAuth",
+        "openapi://lead_management#/components/securitySchemes/cookieAuth",
+        "openapi://enrollment_trial#/components/securitySchemes/cookieAuth",
+        "openapi://program_pricing#/components/securitySchemes/cookieAuth",
+        "openapi://payment_tracking#/components/securitySchemes/cookieAuth",
+        "openapi://calendar_scheduling#/components/securitySchemes/cookieAuth",
+        "openapi://communication#/components/securitySchemes/cookieAuth",
+        "openapi://settings#/components/securitySchemes/cookieAuth"
+      ]
+    },
+    {
+      "id": "role_permission_check",
+      "name": "RBAC Enforcement Middleware",
+      "description": "Checks that the authenticated user has the required role to access the endpoint. Currently enforces single role 'admin' on all protected endpoints. Returns 403 if role check fails",
+      "order": 6,
+      "appliesTo": "protected",
+      "countUsage": 42,
+      "dependencies": ["authService"],
+      "config": {
+        "roles": ["admin"],
+        "defaultDeny": true
+      },
+      "sourceLocation": "src/server/middleware/rbac.ts",
+      "confidence": "medium",
+      "evidenceRefs": [
+        "be_policy_flow://admin_dashboard#/endpoints/*/permissionMatrix (role: admin)",
+        "be_policy_flow://lead_management#/endpoints/*/permissionMatrix (role: admin)",
+        "be_policy_flow://enrollment_trial#/endpoints/*/permissionMatrix (role: admin)",
+        "be_policy_flow://program_pricing#/endpoints/*/permissionMatrix (role: admin)",
+        "be_policy_flow://payment_tracking#/endpoints/*/permissionMatrix (role: admin)",
+        "be_policy_flow://calendar_scheduling#/endpoints/*/permissionMatrix (role: admin)",
+        "be_policy_flow://communication#/endpoints/*/permissionMatrix (role: admin)",
+        "be_policy_flow://settings#/endpoints/*/permissionMatrix (role: admin)",
+        "note: role 'admin' inferred from FE allowedRoles across all modules — OpenAPI lacks x-required-roles (flagged as gap in AD-GAP-01, LM-GAP-01, ET-GAP-02, PP-GAP-01, PT-GAP-02, CS-GAP-01, CM-GAP-01, ST-GAP-01)"
+      ]
+    },
+    {
+      "id": "input_validation",
+      "name": "Request Validation Middleware",
+      "description": "Validates request body, query parameters, and path parameters against Zod schemas derived from OpenAPI spec. Returns 400 with validation error details on failure",
+      "order": 7,
+      "appliesTo": "conditional",
+      "countUsage": 28,
+      "dependencies": ["zod"],
+      "config": {
+        "validateBody": true,
+        "validateQuery": true,
+        "validateParams": true,
+        "stripUnknown": true,
+        "abortEarly": false,
+        "schemaSource": "x-zod-schema annotations in OpenAPI spec"
+      },
+      "sourceLocation": "src/server/middleware/validation.ts",
+      "confidence": "high",
+      "evidenceRefs": [
+        "be_policy_flow://auth_accounts#/endpoints/adminLogin/middleware (requestSchema: AdminLoginRequest)",
+        "be_policy_flow://lead_management#/endpoints/getLeads/middleware (requestSchema: LeadListQuery)",
+        "be_policy_flow://enrollment_trial#/endpoints/bookTrial/middleware (requestSchema: TrialBookingRequest)",
+        "be_policy_flow://program_pricing#/endpoints/createProgram/middleware (requestSchema: ProgramRequest)",
+        "be_policy_flow://payment_tracking#/endpoints/updatePayment/middleware (requestSchema: UpdatePaymentRequest)",
+        "be_policy_flow://calendar_scheduling#/endpoints/addCalendarDate/middleware (requestSchema: CalendarDateRequest)",
+        "be_policy_flow://communication#/endpoints/createTemplate/middleware (requestSchema: TemplateRequest)",
+        "be_policy_flow://settings#/endpoints/updateSettings/middleware (requestSchema: UpdateSettingsRequest)",
+        "openapi://*/components/schemas (x-zod-schema annotations on all request/response schemas)"
+      ]
+    },
+    {
+      "id": "business_rule_guard",
+      "name": "Business Rule Guard Middleware",
+      "description": "Enforces domain-specific business rules before the request handler executes. Each guarded endpoint defines its own rule set (e.g., duplicate enrollment checks, valid status transitions, capacity limits, token expiry). Returns 400/409/410 on rule violations",
+      "order": 8,
+      "appliesTo": "conditional",
+      "countUsage": 16,
+      "dependencies": ["database"],
+      "config": {
+        "rules": {
+          "auth_token_validation": "Token expiry (24h), single-use enforcement",
+          "lead_status_transition": "GP-04: Valid status transitions, admin manual override",
+          "enrollment_duplicate_check": "GP-01: One enrollment per child per program",
+          "enrollment_capacity_check": "Capacity check on CalendarDate spots",
+          "enrollment_coupon_validation": "Coupon code validity and discount calculation",
+          "program_activation_prereq": "Zelle config must exist before ACTIVE status",
+          "payment_amount_validation": "amountReceived must not exceed amountDue",
+          "calendar_uniqueness": "Unique constraint on (programId, date)",
+          "calendar_fk_constraint": "FK constraint prevents orphaning trials on delete",
+          "template_variable_validation": "GP-03: Template placeholders must be valid",
+          "email_retry_guard": "Only FAILED emails can be retried",
+          "settings_zelle_validation": "Zelle config fields required for program activation"
+        }
+      },
+      "sourceLocation": "src/server/middleware/businessRules.ts",
+      "confidence": "medium",
+      "evidenceRefs": [
+        "be_policy_flow://auth_accounts#/endpoints/requestPasswordReset/middleware (token expiry, single-use)",
+        "be_policy_flow://lead_management#/endpoints/updateLeadStatus/middleware (GP-04 status transitions)",
+        "be_policy_flow://enrollment_trial#/endpoints/bookTrial/middleware (GP-01 duplicate, capacity check)",
+        "be_policy_flow://enrollment_trial#/endpoints/submitEnrollment/middleware (GP-01, GP-02, GP-04)",
+        "be_policy_flow://enrollment_trial#/endpoints/updateEnrollmentStatus/middleware (status transitions)",
+        "be_policy_flow://program_pricing#/endpoints/updateProgram/middleware (Zelle config pre-check)",
+        "be_policy_flow://program_pricing#/endpoints/createCoupon/middleware (code uniqueness)",
+        "be_policy_flow://payment_tracking#/endpoints/updatePayment/middleware (amount validation)",
+        "be_policy_flow://calendar_scheduling#/endpoints/addCalendarDate/middleware (unique constraint)",
+        "be_policy_flow://calendar_scheduling#/endpoints/deleteCalendarDate/middleware (FK constraint)",
+        "be_policy_flow://communication#/endpoints/createTemplate/middleware (GP-03 variable validation)",
+        "be_policy_flow://communication#/endpoints/retryEmail/middleware (FAILED-only guard)",
+        "be_policy_flow://settings#/endpoints/updateSettings/middleware (Zelle config validation)"
+      ]
+    },
+    {
+      "id": "audit_log",
+      "name": "Audit Log Middleware",
+      "description": "Records an audit trail entry after the request handler completes for security-sensitive and state-changing operations. Logs user, action, resource, timestamp, and outcome (success/failure)",
+      "order": 9,
+      "appliesTo": "conditional",
+      "countUsage": 17,
+      "dependencies": ["auditLogService", "database"],
+      "config": {
+        "logFields": ["userId", "action", "resourceType", "resourceId", "timestamp", "outcome", "ipAddress"],
+        "asyncWrite": true,
+        "retentionDays": 365
+      },
+      "sourceLocation": "src/server/middleware/auditLog.ts",
+      "confidence": "medium",
+      "evidenceRefs": [
+        "be_policy_flow://auth_accounts#/endpoints/adminLogin/middleware (login success/failure)",
+        "be_policy_flow://auth_accounts#/endpoints/adminLogout/middleware (logout)",
+        "be_policy_flow://auth_accounts#/endpoints/setNewPassword/middleware (password change)",
+        "be_policy_flow://lead_management#/endpoints/updateLead/middleware (lead record change)",
+        "be_policy_flow://lead_management#/endpoints/updateLeadStatus/middleware (status transition)",
+        "be_policy_flow://lead_management#/endpoints/sendTrialBookingLink/middleware (external email)",
+        "be_policy_flow://enrollment_trial#/endpoints/updateEnrollmentStatus/middleware (status change)",
+        "be_policy_flow://enrollment_trial#/endpoints/bookTrial/middleware (trial created + lead auto-create)",
+        "be_policy_flow://enrollment_trial#/endpoints/submitEnrollment/middleware (enrollment + payment created)",
+        "be_policy_flow://program_pricing#/endpoints/createProgram/middleware (program created)",
+        "be_policy_flow://program_pricing#/endpoints/updateProgram/middleware (program updated)",
+        "be_policy_flow://program_pricing#/endpoints/deleteCoupon/middleware (destructive delete)",
+        "be_policy_flow://payment_tracking#/endpoints/updatePayment/middleware (financially sensitive)",
+        "be_policy_flow://calendar_scheduling#/endpoints/deleteCalendarDate/middleware (destructive delete)",
+        "be_policy_flow://communication#/endpoints/updateAutomation/middleware (automation toggle)",
+        "be_policy_flow://communication#/endpoints/retryEmail/middleware (external email send)",
+        "be_policy_flow://settings#/endpoints/updateSettings/middleware (global config change)"
+      ]
+    },
+    {
+      "id": "error_handler",
+      "name": "Global Error Handler Middleware",
+      "description": "Catch-all error handler that normalizes all errors into the standardized ApiError response format ({ error, message, statusCode }). Handles uncaught exceptions, validation errors, and known application errors",
+      "order": 10,
+      "appliesTo": "all",
+      "countUsage": 53,
+      "dependencies": [],
+      "config": {
+        "responseSchema": {
+          "error": "string (error code)",
+          "message": "string (human-readable message)",
+          "statusCode": "integer (HTTP status code)"
+        },
+        "includeStackTrace": false,
+        "logErrors": true,
+        "knownStatusCodes": [400, 401, 403, 404, 409, 410, 429, 500]
+      },
+      "sourceLocation": "src/server/middleware/errorHandler.ts",
+      "confidence": "medium",
+      "evidenceRefs": [
+        "openapi://auth_accounts#/components/schemas/ApiError",
+        "openapi://admin_dashboard#/components/schemas/ApiError",
+        "openapi://lead_management#/components/schemas/ApiError",
+        "openapi://enrollment_trial#/components/schemas/ApiError",
+        "openapi://program_pricing#/components/schemas/ApiError",
+        "openapi://payment_tracking#/components/schemas/ApiError",
+        "openapi://calendar_scheduling#/components/schemas/ApiError",
+        "openapi://communication#/components/schemas/ApiError",
+        "openapi://settings#/components/schemas/ApiError"
+      ]
+    }
+  ],
+  "endpointMiddlewareMap": {
+    "POST /api/auth/login": ["request_id", "cors", "helmet", "rate_limit", "input_validation", "audit_log", "error_handler"],
+    "POST /api/auth/logout": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "audit_log", "error_handler"],
+    "GET /api/auth/me": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "error_handler"],
+    "POST /api/auth/forgot-password": ["request_id", "cors", "helmet", "rate_limit", "input_validation", "business_rule_guard", "error_handler"],
+    "POST /api/auth/reset-password": ["request_id", "cors", "helmet", "rate_limit", "input_validation", "business_rule_guard", "audit_log", "error_handler"],
+
+    "GET /api/dashboard/metrics": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "error_handler"],
+    "GET /api/dashboard/recent-leads": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "error_handler"],
+    "GET /api/dashboard/upcoming-trials": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "error_handler"],
+    "GET /api/dashboard/pending-payments": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "error_handler"],
+
+    "GET /api/leads": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "error_handler"],
+    "GET /api/leads/{leadId}": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "error_handler"],
+    "PUT /api/leads/{leadId}": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "audit_log", "error_handler"],
+    "PATCH /api/leads/{leadId}/status": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "business_rule_guard", "audit_log", "error_handler"],
+    "GET /api/leads/{leadId}/notes": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "error_handler"],
+    "POST /api/leads/{leadId}/notes": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "error_handler"],
+    "GET /api/leads/{leadId}/activity": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "error_handler"],
+    "POST /api/leads/{leadId}/send-trial-link": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "audit_log", "error_handler"],
+
+    "GET /api/enrollments": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "error_handler"],
+    "GET /api/enrollments/{enrollmentId}": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "error_handler"],
+    "PATCH /api/enrollments/{enrollmentId}/status": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "business_rule_guard", "audit_log", "error_handler"],
+    "GET /api/public/programs": ["request_id", "cors", "helmet", "rate_limit", "error_handler"],
+    "GET /api/public/programs/{programId}": ["request_id", "cors", "helmet", "rate_limit", "error_handler"],
+    "POST /api/public/programs/{programId}/price": ["request_id", "cors", "helmet", "rate_limit", "input_validation", "error_handler"],
+    "POST /api/public/trials": ["request_id", "cors", "helmet", "rate_limit", "input_validation", "business_rule_guard", "audit_log", "error_handler"],
+    "POST /api/public/enrollments": ["request_id", "cors", "helmet", "rate_limit", "input_validation", "business_rule_guard", "audit_log", "error_handler"],
+    "GET /api/public/enrollments/{enrollmentId}/confirmation": ["request_id", "cors", "helmet", "rate_limit", "error_handler"],
+
+    "GET /api/programs": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "error_handler"],
+    "POST /api/programs": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "audit_log", "error_handler"],
+    "GET /api/programs/{programId}": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "error_handler"],
+    "PUT /api/programs/{programId}": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "business_rule_guard", "audit_log", "error_handler"],
+    "GET /api/coupons": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "error_handler"],
+    "POST /api/coupons": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "business_rule_guard", "error_handler"],
+    "PUT /api/coupons/{couponId}": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "business_rule_guard", "error_handler"],
+    "DELETE /api/coupons/{couponId}": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "audit_log", "error_handler"],
+
+    "GET /api/payments": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "error_handler"],
+    "GET /api/payments/{paymentId}": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "error_handler"],
+    "PUT /api/payments/{paymentId}": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "business_rule_guard", "audit_log", "error_handler"],
+    "GET /api/public/enrollments/{enrollmentId}/payment-instructions": ["request_id", "cors", "helmet", "rate_limit", "error_handler"],
+
+    "GET /api/calendar": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "error_handler"],
+    "POST /api/calendar": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "business_rule_guard", "error_handler"],
+    "PUT /api/calendar/{dateId}": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "error_handler"],
+    "DELETE /api/calendar/{dateId}": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "business_rule_guard", "audit_log", "error_handler"],
+    "GET /api/programs/{programId}/trial-dates": ["request_id", "cors", "helmet", "rate_limit", "error_handler"],
+
+    "GET /api/communications/templates": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "error_handler"],
+    "GET /api/communications/templates/{templateId}": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "error_handler"],
+    "POST /api/communications/templates": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "business_rule_guard", "error_handler"],
+    "PUT /api/communications/templates/{templateId}": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "business_rule_guard", "error_handler"],
+    "GET /api/communications/automations": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "error_handler"],
+    "PUT /api/communications/automations/{automationId}": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "audit_log", "error_handler"],
+    "GET /api/communications/log": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "error_handler"],
+    "POST /api/communications/log/{logId}/retry": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "business_rule_guard", "audit_log", "error_handler"],
+
+    "GET /api/settings": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "error_handler"],
+    "PUT /api/settings": ["request_id", "cors", "helmet", "auth_session", "role_permission_check", "input_validation", "business_rule_guard", "audit_log", "error_handler"]
+  },
+  "rateLimitTierMap": {
+    "POST /api/auth/login": "auth_login",
+    "POST /api/auth/forgot-password": "auth_recovery",
+    "POST /api/auth/reset-password": "auth_reset",
+    "GET /api/public/programs": "public_read",
+    "GET /api/public/programs/{programId}": "public_read",
+    "POST /api/public/programs/{programId}/price": "coupon_check",
+    "POST /api/public/trials": "public_write",
+    "POST /api/public/enrollments": "public_write",
+    "GET /api/public/enrollments/{enrollmentId}/confirmation": "public_read",
+    "GET /api/public/enrollments/{enrollmentId}/payment-instructions": "public_read",
+    "GET /api/programs/{programId}/trial-dates": "public_read"
+  },
+  "unresolvedMiddleware": [
+    {
+      "id": "UNRESOLVED-01",
+      "candidateNames": ["role_permission_check", "rbac_guard"],
+      "modules": ["all protected modules"],
+      "reason": "Admin role is inferred from FE allowedRoles across 8 modules — OpenAPI specs lack explicit x-required-roles annotations. Flagged as low-severity gap in AD-GAP-01, LM-GAP-01, ET-GAP-02, PP-GAP-01, PT-GAP-02, CS-GAP-01, CM-GAP-01, ST-GAP-01. Currently single-role (admin) so low risk, but needs explicit annotation if roles expand.",
+      "resolution": "Recommend adding x-required-roles to all protected endpoints in OpenAPI specs"
+    },
+    {
+      "id": "UNRESOLVED-02",
+      "candidateNames": ["captcha", "bot_protection"],
+      "modules": ["enrollment_trial"],
+      "reason": "ET-GAP-04: Public write endpoints (bookTrial, submitEnrollment) have no CAPTCHA or bot-protection. Rate limiting is applied as mitigation but may be insufficient for determined abuse.",
+      "resolution": "Consider adding CAPTCHA middleware for public write endpoints post-MVP"
+    }
+  ],
+  "meta": {
+    "totalMiddlewares": 10,
+    "totalEndpoints": 53,
+    "totalModules": 9,
+    "averageMiddlewarePerEndpoint": 5.6,
+    "endpointBreakdown": {
+      "public": 11,
+      "protected": 42
+    },
+    "moduleEndpointCounts": {
+      "auth_accounts": 5,
+      "admin_dashboard": 4,
+      "lead_management": 8,
+      "enrollment_trial": 9,
+      "program_pricing": 8,
+      "payment_tracking": 4,
+      "calendar_scheduling": 5,
+      "communication": 8,
+      "settings": 2
+    },
+    "executionOrder": [
+      "1. request_id (always first — generates trace ID)",
+      "2. cors (before any response — handles preflight)",
+      "3. helmet (security headers — early in chain)",
+      "4. rate_limit (before auth — rejects abuse early on public endpoints)",
+      "5. auth_session (validates session cookie)",
+      "6. role_permission_check (RBAC after auth)",
+      "7. input_validation (validates request shape after auth/RBAC)",
+      "8. business_rule_guard (domain logic checks before handler)",
+      "9. audit_log (after handler — logs outcome)",
+      "10. error_handler (catch-all — always last)"
+    ],
+    "decisions": {
+      "cors_included": "Inferred as required infrastructure — cookie-based auth (cookieAuth) requires credentials:true CORS configuration for cross-origin SPA",
+      "helmet_included": "Inferred as standard security practice — low confidence but zero cost to include",
+      "tenant_context_excluded": "Single-tenant application — no multi-org patterns found across any module (no /organizations/:orgId paths)",
+      "business_rule_guard_included": "Included as global middleware pattern despite being endpoint-specific — 8/9 modules use it with consistent ordering, making it a first-class middleware in the execution chain",
+      "rate_limit_tiered": "Modeled as single middleware with 6 config tiers rather than separate entries — all share the same middleware logic with different parameters"
+    }
+  }
+}

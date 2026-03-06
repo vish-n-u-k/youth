@@ -1,0 +1,343 @@
+{
+  "patterns": [
+    {
+      "pattern": "primary_key",
+      "strategy": "cuid",
+      "field": {
+        "name": "id",
+        "type": "String",
+        "attributes": ["@id", "@default(cuid())"]
+      },
+      "usageCount": 15,
+      "models": [
+        "Admin", "Session", "PasswordResetToken",
+        "Lead", "LeadNote", "LeadActivity",
+        "Trial", "Enrollment",
+        "Program", "Coupon",
+        "CalendarDate",
+        "Template", "Automation", "CommunicationLog",
+        "LocationSettings",
+        "Payment"
+      ],
+      "description": "CUID-based primary keys for all entities. No model uses UUID or auto-increment.",
+      "confidence": "high"
+    },
+    {
+      "pattern": "timestamps",
+      "subPatterns": [
+        {
+          "name": "standard_both",
+          "description": "Models with both createdAt and updatedAt — standard mutable entities",
+          "fields": [
+            {
+              "name": "createdAt",
+              "type": "DateTime",
+              "attributes": ["@default(now())"],
+              "required": true
+            },
+            {
+              "name": "updatedAt",
+              "type": "DateTime",
+              "attributes": ["@updatedAt"],
+              "required": true
+            }
+          ],
+          "usageCount": 8,
+          "models": ["Admin", "Lead", "Program", "CalendarDate", "Template", "LocationSettings", "Payment", "Coupon"]
+        },
+        {
+          "name": "creation_only",
+          "description": "Append-only or immutable models — only track when created, never updated",
+          "fields": [
+            {
+              "name": "createdAt",
+              "type": "DateTime",
+              "attributes": ["@default(now())"],
+              "required": true
+            }
+          ],
+          "usageCount": 5,
+          "models": ["Session", "PasswordResetToken", "LeadNote", "LeadActivity", "CommunicationLog"]
+        },
+        {
+          "name": "domain_named_creation",
+          "description": "Models using a domain-specific name instead of generic createdAt, paired with updatedAt",
+          "fields": [
+            {
+              "name": "bookedAt | enrolledAt",
+              "type": "DateTime",
+              "attributes": ["@default(now())"],
+              "required": true,
+              "note": "Trial uses 'bookedAt', Enrollment uses 'enrolledAt'"
+            },
+            {
+              "name": "updatedAt",
+              "type": "DateTime",
+              "attributes": ["@updatedAt"],
+              "required": true
+            }
+          ],
+          "usageCount": 2,
+          "models": ["Trial", "Enrollment"]
+        }
+      ],
+      "exceptions": [
+        {
+          "model": "Automation",
+          "note": "Has updatedAt but no createdAt — config entity that only tracks last modification"
+        },
+        {
+          "model": "Coupon",
+          "note": "Has createdAt but no updatedAt — treated as creation-only despite being mutable. Listed under standard_both for createdAt presence but technically lacks updatedAt."
+        }
+      ],
+      "description": "Timestamp tracking varies by model mutability. Mutable entities get both fields; append-only entities get creation-only; domain entities use semantic names.",
+      "confidence": "high"
+    },
+    {
+      "pattern": "soft_delete",
+      "status": "not_used",
+      "description": "No model uses soft delete (deletedAt). The system uses hard deletes where allowed, FK constraints to prevent unsafe deletes, and append-only patterns for audit data.",
+      "evidence": [
+        "CalendarDate: hard delete with FK protection — trials block deletion",
+        "LeadNote/LeadActivity/CommunicationLog: append-only, no delete endpoints",
+        "Lead: cascade delete to notes/activities"
+      ],
+      "confidence": "high"
+    },
+    {
+      "pattern": "audit_trail",
+      "status": "not_used",
+      "description": "No model tracks createdBy/updatedBy. MVP has a single admin role, so user-level audit tracking was not needed. Audit is handled via append-only activity/log tables instead.",
+      "confidence": "high"
+    },
+    {
+      "pattern": "location_scoping",
+      "type": "direct_fk",
+      "scope": "mvp_single_location",
+      "fields": [
+        {
+          "name": "locationId",
+          "type": "String",
+          "relation": "LocationSettings",
+          "indexed": true,
+          "usageCount": 2,
+          "models": ["Lead", "Program"]
+        }
+      ],
+      "indirectScoping": [
+        {
+          "model": "Trial",
+          "path": "Trial → Program → LocationSettings"
+        },
+        {
+          "model": "Enrollment",
+          "path": "Enrollment → Program → LocationSettings"
+        },
+        {
+          "model": "CalendarDate",
+          "path": "CalendarDate → Program → LocationSettings"
+        },
+        {
+          "model": "Payment",
+          "path": "Payment → Enrollment → Program → LocationSettings"
+        }
+      ],
+      "description": "MVP is single-location. Only Lead and Program have direct locationId FK. All other entities are scoped through relation chains. Schema supports multi-location expansion without structural changes.",
+      "confidence": "medium"
+    },
+    {
+      "pattern": "indexing",
+      "totalIndexes": 40,
+      "strategies": [
+        {
+          "type": "foreign_key_index",
+          "description": "Single-column index on foreign key fields for join performance",
+          "usageCount": 12,
+          "examples": [
+            "@@index([adminId]) on Session",
+            "@@index([leadId]) on Trial, Enrollment, LeadActivity",
+            "@@index([programId]) on Trial, Enrollment, CalendarDate",
+            "@@index([templateId]) — implicit via Automation relation",
+            "@@index([locationId]) on Lead, Program"
+          ]
+        },
+        {
+          "type": "status_filter",
+          "description": "Index on status enum fields — most-queried filter across the app",
+          "usageCount": 7,
+          "models": ["Lead", "Trial", "Enrollment", "Program", "Payment", "CommunicationLog", "Automation"]
+        },
+        {
+          "type": "composite_index",
+          "description": "Multi-column indexes for common filtered + sorted queries",
+          "usageCount": 9,
+          "examples": [
+            "@@index([locationId, status]) on Lead",
+            "@@index([programId, status]) on Enrollment",
+            "@@index([status, startDate]) on Program",
+            "@@index([status, createdAt]) on Payment",
+            "@@index([leadId, createdAt]) on LeadActivity",
+            "@@index([programId, trialEligible, date]) on CalendarDate",
+            "@@index([deliveryStatus, sentAt]) on CommunicationLog",
+            "@@index([recipientEmail, sentAt]) on CommunicationLog"
+          ]
+        },
+        {
+          "type": "temporal_index",
+          "description": "Index on date/time fields for range queries and sorting",
+          "usageCount": 5,
+          "examples": [
+            "@@index([createdAt]) on Lead",
+            "@@index([expiresAt]) on Session, PasswordResetToken, Coupon",
+            "@@index([date]) on CalendarDate",
+            "@@index([enrolledAt]) on Enrollment"
+          ]
+        },
+        {
+          "type": "lookup_index",
+          "description": "Index on email/identifier fields for direct lookups",
+          "usageCount": 4,
+          "examples": [
+            "@@index([parentEmail]) on Trial, Enrollment",
+            "@@index([email]) on PasswordResetToken",
+            "@@index([triggerEvent]) on Template, CommunicationLog"
+          ]
+        },
+        {
+          "type": "boolean_filter",
+          "description": "Index on boolean fields used as filters",
+          "usageCount": 3,
+          "examples": [
+            "@@index([isDefault]) on Template",
+            "@@index([enabled]) on Automation"
+          ]
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "constraint": "@@unique([email])",
+          "models": ["Admin", "Lead"],
+          "description": "Email uniqueness for user identification"
+        },
+        {
+          "constraint": "@@unique([token])",
+          "models": ["PasswordResetToken"],
+          "description": "Token uniqueness for secure lookup"
+        },
+        {
+          "constraint": "@@unique([code])",
+          "models": ["Coupon"],
+          "description": "Coupon code uniqueness"
+        },
+        {
+          "constraint": "@@unique([programId, date])",
+          "models": ["CalendarDate"],
+          "description": "No duplicate class dates per program"
+        },
+        {
+          "constraint": "@@unique([trialId])",
+          "models": ["Enrollment"],
+          "description": "One-to-one optional: enrollment may link to at most one trial"
+        },
+        {
+          "constraint": "@@unique([triggerEvent])",
+          "models": ["Automation"],
+          "description": "One automation per trigger event"
+        },
+        {
+          "constraint": "@@unique([enrollmentId])",
+          "models": ["Payment"],
+          "description": "One payment per enrollment"
+        }
+      ],
+      "confidence": "high"
+    },
+    {
+      "pattern": "cascade_behavior",
+      "rules": [
+        {
+          "parent": "Lead",
+          "children": ["LeadNote", "LeadActivity"],
+          "onDelete": "Cascade",
+          "source": "lead_management dbNotes.cascadeDelete"
+        },
+        {
+          "parent": "CalendarDate",
+          "children": ["Trial"],
+          "onDelete": "Restrict",
+          "source": "calendar_scheduling dbNotes.hardDelete — FK constraint prevents deletion if trials reference the date"
+        },
+        {
+          "parent": "Template",
+          "children": [],
+          "onDelete": "ApplicationLevel",
+          "source": "communication dbNotes.defaultTemplates — isDefault=true templates protected from deletion at app level"
+        }
+      ],
+      "unspecifiedRelations": [
+        "Admin → Session, PasswordResetToken",
+        "Program → Trial, Enrollment, CalendarDate, Lead(interestedProgram)",
+        "LocationSettings → Lead, Program",
+        "Enrollment → Payment",
+        "Trial → Enrollment"
+      ],
+      "description": "Cascade behavior is partially defined in dbNotes but not formally specified in relation definitions. Unspecified relations should be explicitly defined during implementation. Recommended default: Restrict (prevent accidental orphans).",
+      "confidence": "medium"
+    },
+    {
+      "pattern": "append_only_tables",
+      "description": "Certain tables are intentionally immutable after creation — no update or delete operations. Used as audit trails and activity logs.",
+      "models": [
+        {
+          "model": "LeadNote",
+          "source": "lead_management dbNotes.immutableRecords"
+        },
+        {
+          "model": "LeadActivity",
+          "source": "lead_management dbNotes.immutableRecords"
+        },
+        {
+          "model": "CommunicationLog",
+          "source": "communication dbNotes.logImmutability"
+        }
+      ],
+      "usageCount": 3,
+      "confidence": "high"
+    }
+  ],
+  "conventions": {
+    "naming": {
+      "models": "PascalCase",
+      "fields": "camelCase",
+      "relations": "camelCase",
+      "enums": "PascalCase",
+      "enumValues": "UPPER_SNAKE_CASE"
+    },
+    "idStrategy": "String @id @default(cuid()) — all models, no exceptions",
+    "booleanDefaults": "Boolean fields default to false unless semantically required otherwise (e.g., Automation.enabled defaults to true)",
+    "jsonFields": "Used for flexible/snapshot data: LeadActivity.metadata, Enrollment.priceBreakdown",
+    "textAnnotation": "@db.Text used for long text fields (Template.body)",
+    "computedFields": "Several fields are computed at query time and NOT stored: enrollmentCount, totalFee, spotsRemaining, remainingBalance, availableVariables"
+  },
+  "meta": {
+    "totalModels": 15,
+    "totalModulesWithModels": 8,
+    "modulesWithoutModels": ["admin_dashboard"],
+    "patternsIdentified": 8,
+    "totalIndexes": 40,
+    "totalUniqueConstraints": 8,
+    "generatedAt": "2026-03-06",
+    "sourceModules": [
+      "auth_accounts",
+      "lead_management",
+      "enrollment_trial",
+      "program_pricing",
+      "payment_tracking",
+      "calendar_scheduling",
+      "communication",
+      "settings",
+      "admin_dashboard"
+    ]
+  }
+}

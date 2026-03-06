@@ -1,0 +1,513 @@
+{
+  "generatedAt": "2026-03-06",
+  "registryVersion": "v1.0.0",
+  "services": [
+    {
+      "id": "authService",
+      "name": "Authentication Service",
+      "type": "auth",
+      "description": "Handles admin authentication via email/password, server-side session management with httpOnly cookies, password reset flow with tokenized email links, and session validation on every authenticated request.",
+      "usedInModules": [
+        "auth_accounts",
+        "admin_dashboard",
+        "lead_management",
+        "enrollment_trial",
+        "program_pricing",
+        "payment_tracking",
+        "calendar_scheduling",
+        "communication",
+        "settings"
+      ],
+      "methods": [
+        {
+          "name": "login",
+          "description": "Authenticate admin by email/password, create server-side session, set httpOnly cookie",
+          "confidence": "high",
+          "evidenceRefs": [
+            "openapi://auth_accounts#/paths/~1api~1auth~1login/post",
+            "db_flow://auth_accounts#adminLogin (Admin READ + Session CREATE)"
+          ]
+        },
+        {
+          "name": "logout",
+          "description": "Invalidate session record and clear session cookie",
+          "confidence": "high",
+          "evidenceRefs": [
+            "openapi://auth_accounts#/paths/~1api~1auth~1logout/post",
+            "db_flow://auth_accounts#adminLogout (Session DELETE)"
+          ]
+        },
+        {
+          "name": "validateSession",
+          "description": "Verify session cookie, check session exists and is not expired, return admin profile. Used as auth_session middleware across all modules.",
+          "confidence": "high",
+          "evidenceRefs": [
+            "openapi://auth_accounts#/paths/~1api~1auth~1me/get",
+            "be_policy_flow://*/middlewareChain.auth_session (all modules)"
+          ]
+        },
+        {
+          "name": "requestPasswordReset",
+          "description": "Generate password reset token (24h expiry, single-use), send reset link email. Always returns success regardless of email existence (timing-safe).",
+          "confidence": "high",
+          "evidenceRefs": [
+            "openapi://auth_accounts#/paths/~1api~1auth~1forgot-password/post",
+            "db_flow://auth_accounts#requestPasswordReset (Admin READ + PasswordResetToken CREATE)"
+          ]
+        },
+        {
+          "name": "setNewPassword",
+          "description": "Validate reset token, update admin password hash, mark token as used, invalidate all existing sessions for the admin.",
+          "confidence": "high",
+          "evidenceRefs": [
+            "openapi://auth_accounts#/paths/~1api~1auth~1reset-password/post",
+            "db_flow://auth_accounts#setNewPassword (PasswordResetToken READ+UPDATE, Admin UPDATE, Session DELETE)"
+          ]
+        }
+      ],
+      "dependencies": ["database"],
+      "config": {
+        "sessionCookieName": "session",
+        "sessionTTL": "requires_decision",
+        "passwordResetTokenExpiry": "24h",
+        "passwordMinLength": 8
+      },
+      "sourceLocation": "src/server/services/authService.ts",
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi://auth_accounts#/components/securitySchemes/cookieAuth",
+        "be_policy_flow://*/middlewareChain.auth_session",
+        "db_flow://auth_accounts#modelSummary (Admin, Session, PasswordResetToken)"
+      ]
+    },
+    {
+      "id": "emailService",
+      "name": "Email Transport Service",
+      "type": "notification",
+      "description": "Low-level email transport layer responsible for rendering templates with variable substitution, sending emails via external provider, logging delivery status to CommunicationLog, and retrying failed sends. Works with the communication module's Template and Automation models for content and trigger rules.",
+      "usedInModules": [
+        "auth_accounts",
+        "lead_management",
+        "enrollment_trial",
+        "payment_tracking",
+        "communication"
+      ],
+      "methods": [
+        {
+          "name": "sendEmail",
+          "description": "Render a template with variables, send via email provider, create CommunicationLog entry with PENDING status. Actual send handled by email_send_worker.",
+          "confidence": "high",
+          "evidenceRefs": [
+            "db_flow://communication#email_send_worker (CommunicationLog READ PENDING + UPDATE to SENT/FAILED)",
+            "db_flow://auth_accounts#requestPasswordReset.sideEffects.password_reset_email",
+            "db_flow://enrollment_trial#bookTrial.sideEffects.trial_booked_email",
+            "db_flow://enrollment_trial#submitEnrollment.sideEffects.enrollment_confirmation_email",
+            "db_flow://lead_management#sendTrialBookingLink.sideEffects.trial_booking_link_email"
+          ]
+        },
+        {
+          "name": "renderTemplate",
+          "description": "Substitute template variables (e.g. {{parentName}}, {{programName}}, {{trialDate}}) into a Template record's subject and body fields.",
+          "confidence": "high",
+          "evidenceRefs": [
+            "openapi://communication#/components/schemas/TemplateResponse (availableVariables field)",
+            "be_policy_flow://communication#createTemplate.middlewareChain.business_rule_guard (GP-03 variable validation)"
+          ]
+        },
+        {
+          "name": "retryFailedEmail",
+          "description": "Re-queue a FAILED CommunicationLog entry for re-send by resetting status to PENDING.",
+          "confidence": "high",
+          "evidenceRefs": [
+            "openapi://communication#/paths/~1api~1communications~1log~1{logId}~1retry/post",
+            "db_flow://communication#retryEmail (CommunicationLog READ FAILED + UPDATE to PENDING)"
+          ]
+        },
+        {
+          "name": "checkAutomationEnabled",
+          "description": "Before sending a triggered email, verify the corresponding Automation record is enabled and apply configured delay.",
+          "confidence": "high",
+          "evidenceRefs": [
+            "db_flow://communication#trial_approaching_reminder (Automation READ triggerEvent + enabled check)",
+            "openapi://communication#/components/schemas/AutomationRequest (enabled, delayMinutes fields)"
+          ]
+        }
+      ],
+      "dependencies": ["database", "emailProvider"],
+      "config": {
+        "emailProvider": "requires_decision (e.g. SendGrid, AWS SES, Resend)",
+        "emailProviderApiKey": "env:EMAIL_API_KEY",
+        "fromAddress": "requires_decision",
+        "retryPolicy": "requires_decision"
+      },
+      "sourceLocation": "src/server/services/emailService.ts",
+      "confidence": "high",
+      "evidenceRefs": [
+        "db_flow://communication#scheduledJobs.email_send_worker",
+        "db_flow://communication#modelSummary.CommunicationLog",
+        "db_flow://communication#modelSummary.Template"
+      ],
+      "triggerEvents": [
+        {
+          "event": "LEAD_CREATED",
+          "sourceModule": "enrollment_trial",
+          "description": "Fires when a new lead is auto-created via trial booking or enrollment",
+          "evidenceRefs": ["db_flow://enrollment_trial#bookTrial.sideEffects.lead_created_notification"]
+        },
+        {
+          "event": "TRIAL_SCHEDULED",
+          "sourceModule": "enrollment_trial",
+          "description": "Fires when a parent books a trial class",
+          "evidenceRefs": ["db_flow://enrollment_trial#bookTrial.sideEffects.trial_booked_email"]
+        },
+        {
+          "event": "TRIAL_APPROACHING",
+          "sourceModule": "communication",
+          "description": "Fires via daily scheduled job when trial date is within configured reminder window",
+          "evidenceRefs": ["db_flow://communication#scheduledJobs.trial_approaching_reminder"]
+        },
+        {
+          "event": "ENROLLMENT_COMPLETED",
+          "sourceModule": "enrollment_trial",
+          "description": "Fires when a parent submits enrollment",
+          "evidenceRefs": ["db_flow://enrollment_trial#submitEnrollment.sideEffects.enrollment_confirmation_email"]
+        },
+        {
+          "event": "PAYMENT_OVERDUE",
+          "sourceModule": "payment_tracking",
+          "description": "Fires via daily scheduled job when payment is PENDING beyond overdue threshold",
+          "evidenceRefs": ["db_flow://payment_tracking#scheduledJobs.payment_overdue_check"]
+        },
+        {
+          "event": "CLASS_START_APPROACHING",
+          "sourceModule": "communication",
+          "description": "Fires via daily scheduled job when program startDate is within reminder window",
+          "evidenceRefs": ["db_flow://communication#scheduledJobs.class_start_approaching_reminder"]
+        }
+      ]
+    },
+    {
+      "id": "auditLogService",
+      "name": "Audit Log Service",
+      "type": "audit",
+      "description": "Cross-cutting audit trail service that records security-sensitive and state-changing operations across all modules. Stores events in a queryable AuditLog database table and emits structured log output for operational monitoring. Distinct from domain-specific activity logs like LeadActivity.",
+      "usedInModules": [
+        "auth_accounts",
+        "lead_management",
+        "enrollment_trial",
+        "program_pricing",
+        "payment_tracking",
+        "calendar_scheduling",
+        "communication",
+        "settings"
+      ],
+      "methods": [
+        {
+          "name": "logEvent",
+          "description": "Record a business state-change event (e.g. lead updated, enrollment cancelled, payment received, settings changed)",
+          "confidence": "high",
+          "evidenceRefs": [
+            "be_policy_flow://lead_management#updateLead.middlewareChain.audit_log",
+            "be_policy_flow://enrollment_trial#updateEnrollmentStatus.middlewareChain.audit_log",
+            "be_policy_flow://program_pricing#createProgram.middlewareChain.audit_log",
+            "be_policy_flow://payment_tracking#updatePayment.middlewareChain.audit_log",
+            "be_policy_flow://calendar_scheduling#deleteCalendarDate.middlewareChain.audit_log",
+            "be_policy_flow://communication#updateAutomation.middlewareChain.audit_log",
+            "be_policy_flow://settings#updateSettings.middlewareChain.audit_log"
+          ]
+        },
+        {
+          "name": "logSecurityEvent",
+          "description": "Record a security-sensitive event (login attempt success/failure, logout, password reset). Higher severity, always logged regardless of config.",
+          "confidence": "high",
+          "evidenceRefs": [
+            "be_policy_flow://auth_accounts#adminLogin.middlewareChain.audit_log",
+            "be_policy_flow://auth_accounts#adminLogout.middlewareChain.audit_log",
+            "be_policy_flow://auth_accounts#setNewPassword.middlewareChain.audit_log"
+          ]
+        }
+      ],
+      "dependencies": ["database"],
+      "config": {
+        "storageMode": "database+structured_logging",
+        "retentionPolicy": "requires_decision"
+      },
+      "sourceLocation": "src/server/services/auditLogService.ts",
+      "confidence": "high",
+      "evidenceRefs": [
+        "be_policy_flow://*/middlewareChain.audit_log (8 modules)"
+      ],
+      "auditedEvents": [
+        { "event": "audit_login_attempt", "module": "auth_accounts", "criticality": "security" },
+        { "event": "audit_logout", "module": "auth_accounts", "criticality": "security" },
+        { "event": "audit_password_reset", "module": "auth_accounts", "criticality": "security" },
+        { "event": "audit_lead_update", "module": "lead_management", "criticality": "business" },
+        { "event": "audit_status_change", "module": "lead_management", "criticality": "business" },
+        { "event": "audit_enrollment_status_change", "module": "enrollment_trial", "criticality": "business" },
+        { "event": "audit_program_created", "module": "program_pricing", "criticality": "business" },
+        { "event": "audit_program_updated", "module": "program_pricing", "criticality": "business" },
+        { "event": "audit_coupon_deleted", "module": "program_pricing", "criticality": "business" },
+        { "event": "audit_payment_update", "module": "payment_tracking", "criticality": "financial" },
+        { "event": "audit_calendar_date_deleted", "module": "calendar_scheduling", "criticality": "business" },
+        { "event": "audit_automation_toggle", "module": "communication", "criticality": "business" },
+        { "event": "audit_settings_update", "module": "settings", "criticality": "business" }
+      ]
+    },
+    {
+      "id": "rateLimitService",
+      "name": "Rate Limiting Service",
+      "type": "data",
+      "description": "Stateful rate limiting service that enforces request throttling on public and security-sensitive endpoints. Uses sliding window counters scoped by IP or IP+identifier. Prevents brute-force attacks on auth endpoints and abuse of public-facing forms.",
+      "usedInModules": [
+        "auth_accounts",
+        "enrollment_trial",
+        "payment_tracking",
+        "calendar_scheduling"
+      ],
+      "methods": [
+        {
+          "name": "checkLimit",
+          "description": "Check if the current request exceeds the configured rate limit for the given scope. Returns allow/deny with remaining quota.",
+          "confidence": "high",
+          "evidenceRefs": [
+            "be_policy_flow://auth_accounts#adminLogin.middlewareChain.rate_limit",
+            "be_policy_flow://enrollment_trial#bookTrial.middlewareChain.rate_limit",
+            "be_policy_flow://payment_tracking#getZelleInstructions.middlewareChain.rate_limit",
+            "be_policy_flow://calendar_scheduling#getAvailableTrialDates.middlewareChain.rate_limit"
+          ]
+        },
+        {
+          "name": "recordHit",
+          "description": "Increment the counter for the current scope key (called internally by checkLimit)",
+          "confidence": "high",
+          "evidenceRefs": [
+            "be_policy_flow://auth_accounts#adminLogin.middlewareChain.rate_limit (scope: ip+email)"
+          ]
+        }
+      ],
+      "dependencies": ["redis"],
+      "config": {
+        "profiles": {
+          "auth_login": { "scope": "ip+email", "limit": 5, "windowSeconds": 900 },
+          "auth_forgot_password": { "scope": "ip", "limit": 3, "windowSeconds": 900 },
+          "auth_reset_password": { "scope": "ip", "limit": 5, "windowSeconds": 900 },
+          "public_read": { "scope": "ip", "limit": 60, "windowSeconds": 60 },
+          "public_write": { "scope": "ip", "limit": 5, "windowSeconds": 900 },
+          "public_coupon_check": { "scope": "ip", "limit": 30, "windowSeconds": 60 }
+        }
+      },
+      "sourceLocation": "src/server/services/rateLimitService.ts",
+      "confidence": "high",
+      "evidenceRefs": [
+        "be_policy_flow://auth_accounts#*.middlewareChain.rate_limit",
+        "be_policy_flow://enrollment_trial#*.middlewareChain.rate_limit",
+        "be_policy_flow://payment_tracking#getZelleInstructions.middlewareChain.rate_limit",
+        "be_policy_flow://calendar_scheduling#getAvailableTrialDates.middlewareChain.rate_limit"
+      ]
+    },
+    {
+      "id": "jobQueueService",
+      "name": "Background Job & Scheduler Service",
+      "type": "job",
+      "description": "Manages scheduled and background jobs including daily cron-style tasks (payment overdue checks, reminder emails) and a continuous email send worker. Provides a unified interface for scheduling, executing, and monitoring background tasks.",
+      "usedInModules": [
+        "auth_accounts",
+        "payment_tracking",
+        "communication"
+      ],
+      "methods": [
+        {
+          "name": "scheduleRecurringJob",
+          "description": "Register a job to run on a cron schedule (e.g. daily at midnight)",
+          "confidence": "medium",
+          "evidenceRefs": [
+            "db_flow://payment_tracking#scheduledJobs.payment_overdue_check (daily)",
+            "db_flow://communication#scheduledJobs.trial_approaching_reminder (daily)",
+            "db_flow://communication#scheduledJobs.class_start_approaching_reminder (daily)"
+          ]
+        },
+        {
+          "name": "runWorker",
+          "description": "Start a continuous worker that polls for pending tasks (e.g. email send worker)",
+          "confidence": "medium",
+          "evidenceRefs": [
+            "db_flow://communication#scheduledJobs.email_send_worker (continuous/polling)"
+          ]
+        },
+        {
+          "name": "enqueueJob",
+          "description": "Add a one-off job to the queue for async processing (e.g. send a specific email after commit)",
+          "confidence": "medium",
+          "evidenceRefs": [
+            "db_flow://enrollment_trial#bookTrial.transactionNote (Email sent async after commit)",
+            "db_flow://enrollment_trial#submitEnrollment.transactionNote (Email sent async after commit)"
+          ]
+        }
+      ],
+      "dependencies": ["redis"],
+      "config": {
+        "provider": "requires_decision (e.g. BullMQ, node-cron, custom)",
+        "redisUrl": "env:REDIS_URL",
+        "concurrency": "requires_decision"
+      },
+      "sourceLocation": "src/server/services/jobQueueService.ts",
+      "confidence": "medium",
+      "evidenceRefs": [
+        "db_flow://payment_tracking#scheduledJobs",
+        "db_flow://communication#scheduledJobs",
+        "db_flow://auth_accounts#unresolved.AA-DB-U-01 (session cleanup job deferred)"
+      ],
+      "registeredJobs": [
+        {
+          "name": "payment_overdue_check",
+          "schedule": "daily",
+          "module": "payment_tracking",
+          "description": "Check PENDING payments past overdue threshold, trigger PAYMENT_OVERDUE automation for reminder emails"
+        },
+        {
+          "name": "trial_approaching_reminder",
+          "schedule": "daily",
+          "module": "communication",
+          "description": "Check SCHEDULED trials within reminder window, send TRIAL_APPROACHING emails"
+        },
+        {
+          "name": "class_start_approaching_reminder",
+          "schedule": "daily",
+          "module": "communication",
+          "description": "Check active enrollments with program startDate approaching, send CLASS_START_APPROACHING emails"
+        },
+        {
+          "name": "email_send_worker",
+          "schedule": "continuous",
+          "module": "communication",
+          "description": "Poll CommunicationLog for PENDING entries, attempt send via email provider, update status to SENT or FAILED"
+        },
+        {
+          "name": "session_cleanup",
+          "schedule": "daily",
+          "module": "auth_accounts",
+          "description": "Clean up expired session records from database (deferred — AA-DB-U-01)",
+          "status": "deferred_to_implementation"
+        }
+      ]
+    },
+    {
+      "id": "rolePermissionService",
+      "name": "Role & Permission Service",
+      "type": "auth",
+      "description": "RBAC middleware service that validates the authenticated admin's role against endpoint requirements. Currently single-role (admin) across all protected endpoints. Implemented as role_permission_check middleware in the request chain after auth_session.",
+      "usedInModules": [
+        "admin_dashboard",
+        "lead_management",
+        "enrollment_trial",
+        "program_pricing",
+        "payment_tracking",
+        "calendar_scheduling",
+        "communication",
+        "settings"
+      ],
+      "methods": [
+        {
+          "name": "requireRole",
+          "description": "Middleware that checks if the authenticated user has the required role for the endpoint. Returns 403 if insufficient.",
+          "confidence": "medium",
+          "evidenceRefs": [
+            "be_policy_flow://admin_dashboard#getDashboardMetrics.middlewareChain.role_permission_check",
+            "be_policy_flow://lead_management#getLeads.middlewareChain.role_permission_check",
+            "be_policy_flow://program_pricing#createProgram.middlewareChain.role_permission_check",
+            "be_policy_flow://payment_tracking#updatePayment.middlewareChain.role_permission_check",
+            "be_policy_flow://calendar_scheduling#addCalendarDate.middlewareChain.role_permission_check",
+            "be_policy_flow://communication#createTemplate.middlewareChain.role_permission_check",
+            "be_policy_flow://settings#updateSettings.middlewareChain.role_permission_check"
+          ]
+        }
+      ],
+      "dependencies": ["authService"],
+      "config": {
+        "roles": ["admin"],
+        "note": "Single-role MVP. All admin endpoints require 'admin' role. Role inferred from session — see gaps AD-GAP-01, LM-GAP-01, PP-GAP-01, PT-GAP-02, CS-GAP-01, CM-GAP-01, ST-GAP-01, ET-GAP-02."
+      },
+      "sourceLocation": "src/server/services/rolePermissionService.ts",
+      "confidence": "medium",
+      "evidenceRefs": [
+        "be_policy_flow://*/middlewareChain.role_permission_check (8 modules)",
+        "openapi://auth_accounts#/components/schemas/AdminLoginResponse.user.role (enum: [admin])"
+      ]
+    }
+  ],
+  "middlewareUtilities": [
+    {
+      "id": "requestIdMiddleware",
+      "name": "Request ID Middleware",
+      "description": "Generates a unique request ID for every incoming request. Used for log correlation and distributed tracing. Applied as the first middleware in every endpoint chain across all modules.",
+      "usedInModules": ["all"],
+      "confidence": "high",
+      "evidenceRefs": ["be_policy_flow://*/middlewareChain.request_id (order: 1, all endpoints)"],
+      "note": "Infrastructure middleware, not a standalone service. Does not require its own service file — typically a one-liner Express middleware."
+    },
+    {
+      "id": "inputValidationMiddleware",
+      "name": "Input Validation Middleware (Zod)",
+      "description": "Schema-driven request validation using Zod. Every endpoint with a request body references an x-zod-schema in the OpenAPI contract. Middleware validates request body/query params against the compiled Zod schema and returns 400 on failure.",
+      "usedInModules": ["all"],
+      "confidence": "high",
+      "evidenceRefs": [
+        "be_policy_flow://*/middlewareChain.input_validation",
+        "openapi://*/components/schemas/*.x-zod-schema"
+      ],
+      "note": "Pattern/middleware, not a standalone service. Zod schemas are generated from OpenAPI contracts."
+    }
+  ],
+  "unresolvedServices": [],
+  "crossServiceDependencies": [
+    {
+      "from": "rolePermissionService",
+      "to": "authService",
+      "reason": "Role check requires an authenticated session — authService.validateSession must run first to populate request context with admin role"
+    },
+    {
+      "from": "emailService",
+      "to": "jobQueueService",
+      "reason": "Email sends are enqueued as async jobs (enqueueJob) and processed by the email_send_worker (runWorker). Ensures emails don't block request handling."
+    },
+    {
+      "from": "emailService",
+      "to": "auditLogService",
+      "reason": "Email delivery events (SENT, FAILED) are logged to CommunicationLog (domain-specific) but security-sensitive emails (password reset) should also be audit-logged"
+    },
+    {
+      "from": "jobQueueService",
+      "to": "emailService",
+      "reason": "Scheduled jobs (payment_overdue_check, trial_approaching_reminder, class_start_approaching_reminder) trigger email sends via emailService"
+    }
+  ],
+  "meta": {
+    "totalServices": 6,
+    "highConfidence": 4,
+    "mediumConfidence": 2,
+    "lowConfidence": 0,
+    "middlewareUtilities": 2,
+    "inputModules": 9,
+    "inputFiles": 27,
+    "decisions": [
+      {
+        "id": "DEC-01",
+        "topic": "Audit log storage",
+        "decision": "Database table (AuditLog) + structured JSON logging. DB for admin queryability, structured logs for ops/monitoring.",
+        "alternatives": ["DB only", "Structured logging only"]
+      },
+      {
+        "id": "DEC-02",
+        "topic": "Email service boundary",
+        "decision": "emailService is a thin transport layer. Communication module owns templates, automations, and log UI. emailService handles: render template -> send via provider -> log to CommunicationLog.",
+        "alternatives": ["Single monolithic communication service"]
+      },
+      {
+        "id": "DEC-03",
+        "topic": "requestId and inputValidation classification",
+        "decision": "Classified as middleware utilities, not standalone services. They are stateless, single-purpose middleware with no external dependencies. Listed in middlewareUtilities section for completeness.",
+        "alternatives": ["Include as full services in registry"]
+      }
+    ]
+  }
+}

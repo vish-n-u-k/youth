@@ -1,0 +1,352 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Lead Management API",
+    "version": "v1.0.0",
+    "x-module-id": "lead_management",
+    "x-contract-status": "draft",
+    "x-change-type": "none"
+  },
+  "paths": {
+    "/api/leads": {
+      "get": {
+        "operationId": "getLeads",
+        "summary": "List leads with optional filters, search, and pagination",
+        "tags": ["leads"],
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["new", "contacted", "trial_scheduled", "trial_attended", "enrolled", "dropped", "not_interested"] } },
+          { "name": "source", "in": "query", "schema": { "type": "string", "enum": ["facebook", "google", "website", "manual"] } },
+          { "name": "programId", "in": "query", "schema": { "type": "string" } },
+          { "name": "search", "in": "query", "description": "Search by parent name or email", "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "minimum": 1, "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 25 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated lead list",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LeadListResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } }
+          }
+        }
+      }
+    },
+    "/api/leads/{leadId}": {
+      "get": {
+        "operationId": "getLead",
+        "summary": "Get single lead details",
+        "tags": ["leads"],
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          { "name": "leadId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lead details",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LeadResponse" } } }
+          },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "404": { "description": "Lead not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      },
+      "put": {
+        "operationId": "updateLead",
+        "summary": "Update lead profile fields",
+        "tags": ["leads"],
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          { "name": "leadId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateLeadRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Lead updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LeadResponse" } } } },
+          "400": { "description": "Validation error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "404": { "description": "Lead not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/leads/{leadId}/status": {
+      "patch": {
+        "operationId": "updateLeadStatus",
+        "summary": "Update lead status (e.g. Kanban drag-and-drop)",
+        "tags": ["leads"],
+        "security": [{ "cookieAuth": [] }],
+        "x-policy-ref": "GP-04: Lead status auto-advances on enrollment events; admin can always manually override",
+        "parameters": [
+          { "name": "leadId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateLeadStatusRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Status updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LeadResponse" } } } },
+          "400": { "description": "Invalid status transition", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "404": { "description": "Lead not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/leads/{leadId}/notes": {
+      "get": {
+        "operationId": "getLeadNotes",
+        "summary": "Get all notes for a lead",
+        "tags": ["leads"],
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          { "name": "leadId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Lead notes", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LeadNotesResponse" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "404": { "description": "Lead not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      },
+      "post": {
+        "operationId": "addLeadNote",
+        "summary": "Add a note to a lead",
+        "tags": ["leads"],
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          { "name": "leadId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AddLeadNoteRequest" } } }
+        },
+        "responses": {
+          "201": { "description": "Note added", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LeadNoteResponse" } } } },
+          "400": { "description": "Validation error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "404": { "description": "Lead not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/leads/{leadId}/activity": {
+      "get": {
+        "operationId": "getLeadActivity",
+        "summary": "Get activity timeline for a lead",
+        "tags": ["leads"],
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          { "name": "leadId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Activity timeline", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LeadActivityResponse" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "404": { "description": "Lead not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/leads/{leadId}/send-trial-link": {
+      "post": {
+        "operationId": "sendTrialBookingLink",
+        "summary": "Send trial booking link email to lead",
+        "tags": ["leads"],
+        "security": [{ "cookieAuth": [] }],
+        "x-handoff-ref": "HO-01: lead_management -> enrollment_trial",
+        "parameters": [
+          { "name": "leadId", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SendTrialLinkRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Trial link sent", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SendTrialLinkResponse" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "404": { "description": "Lead not found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error or email delivery failure", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "LeadListResponse": {
+        "type": "object",
+        "required": ["leads", "total", "page", "limit"],
+        "properties": {
+          "leads": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["leadId", "parentName", "email", "source", "status", "createdAt", "updatedAt"],
+              "properties": {
+                "leadId": { "type": "string" },
+                "parentName": { "type": "string" },
+                "email": { "type": "string", "format": "email" },
+                "phone": { "type": "string", "nullable": true },
+                "childName": { "type": "string", "nullable": true },
+                "childAge": { "type": "integer", "nullable": true },
+                "source": { "type": "string", "enum": ["facebook", "google", "website", "manual"] },
+                "status": { "type": "string", "enum": ["new", "contacted", "trial_scheduled", "trial_attended", "enrolled", "dropped", "not_interested"] },
+                "interestedProgram": { "type": "string", "nullable": true },
+                "createdAt": { "type": "string", "format": "date-time" },
+                "updatedAt": { "type": "string", "format": "date-time" }
+              }
+            }
+          },
+          "total": { "type": "integer" },
+          "page": { "type": "integer" },
+          "limit": { "type": "integer" }
+        },
+        "x-zod-schema": "LeadListResponse"
+      },
+      "LeadResponse": {
+        "type": "object",
+        "required": ["leadId", "parentName", "email", "source", "status", "locationId", "createdAt", "updatedAt"],
+        "properties": {
+          "leadId": { "type": "string" },
+          "parentName": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "phone": { "type": "string", "nullable": true },
+          "childName": { "type": "string", "nullable": true },
+          "childAge": { "type": "integer", "nullable": true },
+          "source": { "type": "string", "enum": ["facebook", "google", "website", "manual"] },
+          "status": { "type": "string", "enum": ["new", "contacted", "trial_scheduled", "trial_attended", "enrolled", "dropped", "not_interested"] },
+          "interestedProgram": { "type": "string", "nullable": true },
+          "locationId": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "x-zod-schema": "LeadResponse"
+      },
+      "UpdateLeadRequest": {
+        "type": "object",
+        "required": ["parentName", "email"],
+        "properties": {
+          "parentName": { "type": "string", "minLength": 1 },
+          "email": { "type": "string", "format": "email" },
+          "phone": { "type": "string" },
+          "childName": { "type": "string" },
+          "childAge": { "type": "integer", "minimum": 0, "maximum": 18 },
+          "interestedProgram": { "type": "string" }
+        },
+        "x-zod-schema": "UpdateLeadRequest"
+      },
+      "UpdateLeadStatusRequest": {
+        "type": "object",
+        "required": ["status"],
+        "properties": {
+          "status": { "type": "string", "enum": ["new", "contacted", "trial_scheduled", "trial_attended", "enrolled", "dropped", "not_interested"] }
+        },
+        "x-zod-schema": "UpdateLeadStatusRequest"
+      },
+      "LeadNotesResponse": {
+        "type": "object",
+        "required": ["notes"],
+        "properties": {
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["noteId", "text", "author", "createdAt"],
+              "properties": {
+                "noteId": { "type": "string" },
+                "text": { "type": "string" },
+                "author": { "type": "string" },
+                "createdAt": { "type": "string", "format": "date-time" }
+              }
+            }
+          }
+        },
+        "x-zod-schema": "LeadNotesResponse"
+      },
+      "AddLeadNoteRequest": {
+        "type": "object",
+        "required": ["text"],
+        "properties": {
+          "text": { "type": "string", "minLength": 1 }
+        },
+        "x-zod-schema": "AddLeadNoteRequest"
+      },
+      "LeadNoteResponse": {
+        "type": "object",
+        "required": ["noteId", "text", "author", "createdAt"],
+        "properties": {
+          "noteId": { "type": "string" },
+          "text": { "type": "string" },
+          "author": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        },
+        "x-zod-schema": "LeadNoteResponse"
+      },
+      "LeadActivityResponse": {
+        "type": "object",
+        "required": ["activities"],
+        "properties": {
+          "activities": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["activityId", "type", "description", "timestamp"],
+              "properties": {
+                "activityId": { "type": "string" },
+                "type": { "type": "string", "enum": ["status_change", "email_sent", "enrollment_event", "note_added", "lead_created"] },
+                "description": { "type": "string" },
+                "timestamp": { "type": "string", "format": "date-time" },
+                "metadata": { "type": "object", "additionalProperties": { "type": "string" } }
+              }
+            }
+          }
+        },
+        "x-zod-schema": "LeadActivityResponse"
+      },
+      "SendTrialLinkRequest": {
+        "type": "object",
+        "properties": {
+          "programId": { "type": "string" }
+        },
+        "x-zod-schema": "SendTrialLinkRequest"
+      },
+      "SendTrialLinkResponse": {
+        "type": "object",
+        "required": ["message", "emailSent"],
+        "properties": {
+          "message": { "type": "string" },
+          "emailSent": { "type": "boolean" }
+        },
+        "x-zod-schema": "SendTrialLinkResponse"
+      },
+      "ApiError": {
+        "type": "object",
+        "required": ["error", "message", "statusCode"],
+        "properties": {
+          "error": { "type": "string" },
+          "message": { "type": "string" },
+          "statusCode": { "type": "integer" }
+        },
+        "x-zod-schema": "ApiError"
+      }
+    },
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "session"
+      }
+    }
+  }
+}

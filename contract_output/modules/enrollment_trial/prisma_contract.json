@@ -1,0 +1,344 @@
+{
+  "moduleId": "enrollment_trial",
+  "contractVersion": "v1.0.0",
+  "status": "draft",
+  "changeType": "none",
+  "models": [
+    {
+      "model": "Trial",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@id", "@default(cuid())"],
+          "sourceRefs": ["openapi://TrialBookingResponse.trialId"]
+        },
+        {
+          "name": "programId",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://BookTrialRequest.programId", "openapi://TrialBookingResponse.programId"]
+        },
+        {
+          "name": "trialDateId",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://BookTrialRequest.trialDateId", "openapi://TrialBookingResponse.trialDateId"]
+        },
+        {
+          "name": "parentName",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://BookTrialRequest.parentName", "fe://trial_booking_form.parentName"]
+        },
+        {
+          "name": "parentEmail",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://BookTrialRequest.parentEmail", "fe://trial_booking_form.parentEmail"]
+        },
+        {
+          "name": "parentPhone",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://BookTrialRequest.parentPhone", "fe://trial_booking_form.parentPhone"]
+        },
+        {
+          "name": "childName",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://BookTrialRequest.childName", "fe://trial_booking_form.childName"]
+        },
+        {
+          "name": "childAge",
+          "type": "Int",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://BookTrialRequest.childAge", "fe://trial_booking_form.childAge"]
+        },
+        {
+          "name": "status",
+          "type": "TrialStatus",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(SCHEDULED)"],
+          "sourceRefs": ["openapi://TrialBookingResponse.status"]
+        },
+        {
+          "name": "leadId",
+          "type": "String",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["global://GP-02", "global://GP-04"]
+        },
+        {
+          "name": "bookedAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(now())"],
+          "sourceRefs": ["openapi://TrialBookingResponse.bookedAt"]
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@updatedAt"],
+          "sourceRefs": ["db_internal"]
+        }
+      ],
+      "indexes": [
+        "@@index([programId])",
+        "@@index([trialDateId])",
+        "@@index([parentEmail])",
+        "@@index([leadId])",
+        "@@index([status])"
+      ],
+      "uniques": [],
+      "relations": [
+        {
+          "name": "program",
+          "kind": "manyToOne",
+          "target": "Program",
+          "fkFields": ["programId"],
+          "references": ["id"]
+        },
+        {
+          "name": "trialDate",
+          "kind": "manyToOne",
+          "target": "CalendarDate",
+          "fkFields": ["trialDateId"],
+          "references": ["id"]
+        },
+        {
+          "name": "lead",
+          "kind": "manyToOne",
+          "target": "Lead",
+          "fkFields": ["leadId"],
+          "references": ["id"]
+        },
+        {
+          "name": "enrollment",
+          "kind": "oneToOne",
+          "target": "Enrollment",
+          "fkFields": [],
+          "references": []
+        }
+      ]
+    },
+    {
+      "model": "Enrollment",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@id", "@default(cuid())"],
+          "sourceRefs": ["openapi://EnrollmentResponse.enrollmentId"]
+        },
+        {
+          "name": "programId",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://SubmitEnrollmentRequest.programId", "openapi://EnrollmentResponse.programId"]
+        },
+        {
+          "name": "parentName",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://SubmitEnrollmentRequest.parentName", "fe://enrollment_form.parentName"]
+        },
+        {
+          "name": "parentEmail",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://SubmitEnrollmentRequest.parentEmail", "fe://enrollment_form.parentEmail"]
+        },
+        {
+          "name": "parentPhone",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://SubmitEnrollmentRequest.parentPhone", "fe://enrollment_form.parentPhone"]
+        },
+        {
+          "name": "childName",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://SubmitEnrollmentRequest.childName", "fe://enrollment_form.childName"]
+        },
+        {
+          "name": "childAge",
+          "type": "Int",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://SubmitEnrollmentRequest.childAge", "fe://enrollment_form.childAge"]
+        },
+        {
+          "name": "status",
+          "type": "EnrollmentStatus",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(ACTIVE)"],
+          "sourceRefs": ["openapi://EnrollmentResponse.status", "analysis://ET-A-02"]
+        },
+        {
+          "name": "totalDue",
+          "type": "Float",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://EnrollmentResponse.totalDue"]
+        },
+        {
+          "name": "priceBreakdown",
+          "type": "Json",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://EnrollmentResponse.priceBreakdown"]
+        },
+        {
+          "name": "couponCode",
+          "type": "String",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://SubmitEnrollmentRequest.couponCode", "fe://enrollment_form.couponCode"]
+        },
+        {
+          "name": "leadId",
+          "type": "String",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["global://GP-02", "global://GP-04"]
+        },
+        {
+          "name": "trialId",
+          "type": "String",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://EnrollmentResponse.trialId"]
+        },
+        {
+          "name": "cancellationReason",
+          "type": "String",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://UpdateEnrollmentStatusRequest.cancellationReason"]
+        },
+        {
+          "name": "enrolledAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(now())"],
+          "sourceRefs": ["openapi://EnrollmentResponse.enrolledAt"]
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@updatedAt"],
+          "sourceRefs": ["db_internal"]
+        }
+      ],
+      "indexes": [
+        "@@index([programId])",
+        "@@index([parentEmail])",
+        "@@index([status])",
+        "@@index([leadId])",
+        "@@index([programId, status])",
+        "@@index([enrolledAt])"
+      ],
+      "uniques": ["@@unique([trialId])"],
+      "relations": [
+        {
+          "name": "program",
+          "kind": "manyToOne",
+          "target": "Program",
+          "fkFields": ["programId"],
+          "references": ["id"]
+        },
+        {
+          "name": "lead",
+          "kind": "manyToOne",
+          "target": "Lead",
+          "fkFields": ["leadId"],
+          "references": ["id"]
+        },
+        {
+          "name": "trial",
+          "kind": "oneToOne",
+          "target": "Trial",
+          "fkFields": ["trialId"],
+          "references": ["id"]
+        },
+        {
+          "name": "payment",
+          "kind": "oneToOne",
+          "target": "Payment",
+          "fkFields": [],
+          "references": []
+        }
+      ]
+    }
+  ],
+  "enumDefs": [
+    {
+      "name": "TrialStatus",
+      "values": ["SCHEDULED", "COMPLETED", "NO_SHOW", "CANCELLED"],
+      "volatilityClassification": "stable",
+      "reason": "Trial lifecycle states are fixed by business workflow. Changes require process redesign."
+    },
+    {
+      "name": "EnrollmentStatus",
+      "values": ["ACTIVE", "CANCELLED", "COMPLETED"],
+      "volatilityClassification": "stable",
+      "reason": "Core enrollment lifecycle. ET-A-02 confirmed instant enrollment for MVP. Future 'PENDING_APPROVAL' would be a code change."
+    }
+  ],
+  "dbNotes": {
+    "instantEnrollment": "ET-A-02 (user approved): Enrollment is instant on submission. No approval workflow. Admin can cancel after the fact via PATCH status.",
+    "onePerChild": "GP-01: One enrollment per child per program. Application-level enforcement — check (childName + childAge + programId) before creating. Not a DB unique constraint because childName/Age is not a reliable unique identifier.",
+    "trialIdUnique": "trialId on Enrollment is unique (nullable) — one-to-one optional relationship. An enrollment may or may not have originated from a trial.",
+    "leadAutoCreation": "GP-02/GP-04: On enrollment/trial submission, if parentEmail matches existing Lead, link to it. Otherwise create new Lead. Lead status auto-advances.",
+    "priceSnapshot": "priceBreakdown stored as JSON snapshot at enrollment time. Captures itemized fees at the point of enrollment, independent of later program price changes.",
+    "noWaitlist": "ET-A-04: No waitlist in MVP. Full program returns 409 Conflict. Admin can manually override.",
+    "handoffs": "HO-01: Lead → Trial booking. HO-02: Enrollment → Payment creation. HO-03: Trial/Enrollment → confirmation emails.",
+    "denormalizedParent": "parentName, parentEmail, parentPhone stored on both Trial and Enrollment. Lead is the authoritative source, but denormalization ensures public forms work without lead lookup.",
+    "cancellationReason": "Required when status transitions to CANCELLED. Application-level validation."
+  }
+}

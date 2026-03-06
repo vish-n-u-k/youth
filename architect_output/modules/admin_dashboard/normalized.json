@@ -1,0 +1,166 @@
+{
+  "moduleId": "admin_dashboard",
+  "contractVersion": "v1.0.0",
+  "normalizedAt": "2026-03-06",
+  "routes": [
+    {
+      "screenId": "dashboard_overview",
+      "name": "Dashboard Overview",
+      "feRoute": "/admin/dashboard",
+      "normalizedRoute": "/admin/dashboard",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "endpointProposals": [
+        { "operationId": "getDashboardMetrics", "method": "GET", "path": "/api/dashboard/metrics" },
+        { "operationId": "getDashboardRecentLeads", "method": "GET", "path": "/api/dashboard/recent-leads" },
+        { "operationId": "getDashboardUpcomingTrials", "method": "GET", "path": "/api/dashboard/upcoming-trials" },
+        { "operationId": "getDashboardPendingPayments", "method": "GET", "path": "/api/dashboard/pending-payments" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://dashboard_overview"]
+    }
+  ],
+  "endpoints": [
+    {
+      "operationId": "getDashboardMetrics",
+      "method": "GET",
+      "path": "/api/dashboard/metrics",
+      "tags": ["dashboard"],
+      "security": ["cookieAuth"],
+      "requestSchema": null,
+      "responseSchema": "DashboardMetricsResponse",
+      "errorSchema": "ApiError",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/dashboard/metrics.get", "fe_details://dashboard_overview.endpointProposals[0]"]
+    },
+    {
+      "operationId": "getDashboardRecentLeads",
+      "method": "GET",
+      "path": "/api/dashboard/recent-leads",
+      "tags": ["dashboard"],
+      "security": ["cookieAuth"],
+      "requestSchema": null,
+      "responseSchema": "DashboardRecentLeadsResponse",
+      "errorSchema": "ApiError",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/dashboard/recent-leads.get", "fe_details://dashboard_overview.endpointProposals[1]"]
+    },
+    {
+      "operationId": "getDashboardUpcomingTrials",
+      "method": "GET",
+      "path": "/api/dashboard/upcoming-trials",
+      "tags": ["dashboard"],
+      "security": ["cookieAuth"],
+      "requestSchema": null,
+      "responseSchema": "DashboardUpcomingTrialsResponse",
+      "errorSchema": "ApiError",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/dashboard/upcoming-trials.get", "fe_details://dashboard_overview.endpointProposals[2]"]
+    },
+    {
+      "operationId": "getDashboardPendingPayments",
+      "method": "GET",
+      "path": "/api/dashboard/pending-payments",
+      "tags": ["dashboard"],
+      "security": ["cookieAuth"],
+      "requestSchema": null,
+      "responseSchema": "DashboardPendingPaymentsResponse",
+      "errorSchema": "ApiError",
+      "confidence": "high",
+      "sourceRefs": ["openapi:///api/dashboard/pending-payments.get", "fe_details://dashboard_overview.endpointProposals[3]"]
+    }
+  ],
+  "rbac": [
+    {
+      "endpointId": "getDashboardMetrics",
+      "roles": ["admin"],
+      "permissions": [],
+      "confidence": "medium",
+      "sourceRefs": ["fe_details://dashboard_overview.allowedRoles", "openapi://security.cookieAuth"],
+      "note": "Role 'admin' from FE allowedRoles; OpenAPI only specifies cookieAuth without x-required-roles"
+    },
+    {
+      "endpointId": "getDashboardRecentLeads",
+      "roles": ["admin"],
+      "permissions": [],
+      "confidence": "medium",
+      "sourceRefs": ["fe_details://dashboard_overview.allowedRoles", "openapi://security.cookieAuth"]
+    },
+    {
+      "endpointId": "getDashboardUpcomingTrials",
+      "roles": ["admin"],
+      "permissions": [],
+      "confidence": "medium",
+      "sourceRefs": ["fe_details://dashboard_overview.allowedRoles", "openapi://security.cookieAuth"]
+    },
+    {
+      "endpointId": "getDashboardPendingPayments",
+      "roles": ["admin"],
+      "permissions": [],
+      "confidence": "medium",
+      "sourceRefs": ["fe_details://dashboard_overview.allowedRoles", "openapi://security.cookieAuth"]
+    }
+  ],
+  "db": {
+    "models": [],
+    "enums": [],
+    "crossModuleDependencies": [
+      {
+        "targetModule": "lead_management",
+        "models": ["Lead"],
+        "reason": "getDashboardMetrics aggregates lead source counts; getDashboardRecentLeads queries recent leads",
+        "confidence": "high",
+        "sourceRefs": ["prisma_contract://dbNotes.queryDependencies"]
+      },
+      {
+        "targetModule": "enrollment_trial",
+        "models": ["Trial", "Enrollment"],
+        "reason": "getDashboardMetrics computes conversion rates; getDashboardUpcomingTrials queries upcoming trials",
+        "confidence": "high",
+        "sourceRefs": ["prisma_contract://dbNotes.queryDependencies"]
+      },
+      {
+        "targetModule": "payment_tracking",
+        "models": ["Payment"],
+        "reason": "getDashboardMetrics summarizes payment statuses; getDashboardPendingPayments queries pending payments",
+        "confidence": "high",
+        "sourceRefs": ["prisma_contract://dbNotes.queryDependencies"]
+      },
+      {
+        "targetModule": "program_pricing",
+        "models": ["Program"],
+        "reason": "getDashboardUpcomingTrials joins Program for program name",
+        "confidence": "high",
+        "sourceRefs": ["prisma_contract://dbNotes.queryDependencies"]
+      }
+    ],
+    "notes": "Admin dashboard has no own tables. All endpoints return computed/aggregated data from other modules."
+  },
+  "signals": [],
+  "unknowns": [
+    {
+      "id": "AD-U-01",
+      "description": "No query parameters defined for any dashboard endpoint (e.g., date range, limit). All data returned as-is on page load.",
+      "confidence": "low",
+      "sourceRefs": ["openapi:///api/dashboard/*.get"],
+      "decision": "Accepted for MVP — metrics are real-time on page load per AD-A-01"
+    },
+    {
+      "id": "AD-U-02",
+      "description": "OpenAPI x-contract-status is 'draft' while fe_details status is 'agreed'. Minor status mismatch.",
+      "confidence": "high",
+      "sourceRefs": ["openapi://info.x-contract-status", "fe_details://status"]
+    }
+  ],
+  "evidence": {
+    "sourcesUsed": ["fe_details.json", "openapi.json", "prisma_contract.json", "zod_patch.json"],
+    "decisions": [
+      {
+        "id": "AD-D-01",
+        "description": "Applied admin role to all 4 endpoints based on FE allowedRoles, despite OpenAPI lacking x-required-roles",
+        "confidence": "medium"
+      }
+    ]
+  }
+}

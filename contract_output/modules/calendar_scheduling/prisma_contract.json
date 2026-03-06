@@ -1,0 +1,107 @@
+{
+  "moduleId": "calendar_scheduling",
+  "contractVersion": "v1.0.0",
+  "status": "draft",
+  "changeType": "none",
+  "models": [
+    {
+      "model": "CalendarDate",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@id", "@default(cuid())"],
+          "sourceRefs": ["openapi://CalendarDateResponse.dateId"]
+        },
+        {
+          "name": "date",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CalendarDateRequest.date", "openapi://CalendarDateResponse.date"]
+        },
+        {
+          "name": "programId",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CalendarDateRequest.programId", "openapi://CalendarDateResponse.programId"]
+        },
+        {
+          "name": "trialEligible",
+          "type": "Boolean",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(false)"],
+          "sourceRefs": ["zod://CalendarDateRequest.trialEligible", "openapi://CalendarDateResponse.trialEligible"]
+        },
+        {
+          "name": "capacity",
+          "type": "Int",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://CalendarDateResponse.capacity"]
+        },
+        {
+          "name": "notes",
+          "type": "String",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://CalendarDateRequest.notes", "openapi://CalendarDateResponse.notes"]
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(now())"],
+          "sourceRefs": ["db_internal"]
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@updatedAt"],
+          "sourceRefs": ["db_internal"]
+        }
+      ],
+      "indexes": [
+        "@@index([programId])",
+        "@@index([date])",
+        "@@index([programId, trialEligible, date])"
+      ],
+      "uniques": ["@@unique([programId, date])"],
+      "relations": [
+        {
+          "name": "program",
+          "kind": "manyToOne",
+          "target": "Program",
+          "fkFields": ["programId"],
+          "references": ["id"]
+        },
+        {
+          "name": "trials",
+          "kind": "oneToMany",
+          "target": "Trial",
+          "fkFields": [],
+          "references": []
+        }
+      ]
+    }
+  ],
+  "enumDefs": [],
+  "dbNotes": {
+    "computedFields": "spotsRemaining is computed at query time: capacity - COUNT(Trial WHERE trialDateId AND status != CANCELLED). programName is joined from Program.name at query time. Neither is stored.",
+    "dateUniqueness": "No duplicate class dates for the same program. Enforced by unique constraint on (programId, date).",
+    "hardDelete": "Current API supports DELETE /api/calendar/:dateId. Hard delete is acceptable since trial bookings reference by trialDateId FK — deletion will fail if trials reference the date (FK constraint prevents orphans).",
+    "trialDates": "CS-A-01/A-11: Trial bookings require selecting from admin-defined trial-eligible dates. Parent-facing endpoint filters by trialEligible=true AND date >= now AND spotsRemaining > 0.",
+    "handoff": "HO-05: Parent selects trial date from calendar → navigates to trial booking form with date pre-selected."
+  }
+}

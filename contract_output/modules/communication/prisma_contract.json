@@ -1,0 +1,278 @@
+{
+  "moduleId": "communication",
+  "contractVersion": "v1.0.0",
+  "status": "draft",
+  "changeType": "none",
+  "models": [
+    {
+      "model": "Template",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@id", "@default(cuid())"],
+          "sourceRefs": ["openapi://TemplateResponse.templateId"]
+        },
+        {
+          "name": "name",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://TemplateRequest.name", "fe://template_manager.name"]
+        },
+        {
+          "name": "subject",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://TemplateRequest.subject", "fe://template_manager.subject"]
+        },
+        {
+          "name": "body",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@db.Text"],
+          "sourceRefs": ["zod://TemplateRequest.body", "fe://template_manager.body"]
+        },
+        {
+          "name": "isDefault",
+          "type": "Boolean",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(false)"],
+          "sourceRefs": ["openapi://TemplateResponse.isDefault", "analysis://CM-A-01"]
+        },
+        {
+          "name": "triggerEvent",
+          "type": "String",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://TemplateResponse.triggerEvent"]
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(now())"],
+          "sourceRefs": ["openapi://TemplateResponse.createdAt"]
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@updatedAt"],
+          "sourceRefs": ["openapi://TemplateResponse.updatedAt"]
+        }
+      ],
+      "indexes": [
+        "@@index([isDefault])",
+        "@@index([triggerEvent])"
+      ],
+      "uniques": [],
+      "relations": [
+        {
+          "name": "automations",
+          "kind": "oneToMany",
+          "target": "Automation",
+          "fkFields": [],
+          "references": []
+        }
+      ]
+    },
+    {
+      "model": "Automation",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@id", "@default(cuid())"],
+          "sourceRefs": ["openapi://AutomationResponse.automationId"]
+        },
+        {
+          "name": "triggerEvent",
+          "type": "TriggerEvent",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://AutomationRequest.triggerEvent", "openapi://AutomationResponse.triggerEvent"]
+        },
+        {
+          "name": "templateId",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://AutomationRequest.templateId", "openapi://AutomationResponse.templateId"]
+        },
+        {
+          "name": "delayMinutes",
+          "type": "Int",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://AutomationRequest.delayMinutes", "openapi://AutomationResponse.delayMinutes"]
+        },
+        {
+          "name": "enabled",
+          "type": "Boolean",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(true)"],
+          "sourceRefs": ["zod://AutomationRequest.enabled", "openapi://AutomationResponse.enabled"]
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@updatedAt"],
+          "sourceRefs": ["openapi://AutomationResponse.updatedAt"]
+        }
+      ],
+      "indexes": ["@@index([enabled])"],
+      "uniques": ["@@unique([triggerEvent])"],
+      "relations": [
+        {
+          "name": "template",
+          "kind": "manyToOne",
+          "target": "Template",
+          "fkFields": ["templateId"],
+          "references": ["id"]
+        }
+      ]
+    },
+    {
+      "model": "CommunicationLog",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@id", "@default(cuid())"],
+          "sourceRefs": ["openapi://CommunicationLogEntry.logId"]
+        },
+        {
+          "name": "recipientEmail",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://CommunicationLogEntry.recipientEmail"]
+        },
+        {
+          "name": "recipientName",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://CommunicationLogEntry.recipientName"]
+        },
+        {
+          "name": "subject",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://CommunicationLogEntry.subject"]
+        },
+        {
+          "name": "templateName",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://CommunicationLogEntry.templateName"]
+        },
+        {
+          "name": "triggerEvent",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://CommunicationLogEntry.triggerEvent"]
+        },
+        {
+          "name": "deliveryStatus",
+          "type": "DeliveryStatus",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(PENDING)"],
+          "sourceRefs": ["openapi://CommunicationLogEntry.deliveryStatus"]
+        },
+        {
+          "name": "sentAt",
+          "type": "DateTime",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://CommunicationLogEntry.sentAt"]
+        },
+        {
+          "name": "failureReason",
+          "type": "String",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://CommunicationLogEntry.failureReason"]
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(now())"],
+          "sourceRefs": ["db_internal"]
+        }
+      ],
+      "indexes": [
+        "@@index([deliveryStatus])",
+        "@@index([triggerEvent])",
+        "@@index([deliveryStatus, sentAt])",
+        "@@index([recipientEmail, sentAt])"
+      ],
+      "uniques": [],
+      "relations": []
+    }
+  ],
+  "enumDefs": [
+    {
+      "name": "TriggerEvent",
+      "values": [
+        "LEAD_CREATED",
+        "TRIAL_SCHEDULED",
+        "TRIAL_APPROACHING",
+        "ENROLLMENT_COMPLETED",
+        "PAYMENT_OVERDUE",
+        "CLASS_START_APPROACHING"
+      ],
+      "volatilityClassification": "stable",
+      "reason": "Trigger events map to system events requiring code changes to add. 6 fixed triggers with pre-created automations."
+    },
+    {
+      "name": "DeliveryStatus",
+      "values": ["PENDING", "SENT", "FAILED"],
+      "volatilityClassification": "stable",
+      "reason": "Standard email delivery lifecycle. Adding SMS/WhatsApp in Phase 2 would reuse same statuses."
+    }
+  ],
+  "dbNotes": {
+    "defaultTemplates": "CM-A-01: 6 default templates are pre-created via seed data. Editable but not deletable (isDefault=true protected at application level).",
+    "automationSeeds": "6 automation rows pre-created (one per TriggerEvent). No CREATE/DELETE endpoints — only UPDATE to change template, delay, or enabled status.",
+    "logImmutability": "CommunicationLog is append-only (no update/delete). Each send attempt creates a new entry. Retry creates a new log entry, does not update existing.",
+    "noForeignKeysOnLog": "CommunicationLog intentionally has no FK to Template or Automation. It stores snapshot data (templateName, subject with variables interpolated) for audit independence.",
+    "emailOnly": "CM-A-02 (user approved): Email only in MVP. Channel abstraction for SMS/WhatsApp is Phase 2. No channel field needed yet.",
+    "variablePlaceholders": "Template body stores {{variable_name}} placeholders. availableVariables array in API response is derived by parsing body at query time, not stored.",
+    "handoffs": "HO-03: Trial/enrollment → email triggers. HO-04: Payment overdue → reminder email. Both fire via automation engine, not direct API calls."
+  }
+}

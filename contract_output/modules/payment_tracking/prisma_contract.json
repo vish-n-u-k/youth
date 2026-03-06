@@ -1,0 +1,114 @@
+{
+  "moduleId": "payment_tracking",
+  "contractVersion": "v1.0.0",
+  "status": "draft",
+  "changeType": "none",
+  "models": [
+    {
+      "model": "Payment",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@id", "@default(cuid())"],
+          "sourceRefs": ["openapi://PaymentDetailResponse.paymentId"]
+        },
+        {
+          "name": "enrollmentId",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://PaymentDetailResponse.enrollmentId", "global://HO-02"]
+        },
+        {
+          "name": "status",
+          "type": "PaymentStatus",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(PENDING)"],
+          "sourceRefs": ["zod://UpdatePaymentRequest.status", "openapi://PaymentDetailResponse.status"]
+        },
+        {
+          "name": "amountDue",
+          "type": "Float",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["openapi://PaymentDetailResponse.amountDue"]
+        },
+        {
+          "name": "amountReceived",
+          "type": "Float",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(0)"],
+          "sourceRefs": ["zod://UpdatePaymentRequest.amountReceived", "openapi://PaymentDetailResponse.amountReceived"]
+        },
+        {
+          "name": "paymentMethod",
+          "type": "String",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://UpdatePaymentRequest.paymentMethod", "openapi://PaymentDetailResponse.paymentMethod"]
+        },
+        {
+          "name": "notes",
+          "type": "String",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://UpdatePaymentRequest.notes", "openapi://PaymentDetailResponse.notes"]
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(now())"],
+          "sourceRefs": ["openapi://PaymentDetailResponse.createdAt"]
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@updatedAt"],
+          "sourceRefs": ["openapi://PaymentDetailResponse.lastUpdated"]
+        }
+      ],
+      "indexes": [
+        "@@index([status])",
+        "@@index([status, createdAt])"
+      ],
+      "uniques": ["@@unique([enrollmentId])"],
+      "relations": [
+        {
+          "name": "enrollment",
+          "kind": "oneToOne",
+          "target": "Enrollment",
+          "fkFields": ["enrollmentId"],
+          "references": ["id"]
+        }
+      ]
+    }
+  ],
+  "enumDefs": [
+    {
+      "name": "PaymentStatus",
+      "values": ["PENDING", "PAID", "PARTIAL", "WAIVED"],
+      "volatilityClassification": "stable",
+      "reason": "Payment lifecycle states are fixed. Adding new states (e.g., refunded) would require business process changes."
+    }
+  ],
+  "dbNotes": {
+    "oneToOneEnrollment": "One payment per enrollment. enrollmentId is unique FK. Payment auto-created when enrollment is submitted (HO-02).",
+    "computedFields": "remainingBalance (amountDue - amountReceived) is computed at query time. parentName, parentEmail, childName, programName are joined from Enrollment → Lead/Program at query time.",
+    "manualPayments": "A-13/PT-A-02: Partial payments tracked manually by admin. No automated installment schedules.",
+    "overdueThreshold": "PT-A-01/A-07: Payment overdue threshold configurable by admin (default 3 days). Stored in LocationSettings or handled by application config. Background job checks threshold and triggers HO-04 → communication module.",
+    "zelleInstructions": "Zelle payment instructions for parent-facing page are read from LocationSettings (zelleRecipientName, zelleContactInfo, zelleInstructions). No payment-specific Zelle fields stored."
+  }
+}

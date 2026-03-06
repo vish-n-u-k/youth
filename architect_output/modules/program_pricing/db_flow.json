@@ -1,0 +1,267 @@
+{
+  "moduleId": "program_pricing",
+  "generatedAt": "2026-03-06",
+  "dbFlowVersion": "v1.0.0",
+  "endpoints": [
+    {
+      "operationId": "getPrograms",
+      "method": "GET",
+      "path": "/api/programs",
+      "dbOperations": [
+        {
+          "model": "Program",
+          "operation": "READ",
+          "description": "Paginated list of programs with status filter, includes computed enrollmentCount",
+          "queryType": "list",
+          "filters": ["status"],
+          "pagination": true,
+          "computedFields": ["enrollmentCount (COUNT of Enrollment where programId)", "totalFee (computed from baseFee, feeType, totalSessions)"],
+          "joins": ["LocationSettings (for location name)", "Enrollment (for count aggregate)"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/programs.get", "prisma_contract://models.Program"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "createProgram",
+      "method": "POST",
+      "path": "/api/programs",
+      "dbOperations": [
+        {
+          "model": "LocationSettings",
+          "operation": "READ",
+          "description": "Validate locationId exists",
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.Program.relations.locationSettings"]
+        },
+        {
+          "model": "Program",
+          "operation": "CREATE",
+          "description": "Create new program (default status DRAFT)",
+          "fields": ["id", "name", "ageGroupMin", "ageGroupMax", "totalSessions", "sessionDuration", "location", "locationId", "startDate", "endDate", "capacity", "status", "baseFee", "feeType", "registrationFee", "registrationFeeRequired", "trialAvailable", "createdAt"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/programs.post", "prisma_contract://models.Program"]
+        }
+      ],
+      "transactionBoundary": "single-write",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_program_created",
+          "description": "Audit log records program creation",
+          "confidence": "medium",
+          "inferred": true,
+          "sourceRefs": ["be_policy_flow://createProgram.middlewareChain.audit_log"]
+        }
+      ],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "getProgram",
+      "method": "GET",
+      "path": "/api/programs/{programId}",
+      "dbOperations": [
+        {
+          "model": "Program",
+          "operation": "READ",
+          "description": "Fetch single program with computed fields",
+          "filters": ["id"],
+          "computedFields": ["enrollmentCount", "totalFee"],
+          "joins": ["LocationSettings", "Enrollment (for count)"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/programs/{programId}.get", "prisma_contract://models.Program"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "updateProgram",
+      "method": "PUT",
+      "path": "/api/programs/{programId}",
+      "dbOperations": [
+        {
+          "model": "Program",
+          "operation": "READ",
+          "description": "Read current program state for transition validation",
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["prisma_contract://models.Program"]
+        },
+        {
+          "model": "LocationSettings",
+          "operation": "READ",
+          "description": "If transitioning to ACTIVE, validate Zelle config is complete (zelleRecipientName, zelleContactInfo required)",
+          "filters": ["id (via program.locationId)"],
+          "confidence": "medium",
+          "conditional": "only when status changing to ACTIVE",
+          "inferred": true,
+          "sourceRefs": ["be_policy_flow://updateProgram.middlewareChain.business_rule_guard"]
+        },
+        {
+          "model": "Enrollment",
+          "operation": "READ",
+          "description": "Check enrollment count vs capacity if capacity is being reduced",
+          "queryType": "count",
+          "filters": ["programId", "status == ACTIVE"],
+          "confidence": "medium",
+          "conditional": "only when capacity is being reduced",
+          "inferred": true,
+          "sourceRefs": ["be_policy_flow://updateProgram.middlewareChain.business_rule_guard"]
+        },
+        {
+          "model": "Program",
+          "operation": "UPDATE",
+          "description": "Update program fields",
+          "fields": ["name", "ageGroupMin", "ageGroupMax", "totalSessions", "sessionDuration", "location", "locationId", "startDate", "endDate", "capacity", "status", "baseFee", "feeType", "registrationFee", "registrationFeeRequired", "trialAvailable", "updatedAt"],
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/programs/{programId}.put", "prisma_contract://models.Program"]
+        }
+      ],
+      "transactionBoundary": "multi-entity",
+      "transactionNote": "Status transition validation (Zelle config check, capacity check) + update must be atomic",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_program_updated",
+          "description": "Audit log records program update (especially status transitions)",
+          "confidence": "medium",
+          "inferred": true,
+          "sourceRefs": ["be_policy_flow://updateProgram.middlewareChain.audit_log"]
+        }
+      ],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "getCoupons",
+      "method": "GET",
+      "path": "/api/coupons",
+      "dbOperations": [
+        {
+          "model": "Coupon",
+          "operation": "READ",
+          "description": "List all coupons",
+          "queryType": "list",
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/coupons.get", "prisma_contract://models.Coupon"]
+        }
+      ],
+      "transactionBoundary": "single-read",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "createCoupon",
+      "method": "POST",
+      "path": "/api/coupons",
+      "dbOperations": [
+        {
+          "model": "Coupon",
+          "operation": "CREATE",
+          "description": "Create new coupon (code uniqueness enforced at DB level)",
+          "fields": ["id", "code", "discountType", "discountValue", "scope", "expiresAt", "usageLimit", "usageCount", "createdAt"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/coupons.post", "prisma_contract://models.Coupon"]
+        }
+      ],
+      "transactionBoundary": "single-write",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "updateCoupon",
+      "method": "PUT",
+      "path": "/api/coupons/{couponId}",
+      "dbOperations": [
+        {
+          "model": "Coupon",
+          "operation": "UPDATE",
+          "description": "Update coupon fields (code uniqueness re-validated at DB level)",
+          "fields": ["code", "discountType", "discountValue", "scope", "expiresAt", "usageLimit"],
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/coupons/{couponId}.put", "prisma_contract://models.Coupon"]
+        }
+      ],
+      "transactionBoundary": "single-write",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [],
+      "dbTriggers": []
+    },
+    {
+      "operationId": "deleteCoupon",
+      "method": "DELETE",
+      "path": "/api/coupons/{couponId}",
+      "dbOperations": [
+        {
+          "model": "Coupon",
+          "operation": "DELETE",
+          "description": "Hard delete coupon record",
+          "filters": ["id"],
+          "confidence": "high",
+          "sourceRefs": ["openapi:///api/coupons/{couponId}.delete", "prisma_contract://models.Coupon"]
+        }
+      ],
+      "transactionBoundary": "single-write",
+      "dataCriticality": "workspace_data",
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_coupon_deleted",
+          "description": "Audit log records coupon deletion",
+          "confidence": "medium",
+          "inferred": true,
+          "sourceRefs": ["be_policy_flow://deleteCoupon.middlewareChain.audit_log"]
+        }
+      ],
+      "dbTriggers": []
+    }
+  ],
+  "modelSummary": {
+    "Program": {
+      "operations": ["CREATE", "READ", "UPDATE"],
+      "dataCriticality": "workspace_data",
+      "note": "No DELETE — programs are soft-closed via CLOSED status",
+      "sourceRefs": ["prisma_contract://models.Program"]
+    },
+    "Coupon": {
+      "operations": ["CREATE", "READ", "UPDATE", "DELETE"],
+      "dataCriticality": "workspace_data",
+      "note": "Hard delete. No FK references from Enrollment (couponCode stored as string snapshot).",
+      "sourceRefs": ["prisma_contract://models.Coupon"]
+    }
+  },
+  "crossModuleDependencies": [
+    {
+      "targetModule": "settings",
+      "models": ["LocationSettings"],
+      "accessType": "READ",
+      "reason": "Validate Zelle config before ACTIVE status transition; location name for display",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.Program.relations.locationSettings"]
+    },
+    {
+      "targetModule": "enrollment_trial",
+      "models": ["Enrollment"],
+      "accessType": "READ",
+      "reason": "Enrollment count aggregate for program list/detail; capacity validation on update",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.Program.relations.enrollments"]
+    }
+  ],
+  "scheduledJobs": [],
+  "dbTriggers": [],
+  "unresolved": []
+}

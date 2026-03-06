@@ -1,5 +1,34 @@
 {
   "moduleId": "enrollment_trial",
   "contractVersion": "v1.0.0",
-  "changes": []
+  "changes": [
+    {
+      "changeId": "ET-CL-01",
+      "date": "2026-03-06",
+      "type": "non_breaking",
+      "description": "Added admin enrollment management screens and endpoints",
+      "details": [
+        "Added screen: admin_enrollment_list (/admin/enrollments) — list all enrollments with filters and search",
+        "Added screen: admin_enrollment_detail (/admin/enrollments/:enrollmentId) — view full enrollment details, cancel or complete",
+        "Added endpoints: GET /api/enrollments, GET /api/enrollments/:enrollmentId, PATCH /api/enrollments/:enrollmentId/status",
+        "Added Zod schemas: AdminEnrollmentListQuery, AdminEnrollmentListResponse, AdminEnrollmentDetailResponse, UpdateEnrollmentStatusRequest",
+        "Added state matrix entries for both new screens including custom states for cancellation and invalid transitions"
+      ],
+      "reason": "BLK-01: Global navigation listed 'Enrollments' for admin role but no module provided backing screens or endpoints",
+      "addedBy": "be_contract_agent"
+    },
+    {
+      "changeId": "ET-CL-02",
+      "date": "2026-03-06",
+      "type": "none",
+      "description": "Confirmed assumption ET-A-02: instant enrollment for MVP",
+      "details": [
+        "ET-A-02 state changed from 'open' to 'confirmed'",
+        "ET-A-02 approvalState changed from 'pending_human_review' to 'user_approved'",
+        "Admin can cancel enrollments after the fact via the new PATCH /api/enrollments/:enrollmentId/status endpoint"
+      ],
+      "reason": "BLK-02: User confirmed instant enrollment without approval flow for MVP",
+      "addedBy": "be_contract_agent"
+    }
+  ]
 }

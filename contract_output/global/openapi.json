@@ -1,0 +1,111 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Global Platform API",
+    "version": "v1.0.0",
+    "x-module-id": "global",
+    "x-contract-status": "draft",
+    "x-change-type": "none",
+    "description": "Cross-module platform-wide endpoints for navigation, session management, and health checks"
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "operationId": "healthCheck",
+        "summary": "Platform health check",
+        "tags": ["platform"],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["status"],
+                  "properties": {
+                    "status": { "type": "string", "enum": ["ok"] },
+                    "timestamp": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/navigation/menu": {
+      "get": {
+        "operationId": "getNavigationMenu",
+        "summary": "Get role-based navigation menu items for the current user",
+        "tags": ["navigation"],
+        "security": [{ "cookieAuth": [] }],
+        "x-policy-ref": "Role visibility rules from fe_global_contract.json",
+        "responses": {
+          "200": {
+            "description": "Navigation menu for current user role",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/NavigationMenuResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "NavigationMenuResponse": {
+        "type": "object",
+        "required": ["role", "sections"],
+        "properties": {
+          "role": { "type": "string", "enum": ["admin", "parent", "staff"] },
+          "sections": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["label", "path", "icon"],
+              "properties": {
+                "label": { "type": "string" },
+                "path": { "type": "string" },
+                "icon": { "type": "string" },
+                "children": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["label", "path"],
+                    "properties": {
+                      "label": { "type": "string" },
+                      "path": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ApiError": {
+        "type": "object",
+        "required": ["error", "message", "statusCode"],
+        "properties": {
+          "error": { "type": "string" },
+          "message": { "type": "string" },
+          "statusCode": { "type": "integer" }
+        }
+      }
+    },
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "session"
+      }
+    }
+  }
+}

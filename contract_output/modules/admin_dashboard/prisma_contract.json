@@ -1,0 +1,19 @@
+{
+  "moduleId": "admin_dashboard",
+  "contractVersion": "v1.0.0",
+  "status": "draft",
+  "changeType": "none",
+  "models": [],
+  "enumDefs": [],
+  "dbNotes": {
+    "noOwnTables": "Admin dashboard has no dedicated DB tables. All 4 endpoints return computed/aggregated data from other modules' tables.",
+    "queryDependencies": {
+      "getDashboardMetrics": "Aggregates from Lead (source counts), Trial (conversion rates), Enrollment (active count), Payment (status summary)",
+      "getDashboardRecentLeads": "SELECT from Lead ORDER BY createdAt DESC LIMIT 5",
+      "getDashboardUpcomingTrials": "SELECT from Trial JOIN Program JOIN CalendarDate WHERE trialDate >= NOW() ORDER BY trialDate ASC",
+      "getDashboardPendingPayments": "SELECT from Payment JOIN Enrollment JOIN Program WHERE status IN (PENDING, PARTIAL)"
+    },
+    "realTimeComputation": "AD-A-01: All metrics computed real-time on page load. No pre-aggregation or materialized views.",
+    "indexDependencies": "Dashboard query performance depends on indexes defined in lead_management (Lead.createdAt, Lead.source), enrollment_trial (Enrollment.status, Trial.status), and payment_tracking (Payment.status)."
+  }
+}

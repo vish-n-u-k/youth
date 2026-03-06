@@ -1,0 +1,135 @@
+{
+  "moduleId": "program_pricing",
+  "generatedAt": "2026-03-06",
+  "policyVersion": "v1.0.0",
+  "endpoints": [
+    {
+      "operationId": "getPrograms",
+      "method": "GET",
+      "path": "/api/programs",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" },
+        { "order": 4, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: ProgramListQuery with queryParams" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "createProgram",
+      "method": "POST",
+      "path": "/api/programs",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" },
+        { "order": 4, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: ProgramRequest" },
+        { "order": 5, "middleware": "audit_log", "inferred": true, "confidence": "medium", "evidence": "Program creation is a business-critical state change" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "getProgram",
+      "method": "GET",
+      "path": "/api/programs/{programId}",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "updateProgram",
+      "method": "PUT",
+      "path": "/api/programs/{programId}",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" },
+        { "order": 4, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: ProgramRequest" },
+        { "order": 5, "middleware": "business_rule_guard", "inferred": true, "confidence": "medium", "evidence": "Zelle config must exist before setting status to ACTIVE; capacity changes may need enrollment count check" },
+        { "order": 6, "middleware": "audit_log", "inferred": true, "confidence": "medium", "evidence": "Program update is a business-critical state change" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "getCoupons",
+      "method": "GET",
+      "path": "/api/coupons",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "createCoupon",
+      "method": "POST",
+      "path": "/api/coupons",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" },
+        { "order": 4, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: CouponRequest" },
+        { "order": 5, "middleware": "business_rule_guard", "inferred": true, "confidence": "medium", "evidence": "Coupon code uniqueness enforced at DB level; discountValue must not allow negative totals" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "updateCoupon",
+      "method": "PUT",
+      "path": "/api/coupons/{couponId}",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" },
+        { "order": 4, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: CouponRequest" },
+        { "order": 5, "middleware": "business_rule_guard", "inferred": true, "confidence": "medium", "evidence": "Coupon code uniqueness; discountValue validation" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "deleteCoupon",
+      "method": "DELETE",
+      "path": "/api/coupons/{couponId}",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" },
+        { "order": 4, "middleware": "audit_log", "inferred": true, "confidence": "medium", "evidence": "Destructive delete operation on coupon" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    }
+  ],
+  "moduleGaps": [
+    {
+      "id": "PP-GAP-01",
+      "description": "All admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles.",
+      "severity": "low"
+    },
+    {
+      "id": "PP-GAP-02",
+      "description": "No explicit Zelle config pre-check rule in OpenAPI for program ACTIVE status transition. Business rule guard inferred from db notes.",
+      "severity": "medium"
+    }
+  ],
+  "defaults": {}
+}

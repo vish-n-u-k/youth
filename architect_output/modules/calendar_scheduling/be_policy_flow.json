@@ -1,0 +1,85 @@
+{
+  "moduleId": "calendar_scheduling",
+  "generatedAt": "2026-03-06",
+  "policyVersion": "v1.0.0",
+  "endpoints": [
+    {
+      "operationId": "getCalendarDates",
+      "method": "GET",
+      "path": "/api/calendar",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" },
+        { "order": 4, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: CalendarDatesQuery with queryParams" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "addCalendarDate",
+      "method": "POST",
+      "path": "/api/calendar",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" },
+        { "order": 4, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: CalendarDateRequest" },
+        { "order": 5, "middleware": "business_rule_guard", "inferred": true, "confidence": "medium", "evidence": "Unique constraint on (programId, date) — duplicate check" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "updateCalendarDate",
+      "method": "PUT",
+      "path": "/api/calendar/{dateId}",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" },
+        { "order": 4, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: CalendarDateRequest" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "deleteCalendarDate",
+      "method": "DELETE",
+      "path": "/api/calendar/{dateId}",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "role_permission_check", "inferred": true, "confidence": "medium", "evidence": "Role 'admin' from FE allowedRoles" },
+        { "order": 4, "middleware": "business_rule_guard", "inferred": true, "confidence": "medium", "evidence": "FK constraint prevents orphaning trials — must check for existing trial bookings before delete" },
+        { "order": 5, "middleware": "audit_log", "inferred": true, "confidence": "medium", "evidence": "Destructive delete operation on calendar date" }
+      ],
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" },
+      "policyGaps": []
+    },
+    {
+      "operationId": "getAvailableTrialDates",
+      "method": "GET",
+      "path": "/api/programs/{programId}/trial-dates",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "rate_limit", "inferred": true, "confidence": "medium", "evidence": "Public endpoint — general rate limit", "config": { "scope": "ip", "limit": 60, "windowSeconds": 60 } }
+      ],
+      "auth": { "type": "none", "source": "openapi", "note": "Public endpoint — only trialEligible dates with available spots returned" },
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" },
+      "policyGaps": []
+    }
+  ],
+  "moduleGaps": [
+    {
+      "id": "CS-GAP-01",
+      "description": "Admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles.",
+      "severity": "low"
+    }
+  ],
+  "defaults": {}
+}

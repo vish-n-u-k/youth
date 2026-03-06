@@ -1,0 +1,199 @@
+{
+  "moduleId": "communication",
+  "contractVersion": "v1.0.0",
+  "normalizedAt": "2026-03-06",
+  "routes": [
+    {
+      "screenId": "template_manager",
+      "name": "Template Manager",
+      "feRoute": "/admin/communications/templates",
+      "normalizedRoute": "/admin/communications/templates",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "endpointProposals": [
+        { "operationId": "getTemplates", "method": "GET", "path": "/api/communications/templates" },
+        { "operationId": "getTemplate", "method": "GET", "path": "/api/communications/templates/{templateId}" },
+        { "operationId": "createTemplate", "method": "POST", "path": "/api/communications/templates" },
+        { "operationId": "updateTemplate", "method": "PUT", "path": "/api/communications/templates/{templateId}" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://template_manager"]
+    },
+    {
+      "screenId": "automation_rules",
+      "name": "Automation Rules",
+      "feRoute": "/admin/communications/automations",
+      "normalizedRoute": "/admin/communications/automations",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "endpointProposals": [
+        { "operationId": "getAutomations", "method": "GET", "path": "/api/communications/automations" },
+        { "operationId": "updateAutomation", "method": "PUT", "path": "/api/communications/automations/{automationId}" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://automation_rules"]
+    },
+    {
+      "screenId": "communications_log",
+      "name": "Communications Log",
+      "feRoute": "/admin/communications/log",
+      "normalizedRoute": "/admin/communications/log",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "endpointProposals": [
+        { "operationId": "getCommunicationsLog", "method": "GET", "path": "/api/communications/log" },
+        { "operationId": "retryEmail", "method": "POST", "path": "/api/communications/log/{logId}/retry" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://communications_log"]
+    }
+  ],
+  "endpoints": [
+    { "operationId": "getTemplates", "method": "GET", "path": "/api/communications/templates", "tags": ["templates"], "security": ["cookieAuth"], "requestSchema": null, "responseSchema": "TemplateListResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/communications/templates.get"] },
+    { "operationId": "getTemplate", "method": "GET", "path": "/api/communications/templates/{templateId}", "tags": ["templates"], "security": ["cookieAuth"], "requestSchema": null, "responseSchema": "TemplateResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/communications/templates/{templateId}.get"] },
+    { "operationId": "createTemplate", "method": "POST", "path": "/api/communications/templates", "tags": ["templates"], "security": ["cookieAuth"], "requestSchema": "TemplateRequest", "responseSchema": "TemplateResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/communications/templates.post"], "policyRefs": ["GP-03"] },
+    { "operationId": "updateTemplate", "method": "PUT", "path": "/api/communications/templates/{templateId}", "tags": ["templates"], "security": ["cookieAuth"], "requestSchema": "TemplateRequest", "responseSchema": "TemplateResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/communications/templates/{templateId}.put"] },
+    { "operationId": "getAutomations", "method": "GET", "path": "/api/communications/automations", "tags": ["automations"], "security": ["cookieAuth"], "requestSchema": null, "responseSchema": "AutomationListResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/communications/automations.get"] },
+    { "operationId": "updateAutomation", "method": "PUT", "path": "/api/communications/automations/{automationId}", "tags": ["automations"], "security": ["cookieAuth"], "requestSchema": "AutomationRequest", "responseSchema": "AutomationResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/communications/automations/{automationId}.put"] },
+    { "operationId": "getCommunicationsLog", "method": "GET", "path": "/api/communications/log", "tags": ["communications-log"], "security": ["cookieAuth"], "requestSchema": "CommunicationsLogQuery", "responseSchema": "CommunicationsLogResponse", "errorSchema": "ApiError", "queryParams": ["deliveryStatus", "triggerEvent", "search", "page", "limit"], "confidence": "high", "sourceRefs": ["openapi:///api/communications/log.get"] },
+    { "operationId": "retryEmail", "method": "POST", "path": "/api/communications/log/{logId}/retry", "tags": ["communications-log"], "security": ["cookieAuth"], "requestSchema": null, "responseSchema": "RetryEmailResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/communications/log/{logId}/retry.post"] }
+  ],
+  "rbac": [
+    { "endpointId": "getTemplates", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://template_manager.allowedRoles"] },
+    { "endpointId": "getTemplate", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://template_manager.allowedRoles"] },
+    { "endpointId": "createTemplate", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://template_manager.allowedRoles"] },
+    { "endpointId": "updateTemplate", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://template_manager.allowedRoles"] },
+    { "endpointId": "getAutomations", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://automation_rules.allowedRoles"] },
+    { "endpointId": "updateAutomation", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://automation_rules.allowedRoles"] },
+    { "endpointId": "getCommunicationsLog", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://communications_log.allowedRoles"] },
+    { "endpointId": "retryEmail", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://communications_log.allowedRoles"] }
+  ],
+  "db": {
+    "models": [
+      {
+        "model": "Template",
+        "fields": [
+          { "name": "id", "type": "String", "isOptional": false, "attributes": ["@id", "@default(cuid())"] },
+          { "name": "name", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "subject", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "body", "type": "String", "isOptional": false, "attributes": ["@db.Text"] },
+          { "name": "isDefault", "type": "Boolean", "isOptional": false, "attributes": ["@default(false)"] },
+          { "name": "triggerEvent", "type": "String", "isOptional": true, "attributes": [] },
+          { "name": "createdAt", "type": "DateTime", "isOptional": false, "attributes": ["@default(now())"] },
+          { "name": "updatedAt", "type": "DateTime", "isOptional": false, "attributes": ["@updatedAt"] }
+        ],
+        "indexes": ["@@index([isDefault])", "@@index([triggerEvent])"],
+        "uniques": [],
+        "relations": [
+          { "name": "automations", "kind": "oneToMany", "target": "Automation" }
+        ],
+        "confidence": "high",
+        "sourceRefs": ["prisma_contract://models.Template"]
+      },
+      {
+        "model": "Automation",
+        "fields": [
+          { "name": "id", "type": "String", "isOptional": false, "attributes": ["@id", "@default(cuid())"] },
+          { "name": "triggerEvent", "type": "TriggerEvent", "isOptional": false, "attributes": [] },
+          { "name": "templateId", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "delayMinutes", "type": "Int", "isOptional": true, "attributes": [] },
+          { "name": "enabled", "type": "Boolean", "isOptional": false, "attributes": ["@default(true)"] },
+          { "name": "updatedAt", "type": "DateTime", "isOptional": false, "attributes": ["@updatedAt"] }
+        ],
+        "indexes": ["@@index([enabled])"],
+        "uniques": ["@@unique([triggerEvent])"],
+        "relations": [
+          { "name": "template", "kind": "manyToOne", "target": "Template", "fkFields": ["templateId"] }
+        ],
+        "confidence": "high",
+        "sourceRefs": ["prisma_contract://models.Automation"]
+      },
+      {
+        "model": "CommunicationLog",
+        "fields": [
+          { "name": "id", "type": "String", "isOptional": false, "attributes": ["@id", "@default(cuid())"] },
+          { "name": "recipientEmail", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "recipientName", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "subject", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "templateName", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "triggerEvent", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "deliveryStatus", "type": "DeliveryStatus", "isOptional": false, "attributes": ["@default(PENDING)"] },
+          { "name": "sentAt", "type": "DateTime", "isOptional": true, "attributes": [] },
+          { "name": "failureReason", "type": "String", "isOptional": true, "attributes": [] },
+          { "name": "createdAt", "type": "DateTime", "isOptional": false, "attributes": ["@default(now())"] }
+        ],
+        "indexes": ["@@index([deliveryStatus])", "@@index([triggerEvent])", "@@index([deliveryStatus, sentAt])", "@@index([recipientEmail, sentAt])"],
+        "uniques": [],
+        "relations": [],
+        "confidence": "high",
+        "sourceRefs": ["prisma_contract://models.CommunicationLog"],
+        "note": "No FK to Template/Automation — stores snapshot data for audit independence"
+      }
+    ],
+    "enums": [
+      { "name": "TriggerEvent", "values": ["LEAD_CREATED", "TRIAL_SCHEDULED", "TRIAL_APPROACHING", "ENROLLMENT_COMPLETED", "PAYMENT_OVERDUE", "CLASS_START_APPROACHING"], "volatility": "stable" },
+      { "name": "DeliveryStatus", "values": ["PENDING", "SENT", "FAILED"], "volatility": "stable" }
+    ],
+    "notes": "6 default templates pre-seeded (CM-A-01, editable but not deletable). 6 automations pre-seeded (one per TriggerEvent, no CREATE/DELETE). CommunicationLog is append-only. Email only in MVP (CM-A-02)."
+  },
+  "signals": [
+    {
+      "type": "trigger",
+      "name": "lead_created",
+      "trigger": "LEAD_CREATED event from lead_management",
+      "description": "Fires email to admin when new lead captured",
+      "confidence": "high",
+      "sourceRefs": ["openapi://AutomationRequest.triggerEvent", "prisma_contract://enumDefs.TriggerEvent"]
+    },
+    {
+      "type": "trigger",
+      "name": "trial_scheduled",
+      "trigger": "TRIAL_SCHEDULED event from enrollment_trial",
+      "description": "Fires trial confirmation email to parent (HO-03)",
+      "confidence": "high",
+      "sourceRefs": ["openapi://AutomationRequest.triggerEvent"]
+    },
+    {
+      "type": "trigger",
+      "name": "trial_approaching",
+      "trigger": "Scheduled job — before trial date",
+      "description": "Fires trial reminder email to parent",
+      "confidence": "high",
+      "sourceRefs": ["openapi://AutomationRequest.triggerEvent"]
+    },
+    {
+      "type": "trigger",
+      "name": "enrollment_completed",
+      "trigger": "ENROLLMENT_COMPLETED event from enrollment_trial",
+      "description": "Fires enrollment confirmation email to parent (HO-03)",
+      "confidence": "high",
+      "sourceRefs": ["openapi://AutomationRequest.triggerEvent"]
+    },
+    {
+      "type": "trigger",
+      "name": "payment_overdue",
+      "trigger": "Background job from payment_tracking (HO-04)",
+      "description": "Fires payment reminder email to parent",
+      "confidence": "high",
+      "sourceRefs": ["openapi://AutomationRequest.triggerEvent"]
+    },
+    {
+      "type": "trigger",
+      "name": "class_start_approaching",
+      "trigger": "Scheduled job — before program start date",
+      "description": "Fires class start reminder email to parent",
+      "confidence": "high",
+      "sourceRefs": ["openapi://AutomationRequest.triggerEvent"]
+    }
+  ],
+  "unknowns": [],
+  "evidence": {
+    "sourcesUsed": ["fe_details.json", "openapi.json", "prisma_contract.json", "zod_patch.json"],
+    "decisions": [
+      { "id": "CM-D-01", "description": "FE paths with :templateId/:automationId/:logId normalized to {templateId}/{automationId}/{logId}", "confidence": "medium" }
+    ]
+  }
+}

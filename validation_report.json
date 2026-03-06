@@ -1,0 +1,428 @@
+{
+  "reportVersion": "v1.0.0",
+  "generatedAt": "2026-03-06T00:00:00Z",
+  "summary": {
+    "totalModules": 9,
+    "totalEndpoints": 45,
+    "totalBeAdditions": 6,
+    "totalBeRefinements": 4,
+    "totalBlockers": 0,
+    "totalWarnings": 5,
+    "totalDbModels": 14,
+    "totalDbEnums": 11,
+    "totalDbFindings": 8,
+    "totalDbBlockers": 0,
+    "totalDbWarnings": 3
+  },
+  "globalFindings": [
+    {
+      "id": "GF-01",
+      "type": "be_decision",
+      "description": "Auth strategy: httpOnly session cookies instead of bearer tokens. FE schema included a 'token' field in AdminLoginResponse — removed in favor of server-managed session cookie for security.",
+      "impact": "FE must read user data from response body, not decode a JWT. Session validation via GET /api/auth/me.",
+      "sourceProvenance": "fe",
+      "resolution": "Applied in auth_accounts openapi.json. FE action: remove token handling code, use cookie-based session."
+    },
+    {
+      "id": "GF-02",
+      "type": "be_addition",
+      "description": "Added POST /api/auth/logout endpoint — required by AA-REQ-02 ('Admin can log out from any page') but absent from FE endpoint proposals.",
+      "impact": "FE needs to call this on logout button click.",
+      "sourceProvenance": "fe"
+    },
+    {
+      "id": "GF-03",
+      "type": "be_addition",
+      "description": "Added GET /api/auth/me endpoint — required for FE to validate session on app load and enforce GP-05 (unauthenticated admin access redirects to login).",
+      "impact": "FE should call this on app initialization to check auth state.",
+      "sourceProvenance": "fe"
+    },
+    {
+      "id": "GF-04",
+      "type": "be_addition",
+      "description": "Added GET /api/navigation/menu endpoint — returns role-based menu items per global contract role visibility rules. Keeps navigation config server-driven.",
+      "impact": "FE sidebar can render dynamically from this API instead of hardcoding visibility rules.",
+      "sourceProvenance": "fe"
+    },
+    {
+      "id": "GF-05",
+      "type": "be_decision",
+      "description": "Consistent error envelope across all modules: { error: string, message: string, statusCode: number }. Maps to FE ApiError Zod schema.",
+      "impact": "FE can use a single error handler for all API responses.",
+      "sourceProvenance": "fe"
+    },
+    {
+      "id": "GF-06",
+      "type": "be_decision",
+      "description": "Pagination convention: offset-based with page/limit query params. Response always includes total/page/limit fields.",
+      "impact": "Consistent across lead_management, program_pricing, payment_tracking, communication log.",
+      "sourceProvenance": "fe"
+    },
+    {
+      "id": "GF-07",
+      "type": "assumption",
+      "description": "English-only in MVP. No localization, no locale headers, no multi-language response fields.",
+      "impact": "If localization is needed later, endpoints serving user-visible text will need locale handling added.",
+      "sourceProvenance": "analysis_global",
+      "approvalState": "be_assumed",
+      "severity": "low"
+    },
+    {
+      "id": "GF-08",
+      "type": "be_refinement",
+      "description": "Added 429 (rate limit) responses on login and forgot-password endpoints to prevent brute-force attacks.",
+      "impact": "FE should handle 429 by showing 'Too many attempts, try again later' message.",
+      "sourceProvenance": "fe"
+    },
+    {
+      "id": "GF-09",
+      "type": "be_refinement",
+      "description": "Added 410 (Gone) response on reset-password for expired tokens, distinct from 400 (bad request).",
+      "impact": "FE can show different messaging for expired vs invalid tokens.",
+      "sourceProvenance": "fe"
+    },
+    {
+      "id": "GF-10",
+      "type": "be_refinement",
+      "description": "Added 409 (Conflict) responses for duplicate scenarios: coupon code already exists, child already enrolled in program, trial already booked.",
+      "impact": "FE can show specific error messages for these cases.",
+      "sourceProvenance": "fe"
+    },
+    {
+      "id": "GF-11",
+      "type": "be_refinement",
+      "description": "POST endpoints that create resources return 201 (Created) instead of 200 (OK) for RESTful consistency.",
+      "impact": "FE should treat both 200 and 201 as success.",
+      "sourceProvenance": "fe"
+    },
+    {
+      "id": "GF-12",
+      "type": "be_addition",
+      "description": "Added admin enrollment management endpoints: GET /api/enrollments (list with filters), GET /api/enrollments/{enrollmentId} (detail), PATCH /api/enrollments/{enrollmentId}/status (cancel/complete). Resolves BLK-01.",
+      "impact": "FE needs an admin enrollment list screen at /admin/enrollments and detail screen at /admin/enrollments/:enrollmentId. These were implied by global nav but had no backing endpoints.",
+      "sourceProvenance": "fe"
+    },
+    {
+      "id": "GF-13",
+      "type": "assumption_confirmed",
+      "description": "ET-A-02: Instant enrollment confirmed for MVP. No approval workflow. Admin cancels after the fact if needed. Resolves BLK-02.",
+      "impact": "submitEnrollment returns confirmed enrollment immediately. Admin uses PATCH /api/enrollments/{enrollmentId}/status to cancel if needed.",
+      "sourceProvenance": "fe"
+    }
+  ],
+  "moduleFindings": {
+    "auth_accounts": {
+      "status": "draft",
+      "endpointCount": 5,
+      "findings": [
+        {
+          "id": "AA-BF-01",
+          "type": "fe_action_item",
+          "description": "FE AdminLoginResponse schema includes 'token' field. BE uses httpOnly cookie instead. FE should remove token field from its Zod schema and response handling.",
+          "sourceProvenance": "fe",
+          "severity": "medium"
+        }
+      ]
+    },
+    "settings": {
+      "status": "draft",
+      "endpointCount": 2,
+      "findings": []
+    },
+    "lead_management": {
+      "status": "draft",
+      "endpointCount": 7,
+      "findings": [
+        {
+          "id": "LM-BF-01",
+          "type": "warning",
+          "description": "No POST /api/leads endpoint exists for manual lead creation. Lead sources include 'manual' but FE doesn't propose a create-lead screen or endpoint. Admin may need this for phone/walk-in leads.",
+          "sourceProvenance": "fe",
+          "severity": "medium"
+        },
+        {
+          "id": "LM-BF-02",
+          "type": "warning",
+          "description": "No webhook/ingest endpoint for Facebook Lead Forms or Google Forms. These external lead sources need a BE-only ingestion mechanism (not FE-facing). Deferred per technical_parking_lot.",
+          "sourceProvenance": "blocked_parking_lot",
+          "severity": "low"
+        },
+        {
+          "id": "LM-BF-03",
+          "type": "assumption_carried",
+          "description": "LM-A-01 (returning parents identified by email match) is pending_human_review. BE contract proceeds with email-based matching but this could change.",
+          "sourceProvenance": "fe",
+          "severity": "low"
+        }
+      ]
+    },
+    "program_pricing": {
+      "status": "draft",
+      "endpointCount": 7,
+      "findings": [
+        {
+          "id": "PP-BF-01",
+          "type": "assumption_carried",
+          "description": "PP-A-02 (capacity is per-program, not per-session) is pending_human_review. Schema uses a single 'capacity' field at program level.",
+          "sourceProvenance": "fe",
+          "severity": "medium"
+        }
+      ]
+    },
+    "calendar_scheduling": {
+      "status": "draft",
+      "endpointCount": 5,
+      "findings": []
+    },
+    "enrollment_trial": {
+      "status": "draft",
+      "endpointCount": 9,
+      "findings": [
+        {
+          "id": "ET-BF-01",
+          "type": "resolved",
+          "description": "RESOLVED: Added admin enrollment management endpoints: GET /api/enrollments (list), GET /api/enrollments/{enrollmentId} (detail), PATCH /api/enrollments/{enrollmentId}/status (cancel/complete). Global nav 'Enrollments' section is now backed by API endpoints.",
+          "sourceProvenance": "fe",
+          "severity": "resolved",
+          "resolvedAt": "2026-03-06"
+        },
+        {
+          "id": "ET-BF-02",
+          "type": "resolved",
+          "description": "RESOLVED: User confirmed instant enrollment for MVP (Option A). No approval flow. Admin can cancel enrollments after the fact via PATCH /api/enrollments/{enrollmentId}/status. Assumption ET-A-02 is now confirmed.",
+          "sourceProvenance": "fe",
+          "severity": "resolved",
+          "resolvedAt": "2026-03-06"
+        },
+        {
+          "id": "ET-BF-03",
+          "type": "warning",
+          "description": "ET-A-04 (no waitlist in MVP) means program-full returns 400/409. If waitlist is added later, a new endpoint would be needed.",
+          "sourceProvenance": "fe",
+          "severity": "low"
+        }
+      ]
+    },
+    "payment_tracking": {
+      "status": "draft",
+      "endpointCount": 3,
+      "findings": [
+        {
+          "id": "PT-BF-01",
+          "type": "warning",
+          "description": "Payment overdue threshold check is a background job concern (not an API endpoint). HO-04 handoff (payment_tracking -> communication) fires when overdue threshold is exceeded. This is BE-internal logic, not surfaced as an FE-callable endpoint.",
+          "sourceProvenance": "fe",
+          "severity": "low"
+        }
+      ]
+    },
+    "communication": {
+      "status": "draft",
+      "endpointCount": 7,
+      "findings": [
+        {
+          "id": "CM-BF-01",
+          "type": "warning",
+          "description": "No DELETE endpoint for templates. Default templates are not deletable (CM-A-01). Custom templates also have no delete path in FE proposals. If delete is needed for custom templates, FE must add the interaction.",
+          "sourceProvenance": "fe",
+          "severity": "low"
+        }
+      ]
+    },
+    "admin_dashboard": {
+      "status": "draft",
+      "endpointCount": 4,
+      "findings": []
+    }
+  },
+  "dbLayerFindings": {
+    "global": [
+      {
+        "id": "DB-GF-01",
+        "type": "db_decision",
+        "description": "All enums classified as stable after volatility check. No lookup tables needed for MVP. Lead sources, statuses, payment statuses, etc. are all engineering-controlled values that require code changes to modify.",
+        "sourceProvenance": "fe",
+        "impact": "Enum migrations needed if values are added, but all additions require corresponding code changes anyway."
+      },
+      {
+        "id": "DB-GF-02",
+        "type": "db_decision",
+        "description": "Admin.role uses String type (not enum) because only 'admin' exists in MVP. Staff and parent roles are Phase 2. Avoids single-value enum.",
+        "sourceProvenance": "fe",
+        "impact": "Role-based access enforced at application level. Migration to enum when Phase 2 roles are added."
+      },
+      {
+        "id": "DB-GF-03",
+        "type": "db_decision",
+        "description": "Denormalized parent info (parentName, parentEmail, parentPhone) stored on both Trial and Enrollment models. Lead is authoritative source but denormalization supports public form flows without lead lookup.",
+        "sourceProvenance": "fe",
+        "impact": "Parent info updates on Lead do not automatically propagate to Trial/Enrollment records. Acceptable for MVP since these are point-in-time snapshots."
+      },
+      {
+        "id": "DB-GF-04",
+        "type": "db_decision",
+        "description": "Computed fields (enrollmentCount, totalFee, spotsRemaining, remainingBalance) are NOT stored in DB. Calculated at query time from source data.",
+        "sourceProvenance": "fe",
+        "impact": "No stale data risk. Dashboard and list queries use JOINs/COUNTs instead of cached values."
+      },
+      {
+        "id": "DB-GF-05",
+        "type": "db_decision",
+        "description": "CommunicationLog has no FK to Template or Automation. Stores snapshot data (templateName, interpolated subject) for audit independence. Template changes don't affect historical log entries.",
+        "sourceProvenance": "fe",
+        "impact": "Log entries are immutable audit records. Retry creates new entries."
+      },
+      {
+        "id": "DB-GF-06",
+        "type": "assumption_carried",
+        "description": "English-only MVP (GF-07). No localization storage strategy needed. Localization checklist not applicable for current scope.",
+        "sourceProvenance": "analysis_global",
+        "impact": "If localization is added later, localized content fields will need migration."
+      }
+    ],
+    "moduleFindings": {
+      "auth_accounts": {
+        "dbStatus": "draft",
+        "modelCount": 3,
+        "findings": []
+      },
+      "settings": {
+        "dbStatus": "draft",
+        "modelCount": 1,
+        "findings": []
+      },
+      "lead_management": {
+        "dbStatus": "draft",
+        "modelCount": 3,
+        "findings": [
+          {
+            "id": "DB-LM-01",
+            "type": "assumption_carried",
+            "description": "A-01/LM-A-01: Lead email uniqueness (returning parents identified by email match) is pending_human_review. DB contract proceeds with unique constraint on Lead.email as default.",
+            "sourceProvenance": "analysis_module",
+            "severity": "low"
+          }
+        ]
+      },
+      "program_pricing": {
+        "dbStatus": "draft",
+        "modelCount": 2,
+        "findings": [
+          {
+            "id": "DB-PP-01",
+            "type": "assumption_carried",
+            "description": "A-12/PP-A-02: Capacity is per-program (not per-session) is pending_human_review. DB contract uses single capacity field at program level. Isolated for future per-session migration.",
+            "sourceProvenance": "analysis_module",
+            "severity": "medium"
+          }
+        ]
+      },
+      "calendar_scheduling": {
+        "dbStatus": "draft",
+        "modelCount": 1,
+        "findings": []
+      },
+      "enrollment_trial": {
+        "dbStatus": "draft",
+        "modelCount": 2,
+        "findings": [
+          {
+            "id": "DB-ET-01",
+            "type": "db_warning",
+            "description": "GP-01 (one enrollment per child per program) cannot be enforced as a DB unique constraint because child identity is based on name+age (not a unique identifier). Enforced at application level by checking (childName, childAge, programId) before insert.",
+            "sourceProvenance": "fe",
+            "severity": "medium"
+          }
+        ]
+      },
+      "payment_tracking": {
+        "dbStatus": "draft",
+        "modelCount": 1,
+        "findings": [
+          {
+            "id": "DB-PT-01",
+            "type": "db_warning",
+            "description": "PT-A-01/A-07: Payment overdue threshold (default 3 days) is admin-configurable but no dedicated config field exists in LocationSettings. Application config or environment variable assumed for MVP.",
+            "sourceProvenance": "analysis_module",
+            "severity": "low"
+          }
+        ]
+      },
+      "communication": {
+        "dbStatus": "draft",
+        "modelCount": 3,
+        "findings": [
+          {
+            "id": "DB-CM-01",
+            "type": "db_warning",
+            "description": "CM-A-01: 6 default templates and 6 automation rows require seed data on first deployment. No DB-level protection against deleting defaults — isDefault flag checked at application level.",
+            "sourceProvenance": "analysis_module",
+            "severity": "low"
+          }
+        ]
+      },
+      "admin_dashboard": {
+        "dbStatus": "draft",
+        "modelCount": 0,
+        "findings": []
+      }
+    }
+  },
+  "blockers": [],
+  "resolvedBlockers": [
+    {
+      "id": "BLK-01",
+      "description": "No admin enrollment management screen or endpoints.",
+      "resolution": "Added 3 admin enrollment endpoints to enrollment_trial module: GET /api/enrollments, GET /api/enrollments/{enrollmentId}, PATCH /api/enrollments/{enrollmentId}/status. Supports list, detail, cancel, and complete actions.",
+      "resolvedAt": "2026-03-06"
+    },
+    {
+      "id": "BLK-02",
+      "description": "ET-A-02 (instant enrollment without approval) was pending human review.",
+      "resolution": "User confirmed instant enrollment for MVP. No approval flow needed. Admin can cancel after the fact using the new enrollment status endpoint. Assumption ET-A-02 upgraded from pending_human_review to user_approved.",
+      "resolvedAt": "2026-03-06"
+    }
+  ],
+  "crossModuleHandoffValidation": [
+    {
+      "handoffId": "HO-01",
+      "from": "lead_management",
+      "to": "enrollment_trial",
+      "status": "covered",
+      "endpoints": ["sendTrialBookingLink (POST /api/leads/{leadId}/send-trial-link)", "bookTrial (POST /api/public/trials)"],
+      "notes": "Admin sends trial link via lead management -> parent lands on trial booking form via public URL"
+    },
+    {
+      "handoffId": "HO-02",
+      "from": "enrollment_trial",
+      "to": "payment_tracking",
+      "status": "covered",
+      "endpoints": ["submitEnrollment (POST /api/public/enrollments)", "getEnrollmentConfirmation (GET /api/public/enrollments/{enrollmentId}/confirmation)", "getZelleInstructions (GET /api/public/enrollments/{enrollmentId}/payment-instructions)"],
+      "notes": "Enrollment creates payment record. Confirmation page shows Zelle instructions. Separate payment instructions page also available."
+    },
+    {
+      "handoffId": "HO-03",
+      "from": "enrollment_trial",
+      "to": "communication",
+      "status": "covered",
+      "endpoints": ["bookTrial (triggers trial confirmation email)", "submitEnrollment (triggers enrollment confirmation email)"],
+      "notes": "Background email fires via automation engine. No dedicated API call from FE — handled BE-side."
+    },
+    {
+      "handoffId": "HO-04",
+      "from": "payment_tracking",
+      "to": "communication",
+      "status": "covered",
+      "endpoints": ["BE background job checks payment overdue threshold -> triggers payment_overdue automation"],
+      "notes": "No FE-facing endpoint. Handled by BE scheduler/cron job."
+    },
+    {
+      "handoffId": "HO-05",
+      "from": "calendar_scheduling",
+      "to": "enrollment_trial",
+      "status": "covered",
+      "endpoints": ["getAvailableTrialDates (GET /api/programs/{programId}/trial-dates)", "bookTrial (POST /api/public/trials)"],
+      "notes": "Parent selects trial date from calendar -> navigates to trial booking form with date pre-selected"
+    }
+  ]
+}

@@ -1,0 +1,181 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Admin Dashboard API",
+    "version": "v1.0.0",
+    "x-module-id": "admin_dashboard",
+    "x-contract-status": "draft",
+    "x-change-type": "none"
+  },
+  "paths": {
+    "/api/dashboard/metrics": {
+      "get": {
+        "operationId": "getDashboardMetrics",
+        "summary": "Get dashboard summary metrics (leads by source, conversion rates, payment summary)",
+        "tags": ["dashboard"],
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": { "description": "Dashboard metrics", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DashboardMetricsResponse" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/dashboard/recent-leads": {
+      "get": {
+        "operationId": "getDashboardRecentLeads",
+        "summary": "Get 5 most recent leads for dashboard widget",
+        "tags": ["dashboard"],
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": { "description": "Recent leads", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DashboardRecentLeadsResponse" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/dashboard/upcoming-trials": {
+      "get": {
+        "operationId": "getDashboardUpcomingTrials",
+        "summary": "Get upcoming trial sessions for dashboard widget",
+        "tags": ["dashboard"],
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": { "description": "Upcoming trials", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DashboardUpcomingTrialsResponse" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    },
+    "/api/dashboard/pending-payments": {
+      "get": {
+        "operationId": "getDashboardPendingPayments",
+        "summary": "Get pending payments for dashboard widget",
+        "tags": ["dashboard"],
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": { "description": "Pending payments", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DashboardPendingPaymentsResponse" } } } },
+          "401": { "description": "Not authenticated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "description": "Internal server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DashboardMetricsResponse": {
+        "type": "object",
+        "required": ["totalLeadsBySource", "leadToTrialConversionRate", "trialToEnrollmentConversionRate", "totalActiveEnrollments", "paymentStatusSummary"],
+        "properties": {
+          "totalLeadsBySource": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["source", "count"],
+              "properties": {
+                "source": { "type": "string" },
+                "count": { "type": "integer" }
+              }
+            }
+          },
+          "leadToTrialConversionRate": { "type": "number", "description": "Percentage 0-100" },
+          "trialToEnrollmentConversionRate": { "type": "number", "description": "Percentage 0-100" },
+          "totalActiveEnrollments": { "type": "integer" },
+          "paymentStatusSummary": {
+            "type": "object",
+            "required": ["pending", "paid", "partial", "waived"],
+            "properties": {
+              "pending": { "type": "integer" },
+              "paid": { "type": "integer" },
+              "partial": { "type": "integer" },
+              "waived": { "type": "integer" }
+            }
+          }
+        },
+        "x-zod-schema": "DashboardMetricsResponse"
+      },
+      "DashboardRecentLeadsResponse": {
+        "type": "object",
+        "required": ["leads"],
+        "properties": {
+          "leads": {
+            "type": "array",
+            "maxItems": 5,
+            "items": {
+              "type": "object",
+              "required": ["leadId", "parentName", "source", "status", "createdAt"],
+              "properties": {
+                "leadId": { "type": "string" },
+                "parentName": { "type": "string" },
+                "source": { "type": "string" },
+                "status": { "type": "string" },
+                "createdAt": { "type": "string", "format": "date-time" }
+              }
+            }
+          }
+        },
+        "x-zod-schema": "DashboardRecentLeadsResponse"
+      },
+      "DashboardUpcomingTrialsResponse": {
+        "type": "object",
+        "required": ["trials"],
+        "properties": {
+          "trials": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["leadId", "parentName", "childName", "programName", "trialDate"],
+              "properties": {
+                "leadId": { "type": "string" },
+                "parentName": { "type": "string" },
+                "childName": { "type": "string" },
+                "programName": { "type": "string" },
+                "trialDate": { "type": "string", "format": "date-time" }
+              }
+            }
+          }
+        },
+        "x-zod-schema": "DashboardUpcomingTrialsResponse"
+      },
+      "DashboardPendingPaymentsResponse": {
+        "type": "object",
+        "required": ["payments"],
+        "properties": {
+          "payments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["paymentId", "parentName", "childName", "programName", "amountDue", "enrolledAt"],
+              "properties": {
+                "paymentId": { "type": "string" },
+                "parentName": { "type": "string" },
+                "childName": { "type": "string" },
+                "programName": { "type": "string" },
+                "amountDue": { "type": "number" },
+                "enrolledAt": { "type": "string", "format": "date-time" }
+              }
+            }
+          }
+        },
+        "x-zod-schema": "DashboardPendingPaymentsResponse"
+      },
+      "ApiError": {
+        "type": "object",
+        "required": ["error", "message", "statusCode"],
+        "properties": {
+          "error": { "type": "string" },
+          "message": { "type": "string" },
+          "statusCode": { "type": "integer" }
+        },
+        "x-zod-schema": "ApiError"
+      }
+    },
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "session"
+      }
+    }
+  }
+}

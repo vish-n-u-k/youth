@@ -1,0 +1,142 @@
+{
+  "moduleId": "auth_accounts",
+  "generatedAt": "2026-03-06",
+  "policyVersion": "v1.0.0",
+  "endpoints": [
+    {
+      "operationId": "adminLogin",
+      "method": "POST",
+      "path": "/api/auth/login",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "rate_limit", "inferred": true, "confidence": "high", "evidence": "Public auth endpoint — brute-force risk", "config": { "scope": "ip+email", "limit": 5, "windowSeconds": 900 } },
+        { "order": 3, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: AdminLoginRequest" },
+        { "order": 4, "middleware": "audit_log", "inferred": true, "confidence": "medium", "evidence": "Login is security-sensitive; logs both success and failure" }
+      ],
+      "auth": {
+        "type": "none",
+        "source": "openapi",
+        "note": "Public endpoint — no auth required"
+      },
+      "permissionMatrix": {
+        "roles": [],
+        "permissions": [],
+        "source": "openapi",
+        "precedence": "openapi"
+      },
+      "policyGaps": []
+    },
+    {
+      "operationId": "adminLogout",
+      "method": "POST",
+      "path": "/api/auth/logout",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" },
+        { "order": 3, "middleware": "audit_log", "inferred": true, "confidence": "medium", "evidence": "Logout is security-sensitive state change" }
+      ],
+      "auth": {
+        "type": "cookieAuth",
+        "source": "openapi",
+        "note": "Requires valid admin session"
+      },
+      "permissionMatrix": {
+        "roles": ["admin"],
+        "permissions": [],
+        "source": "openapi",
+        "precedence": "openapi"
+      },
+      "policyGaps": [
+        {
+          "id": "AA-GAP-02",
+          "description": "Role 'admin' inferred from cookieAuth + rbac section, not from explicit x-required-roles in OpenAPI",
+          "severity": "low"
+        }
+      ]
+    },
+    {
+      "operationId": "getSession",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "auth_session", "inferred": false, "confidence": "high", "evidence": "security: [\"cookieAuth\"] explicit in OpenAPI" }
+      ],
+      "auth": {
+        "type": "cookieAuth",
+        "source": "openapi",
+        "note": "Session validation on app load"
+      },
+      "permissionMatrix": {
+        "roles": ["admin"],
+        "permissions": [],
+        "source": "openapi",
+        "precedence": "openapi"
+      },
+      "policyGaps": []
+    },
+    {
+      "operationId": "requestPasswordReset",
+      "method": "POST",
+      "path": "/api/auth/forgot-password",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "rate_limit", "inferred": true, "confidence": "high", "evidence": "Public endpoint — email spam abuse risk", "config": { "scope": "ip", "limit": 3, "windowSeconds": 900 } },
+        { "order": 3, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: PasswordResetRequest" },
+        { "order": 4, "middleware": "business_rule_guard", "inferred": true, "confidence": "medium", "evidence": "AA-A-03: always return success regardless of email existence (timing-safe response)" }
+      ],
+      "auth": {
+        "type": "none",
+        "source": "openapi",
+        "note": "Public endpoint"
+      },
+      "permissionMatrix": {
+        "roles": [],
+        "permissions": [],
+        "source": "openapi",
+        "precedence": "openapi"
+      },
+      "policyGaps": []
+    },
+    {
+      "operationId": "setNewPassword",
+      "method": "POST",
+      "path": "/api/auth/reset-password",
+      "middlewareChain": [
+        { "order": 1, "middleware": "request_id", "inferred": true, "confidence": "high", "evidence": "Standard for all endpoints" },
+        { "order": 2, "middleware": "rate_limit", "inferred": true, "confidence": "high", "evidence": "Public endpoint — token-guessing risk", "config": { "scope": "ip", "limit": 5, "windowSeconds": 900 } },
+        { "order": 3, "middleware": "input_validation", "inferred": false, "confidence": "high", "evidence": "requestSchema: SetNewPasswordRequest" },
+        { "order": 4, "middleware": "business_rule_guard", "inferred": true, "confidence": "medium", "evidence": "Token expiry check (24h), single-use check (used field)" },
+        { "order": 5, "middleware": "audit_log", "inferred": true, "confidence": "medium", "evidence": "Password change is security-sensitive" }
+      ],
+      "auth": {
+        "type": "none",
+        "source": "openapi",
+        "note": "Token-based auth (not session-based)"
+      },
+      "permissionMatrix": {
+        "roles": [],
+        "permissions": [],
+        "source": "openapi",
+        "precedence": "openapi"
+      },
+      "policyGaps": []
+    }
+  ],
+  "moduleGaps": [
+    {
+      "id": "AA-GAP-01",
+      "description": "No explicit rate-limit config in OpenAPI for public auth endpoints — values must be decided. Defaults applied: 5 req/15min for login/reset, 3 req/15min for forgot-password.",
+      "severity": "medium"
+    },
+    {
+      "id": "AA-GAP-02",
+      "description": "adminLogout has no x-required-roles — role 'admin' inferred from cookieAuth + rbac section, not explicitly from OpenAPI security extensions.",
+      "severity": "low"
+    }
+  ],
+  "defaults": {
+    "auditLoginFailures": true,
+    "rateLimitScope": "ip+email for login, ip-only for other public endpoints"
+  }
+}

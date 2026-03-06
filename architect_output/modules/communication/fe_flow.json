@@ -1,0 +1,171 @@
+{
+  "moduleId": "communication",
+  "flowVersion": "v1.0.0",
+  "generatedAt": "2026-03-06",
+  "routeGraph": {
+    "entryPoints": [
+      { "route": "/admin/communications/templates", "screenId": "template_manager", "context": "Sidebar navigation — Communications section", "confidence": "high", "evidenceRefs": ["fe_details://template_manager"] },
+      { "route": "/admin/communications/automations", "screenId": "automation_rules", "context": "Communications sub-navigation", "confidence": "high", "evidenceRefs": ["fe_details://automation_rules"] },
+      { "route": "/admin/communications/log", "screenId": "communications_log", "context": "Communications sub-navigation", "confidence": "high", "evidenceRefs": ["fe_details://communications_log"] }
+    ],
+    "transitions": [
+      { "from": "/admin/communications/templates", "to": "/admin/communications/automations", "trigger": "automationsTabClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://template_manager", "fe_details://automation_rules"] },
+      { "from": "/admin/communications/templates", "to": "/admin/communications/log", "trigger": "logTabClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://template_manager", "fe_details://communications_log"] },
+      { "from": "/admin/communications/automations", "to": "/admin/communications/templates", "trigger": "templatesTabClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://automation_rules", "fe_details://template_manager"] },
+      { "from": "/admin/communications/automations", "to": "/admin/communications/log", "trigger": "logTabClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://automation_rules", "fe_details://communications_log"] },
+      { "from": "/admin/communications/log", "to": "/admin/communications/templates", "trigger": "templatesTabClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://communications_log", "fe_details://template_manager"] },
+      { "from": "/admin/communications/log", "to": "/admin/communications/automations", "trigger": "automationsTabClick", "flowType": "event", "confidence": "high", "evidenceRefs": ["fe_details://communications_log", "fe_details://automation_rules"] }
+    ]
+  },
+  "screenGraph": [
+    {
+      "screenId": "template_manager",
+      "route": "/admin/communications/templates",
+      "components": ["TemplateList", "TemplateEditorModal"],
+      "actions": [
+        {
+          "actionId": "loadTemplates",
+          "flowType": "http",
+          "trigger": "onMount",
+          "apiEdge": { "method": "GET", "path": "/api/communications/templates", "operationId": "getTemplates" },
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/communications/templates.get", "fe_details://template_manager.endpointProposals[0]"]
+        },
+        {
+          "actionId": "loadTemplate",
+          "flowType": "http",
+          "trigger": "onEditClick",
+          "apiEdge": { "method": "GET", "path": "/api/communications/templates/{templateId}", "operationId": "getTemplate" },
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/communications/templates/{templateId}.get", "fe_details://template_manager.endpointProposals[1]"]
+        },
+        {
+          "actionId": "createTemplate",
+          "flowType": "http",
+          "apiEdge": { "method": "POST", "path": "/api/communications/templates", "operationId": "createTemplate" },
+          "onSuccess": "closeModal+refreshTemplates",
+          "onError": "showValidationError",
+          "note": "GP-03: template placeholder validation",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/communications/templates.post", "fe_details://template_manager.endpointProposals[2]"]
+        },
+        {
+          "actionId": "updateTemplate",
+          "flowType": "http",
+          "apiEdge": { "method": "PUT", "path": "/api/communications/templates/{templateId}", "operationId": "updateTemplate" },
+          "onSuccess": "closeModal+refreshTemplates",
+          "onError": "showValidationError",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/communications/templates/{templateId}.put", "fe_details://template_manager.endpointProposals[3]"]
+        }
+      ]
+    },
+    {
+      "screenId": "automation_rules",
+      "route": "/admin/communications/automations",
+      "components": ["AutomationTable", "AutomationEditModal"],
+      "actions": [
+        {
+          "actionId": "loadAutomations",
+          "flowType": "http",
+          "trigger": "onMount",
+          "apiEdge": { "method": "GET", "path": "/api/communications/automations", "operationId": "getAutomations" },
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/communications/automations.get", "fe_details://automation_rules.endpointProposals[0]"]
+        },
+        {
+          "actionId": "updateAutomation",
+          "flowType": "http",
+          "apiEdge": { "method": "PUT", "path": "/api/communications/automations/{automationId}", "operationId": "updateAutomation" },
+          "onSuccess": "closeModal+refreshAutomations",
+          "onError": "showValidationError",
+          "note": "Pre-seeded automations — update only (enable/disable, change template, set delay)",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/communications/automations/{automationId}.put", "fe_details://automation_rules.endpointProposals[1]"]
+        }
+      ]
+    },
+    {
+      "screenId": "communications_log",
+      "route": "/admin/communications/log",
+      "components": ["LogFilters", "LogTable", "Pagination", "RetryButton"],
+      "actions": [
+        {
+          "actionId": "loadLog",
+          "flowType": "http",
+          "trigger": "onMount+onFilterChange",
+          "apiEdge": { "method": "GET", "path": "/api/communications/log", "operationId": "getCommunicationsLog" },
+          "queryParams": ["deliveryStatus", "triggerEvent", "search", "page", "limit"],
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/communications/log.get", "fe_details://communications_log.endpointProposals[0]"]
+        },
+        {
+          "actionId": "retryEmail",
+          "flowType": "http",
+          "apiEdge": { "method": "POST", "path": "/api/communications/log/{logId}/retry", "operationId": "retryEmail" },
+          "onSuccess": "refreshLog",
+          "onError": "showError",
+          "note": "Only available for FAILED status entries",
+          "confidence": "high",
+          "evidenceRefs": ["openapi:///api/communications/log/{logId}/retry.post", "fe_details://communications_log.endpointProposals[1]"]
+        }
+      ]
+    }
+  ],
+  "guards": [
+    { "route": "/admin/communications/templates", "authRequired": true, "allowedRoles": ["admin"], "redirectIfUnauthenticated": "/admin/login", "confidence": "high", "evidenceRefs": ["fe_details://template_manager"] },
+    { "route": "/admin/communications/automations", "authRequired": true, "allowedRoles": ["admin"], "redirectIfUnauthenticated": "/admin/login", "confidence": "high", "evidenceRefs": ["fe_details://automation_rules"] },
+    { "route": "/admin/communications/log", "authRequired": true, "allowedRoles": ["admin"], "redirectIfUnauthenticated": "/admin/login", "confidence": "high", "evidenceRefs": ["fe_details://communications_log"] }
+  ],
+  "unmappedActions": [],
+  "signals": [
+    {
+      "type": "trigger",
+      "name": "lead_created",
+      "trigger": "LEAD_CREATED event from lead_management",
+      "description": "Fires email to admin when new lead captured",
+      "confidence": "high",
+      "evidenceRefs": ["openapi://AutomationRequest.triggerEvent"]
+    },
+    {
+      "type": "trigger",
+      "name": "trial_scheduled",
+      "trigger": "TRIAL_SCHEDULED event from enrollment_trial",
+      "description": "Fires trial confirmation email to parent (HO-03)",
+      "confidence": "high",
+      "evidenceRefs": ["openapi://AutomationRequest.triggerEvent"]
+    },
+    {
+      "type": "trigger",
+      "name": "trial_approaching",
+      "trigger": "Scheduled job — before trial date",
+      "description": "Fires trial reminder email to parent",
+      "confidence": "high",
+      "evidenceRefs": ["openapi://AutomationRequest.triggerEvent"]
+    },
+    {
+      "type": "trigger",
+      "name": "enrollment_completed",
+      "trigger": "ENROLLMENT_COMPLETED event from enrollment_trial",
+      "description": "Fires enrollment confirmation email to parent (HO-03)",
+      "confidence": "high",
+      "evidenceRefs": ["openapi://AutomationRequest.triggerEvent"]
+    },
+    {
+      "type": "trigger",
+      "name": "payment_overdue",
+      "trigger": "Background job from payment_tracking (HO-04)",
+      "description": "Fires payment reminder email to parent",
+      "confidence": "high",
+      "evidenceRefs": ["openapi://AutomationRequest.triggerEvent"]
+    },
+    {
+      "type": "trigger",
+      "name": "class_start_approaching",
+      "trigger": "Scheduled job — before program start date",
+      "description": "Fires class start reminder email to parent",
+      "confidence": "high",
+      "evidenceRefs": ["openapi://AutomationRequest.triggerEvent"]
+    }
+  ]
+}

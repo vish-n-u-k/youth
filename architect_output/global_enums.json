@@ -1,0 +1,155 @@
+{
+  "enums": [
+    {
+      "name": "LeadSource",
+      "values": ["FACEBOOK", "GOOGLE", "WEBSITE", "MANUAL"],
+      "description": "Channel through which a lead was acquired. Integration-specific — adding a new source requires new integration code.",
+      "volatilityClassification": "stable",
+      "usedInModels": ["Lead"],
+      "sourceModule": "lead_management",
+      "confidence": "high",
+      "evidenceRefs": ["prisma://lead_management#/enumDefs/0"]
+    },
+    {
+      "name": "LeadStatus",
+      "values": ["NEW", "CONTACTED", "TRIAL_SCHEDULED", "TRIAL_ATTENDED", "ENROLLED", "DROPPED", "NOT_INTERESTED"],
+      "description": "Lead lifecycle states. Fixed by business workflow (LM-BR-04). Status auto-advances on enrollment events (GP-04).",
+      "volatilityClassification": "stable",
+      "usedInModels": ["Lead"],
+      "sourceModule": "lead_management",
+      "confidence": "high",
+      "evidenceRefs": ["prisma://lead_management#/enumDefs/1"]
+    },
+    {
+      "name": "ActivityType",
+      "values": ["STATUS_CHANGE", "EMAIL_SENT", "ENROLLMENT_EVENT", "NOTE_ADDED", "LEAD_CREATED"],
+      "description": "Types of system events logged in lead activity trail. Each type maps to a code path.",
+      "volatilityClassification": "stable",
+      "usedInModels": ["LeadActivity"],
+      "sourceModule": "lead_management",
+      "confidence": "high",
+      "evidenceRefs": ["prisma://lead_management#/enumDefs/2"]
+    },
+    {
+      "name": "TrialStatus",
+      "values": ["SCHEDULED", "COMPLETED", "NO_SHOW", "CANCELLED"],
+      "description": "Trial booking lifecycle states. Fixed by business workflow.",
+      "volatilityClassification": "stable",
+      "usedInModels": ["Trial"],
+      "sourceModule": "enrollment_trial",
+      "confidence": "high",
+      "evidenceRefs": ["prisma://enrollment_trial#/enumDefs/0"]
+    },
+    {
+      "name": "EnrollmentStatus",
+      "values": ["ACTIVE", "CANCELLED", "COMPLETED"],
+      "description": "Core enrollment lifecycle. Instant enrollment for MVP (ET-A-02). Future 'PENDING_APPROVAL' would be a code change.",
+      "volatilityClassification": "stable",
+      "usedInModels": ["Enrollment"],
+      "sourceModule": "enrollment_trial",
+      "confidence": "high",
+      "evidenceRefs": ["prisma://enrollment_trial#/enumDefs/1"]
+    },
+    {
+      "name": "ProgramStatus",
+      "values": ["DRAFT", "ACTIVE", "CLOSED"],
+      "description": "Program lifecycle states. Only ACTIVE programs visible to parents. Publishing requires Zelle config.",
+      "volatilityClassification": "stable",
+      "usedInModels": ["Program"],
+      "sourceModule": "program_pricing",
+      "confidence": "high",
+      "evidenceRefs": ["prisma://program_pricing#/enumDefs/0"]
+    },
+    {
+      "name": "FeeType",
+      "values": ["TOTAL", "PER_SESSION"],
+      "description": "Pricing model type. TOTAL = flat fee for program, PER_SESSION = baseFee * totalSessions. Structurally different calculation paths.",
+      "volatilityClassification": "stable",
+      "usedInModels": ["Program"],
+      "sourceModule": "program_pricing",
+      "confidence": "high",
+      "evidenceRefs": ["prisma://program_pricing#/enumDefs/1"]
+    },
+    {
+      "name": "DiscountType",
+      "values": ["PERCENTAGE", "FLAT"],
+      "description": "Standard discount calculation types for coupons.",
+      "volatilityClassification": "stable",
+      "usedInModels": ["Coupon"],
+      "sourceModule": "program_pricing",
+      "confidence": "high",
+      "evidenceRefs": ["prisma://program_pricing#/enumDefs/2"]
+    },
+    {
+      "name": "CouponScope",
+      "values": ["PROGRAM_FEE", "REGISTRATION_FEE", "BOTH"],
+      "description": "Which fee component(s) a coupon discount applies to. Maps to the two-part pricing model (program fee + optional registration fee).",
+      "volatilityClassification": "stable",
+      "usedInModels": ["Coupon"],
+      "sourceModule": "program_pricing",
+      "confidence": "high",
+      "evidenceRefs": ["prisma://program_pricing#/enumDefs/3"]
+    },
+    {
+      "name": "TriggerEvent",
+      "values": ["LEAD_CREATED", "TRIAL_SCHEDULED", "TRIAL_APPROACHING", "ENROLLMENT_COMPLETED", "PAYMENT_OVERDUE", "CLASS_START_APPROACHING"],
+      "description": "System events that trigger automated email sending. 6 fixed triggers with pre-seeded automations. Adding new triggers requires code changes.",
+      "volatilityClassification": "stable",
+      "usedInModels": ["Automation"],
+      "sourceModule": "communication",
+      "confidence": "high",
+      "evidenceRefs": ["prisma://communication#/enumDefs/0"]
+    },
+    {
+      "name": "DeliveryStatus",
+      "values": ["PENDING", "SENT", "FAILED"],
+      "description": "Email delivery lifecycle. Reusable for future SMS/WhatsApp channels (Phase 2).",
+      "volatilityClassification": "stable",
+      "usedInModels": ["CommunicationLog"],
+      "sourceModule": "communication",
+      "confidence": "high",
+      "evidenceRefs": ["prisma://communication#/enumDefs/1"]
+    },
+    {
+      "name": "PaymentStatus",
+      "values": ["PENDING", "PAID", "PARTIAL", "WAIVED"],
+      "description": "Payment lifecycle states. Manual tracking by admin (no automated payment gateway).",
+      "volatilityClassification": "stable",
+      "usedInModels": ["Payment"],
+      "sourceModule": "payment_tracking",
+      "confidence": "high",
+      "evidenceRefs": ["prisma://payment_tracking#/enumDefs/0"]
+    }
+  ],
+  "duplicateEnums": [
+    {
+      "candidateNames": ["ActivityType.LEAD_CREATED", "TriggerEvent.LEAD_CREATED"],
+      "overlappingValues": ["LEAD_CREATED"],
+      "modules": ["lead_management", "communication"],
+      "reason": "Same event name used in two contexts: ActivityType logs it as a lead activity entry, TriggerEvent uses it to fire an automated email. Different purposes — not a true duplicate. No consolidation needed.",
+      "action": "none"
+    },
+    {
+      "candidateNames": ["LeadStatus.TRIAL_SCHEDULED", "TriggerEvent.TRIAL_SCHEDULED"],
+      "overlappingValues": ["TRIAL_SCHEDULED"],
+      "modules": ["lead_management", "communication"],
+      "reason": "Same concept (trial was booked) represented as a lead state value and an email trigger. Conceptual overlap but different enum types with different value sets. No consolidation needed.",
+      "action": "none"
+    }
+  ],
+  "meta": {
+    "totalEnums": 12,
+    "allStableVolatility": true,
+    "duplicateCandidates": 2,
+    "duplicatesRequiringAction": 0,
+    "generatedAt": "2026-03-06",
+    "sourceModules": [
+      "lead_management",
+      "enrollment_trial",
+      "program_pricing",
+      "communication",
+      "payment_tracking"
+    ],
+    "modulesWithNoEnums": ["auth_accounts", "calendar_scheduling", "settings", "admin_dashboard"]
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "moduleId": "payment_tracking",
+  "contractVersion": "v1.0.0",
+  "normalizedAt": "2026-03-06",
+  "routes": [
+    {
+      "screenId": "payment_dashboard",
+      "name": "Payment Dashboard",
+      "feRoute": "/admin/payments",
+      "normalizedRoute": "/admin/payments",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "endpointProposals": [
+        { "operationId": "getPayments", "method": "GET", "path": "/api/payments" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://payment_dashboard"]
+    },
+    {
+      "screenId": "payment_detail",
+      "name": "Payment Detail",
+      "feRoute": "/admin/payments/:paymentId",
+      "normalizedRoute": "/admin/payments/{paymentId}",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "endpointProposals": [
+        { "operationId": "getPayment", "method": "GET", "path": "/api/payments/{paymentId}" },
+        { "operationId": "updatePayment", "method": "PUT", "path": "/api/payments/{paymentId}" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://payment_detail"],
+      "pathNormalization": { "original": "/admin/payments/:paymentId", "normalized": "/admin/payments/{paymentId}", "confidence": "medium" }
+    },
+    {
+      "screenId": "zelle_instructions",
+      "name": "Zelle Payment Instructions",
+      "feRoute": "/enrollment/:enrollmentId/pay",
+      "normalizedRoute": "/enrollment/{enrollmentId}/pay",
+      "type": "api_driven",
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "endpointProposals": [
+        { "operationId": "getZelleInstructions", "method": "GET", "path": "/api/public/enrollments/{enrollmentId}/payment-instructions" }
+      ],
+      "confidence": "high",
+      "sourceRefs": ["fe_details://zelle_instructions"],
+      "pathNormalization": { "original": "/enrollment/:enrollmentId/pay", "normalized": "/enrollment/{enrollmentId}/pay", "confidence": "medium" }
+    }
+  ],
+  "endpoints": [
+    { "operationId": "getPayments", "method": "GET", "path": "/api/payments", "tags": ["payments"], "security": ["cookieAuth"], "requestSchema": "PaymentListQuery", "responseSchema": "PaymentListResponse", "errorSchema": "ApiError", "queryParams": ["status", "search", "page", "limit"], "confidence": "high", "sourceRefs": ["openapi:///api/payments.get"] },
+    { "operationId": "getPayment", "method": "GET", "path": "/api/payments/{paymentId}", "tags": ["payments"], "security": ["cookieAuth"], "requestSchema": null, "responseSchema": "PaymentDetailResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/payments/{paymentId}.get"] },
+    { "operationId": "updatePayment", "method": "PUT", "path": "/api/payments/{paymentId}", "tags": ["payments"], "security": ["cookieAuth"], "requestSchema": "UpdatePaymentRequest", "responseSchema": "PaymentDetailResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/payments/{paymentId}.put"], "handoffRefs": ["HO-04"] },
+    { "operationId": "getZelleInstructions", "method": "GET", "path": "/api/public/enrollments/{enrollmentId}/payment-instructions", "tags": ["payments-public"], "security": [], "requestSchema": null, "responseSchema": "ZelleInstructionsResponse", "errorSchema": "ApiError", "confidence": "high", "sourceRefs": ["openapi:///api/public/enrollments/{enrollmentId}/payment-instructions.get"], "handoffRefs": ["HO-02"] }
+  ],
+  "rbac": [
+    { "endpointId": "getPayments", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://payment_dashboard.allowedRoles"] },
+    { "endpointId": "getPayment", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://payment_detail.allowedRoles"] },
+    { "endpointId": "updatePayment", "roles": ["admin"], "permissions": [], "confidence": "medium", "sourceRefs": ["fe_details://payment_detail.allowedRoles"] },
+    { "endpointId": "getZelleInstructions", "roles": [], "permissions": [], "confidence": "high", "sourceRefs": ["openapi://security.[]"], "note": "Public endpoint" }
+  ],
+  "db": {
+    "models": [
+      {
+        "model": "Payment",
+        "fields": [
+          { "name": "id", "type": "String", "isOptional": false, "attributes": ["@id", "@default(cuid())"] },
+          { "name": "enrollmentId", "type": "String", "isOptional": false, "attributes": [] },
+          { "name": "status", "type": "PaymentStatus", "isOptional": false, "attributes": ["@default(PENDING)"] },
+          { "name": "amountDue", "type": "Float", "isOptional": false, "attributes": [] },
+          { "name": "amountReceived", "type": "Float", "isOptional": false, "attributes": ["@default(0)"] },
+          { "name": "paymentMethod", "type": "String", "isOptional": true, "attributes": [] },
+          { "name": "notes", "type": "String", "isOptional": true, "attributes": [] },
+          { "name": "createdAt", "type": "DateTime", "isOptional": false, "attributes": ["@default(now())"] },
+          { "name": "updatedAt", "type": "DateTime", "isOptional": false, "attributes": ["@updatedAt"] }
+        ],
+        "indexes": ["@@index([status])", "@@index([status, createdAt])"],
+        "uniques": ["@@unique([enrollmentId])"],
+        "relations": [
+          { "name": "enrollment", "kind": "oneToOne", "target": "Enrollment", "fkFields": ["enrollmentId"] }
+        ],
+        "confidence": "high",
+        "sourceRefs": ["prisma_contract://models.Payment"]
+      }
+    ],
+    "enums": [
+      { "name": "PaymentStatus", "values": ["PENDING", "PAID", "PARTIAL", "WAIVED"], "volatility": "stable" }
+    ],
+    "notes": "One payment per enrollment (enrollmentId unique FK). Payment auto-created on enrollment (HO-02). remainingBalance computed at query time. Partial payments tracked manually (PT-A-02). Zelle instructions read from LocationSettings."
+  },
+  "signals": [
+    {
+      "type": "job",
+      "name": "payment_overdue_check",
+      "trigger": "scheduled/background",
+      "description": "Background job checks payment overdue threshold (default 3 days) and triggers reminder email (HO-04: payment_tracking -> communication)",
+      "confidence": "medium",
+      "sourceRefs": ["prisma_contract://dbNotes.overdueThreshold", "openapi:///api/payments/{paymentId}.put.x-handoff-ref"]
+    }
+  ],
+  "unknowns": [
+    {
+      "id": "PT-U-01",
+      "description": "Payment overdue threshold is admin-configurable (PT-A-01). Storage location (LocationSettings vs app config) not specified.",
+      "confidence": "low",
+      "sourceRefs": ["fe_details://assumptions.PT-A-01"]
+    }
+  ],
+  "evidence": {
+    "sourcesUsed": ["fe_details.json", "openapi.json", "prisma_contract.json", "zod_patch.json"],
+    "decisions": [
+      { "id": "PT-D-01", "description": "FE paths with :paymentId/:enrollmentId normalized to {paymentId}/{enrollmentId}", "confidence": "medium" }
+    ]
+  }
+}

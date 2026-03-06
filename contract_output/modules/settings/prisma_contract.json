@@ -1,0 +1,149 @@
+{
+  "moduleId": "settings",
+  "contractVersion": "v1.0.0",
+  "status": "draft",
+  "changeType": "none",
+  "models": [
+    {
+      "model": "LocationSettings",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@id", "@default(cuid())"],
+          "sourceRefs": ["openapi://SettingsResponse.locationId"]
+        },
+        {
+          "name": "businessName",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://UpdateSettingsRequest.businessName", "fe://general_settings.businessName"]
+        },
+        {
+          "name": "address",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://UpdateSettingsRequest.address", "fe://general_settings.address"]
+        },
+        {
+          "name": "phone",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://UpdateSettingsRequest.phone", "fe://general_settings.phone"]
+        },
+        {
+          "name": "email",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://UpdateSettingsRequest.email", "fe://general_settings.email"]
+        },
+        {
+          "name": "websiteUrl",
+          "type": "String",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://UpdateSettingsRequest.websiteUrl", "fe://general_settings.websiteUrl"]
+        },
+        {
+          "name": "zelleRecipientName",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://UpdateSettingsRequest.zelleRecipientName", "fe://general_settings.zelleRecipientName"]
+        },
+        {
+          "name": "zelleContactInfo",
+          "type": "String",
+          "isOptional": false,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://UpdateSettingsRequest.zelleContactInfo", "fe://general_settings.zelleContactInfo"]
+        },
+        {
+          "name": "zelleInstructions",
+          "type": "String",
+          "isOptional": true,
+          "isList": false,
+          "attributes": [],
+          "sourceRefs": ["zod://UpdateSettingsRequest.zelleInstructions", "fe://general_settings.zelleInstructions"]
+        },
+        {
+          "name": "notifyNewLead",
+          "type": "Boolean",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(false)"],
+          "sourceRefs": ["zod://UpdateSettingsRequest.notifyNewLead", "fe://general_settings.notifyNewLead"]
+        },
+        {
+          "name": "notifyNewEnrollment",
+          "type": "Boolean",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(false)"],
+          "sourceRefs": ["zod://UpdateSettingsRequest.notifyNewEnrollment", "fe://general_settings.notifyNewEnrollment"]
+        },
+        {
+          "name": "notifyPaymentReceived",
+          "type": "Boolean",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(false)"],
+          "sourceRefs": ["zod://UpdateSettingsRequest.notifyPaymentReceived", "fe://general_settings.notifyPaymentReceived"]
+        },
+        {
+          "name": "createdAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@default(now())"],
+          "sourceRefs": ["db_internal"]
+        },
+        {
+          "name": "updatedAt",
+          "type": "DateTime",
+          "isOptional": false,
+          "isList": false,
+          "attributes": ["@updatedAt"],
+          "sourceRefs": ["db_internal"]
+        }
+      ],
+      "indexes": [],
+      "uniques": [],
+      "relations": [
+        {
+          "name": "leads",
+          "kind": "oneToMany",
+          "target": "Lead",
+          "fkFields": [],
+          "references": []
+        },
+        {
+          "name": "programs",
+          "kind": "oneToMany",
+          "target": "Program",
+          "fkFields": [],
+          "references": []
+        }
+      ]
+    }
+  ],
+  "enumDefs": [],
+  "dbNotes": {
+    "singleLocation": "MVP supports one location (A-09/ST-A-01). LocationSettings.id is the locationId referenced by Lead and Program. Data model supports multi-location expansion without schema change.",
+    "zellePrerequisite": "ST-A-02/ST-BR-01: Zelle configuration (zelleRecipientName, zelleContactInfo) must be completed before first program can be published. Enforced at application level.",
+    "staffRolesStub": "Staff & Roles screen is a Phase 2 stub. No DB entity needed for MVP."
+  }
+}
