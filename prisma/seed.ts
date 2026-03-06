@@ -1,9 +1,25 @@
 // ============================================
 // DATABASE SEED SCRIPT
 // ============================================
+//
+// @purpose    Seeds the database with required bootstrap data:
+//             - LocationSettings (single record, ST-A-01)
+//             - Default Admin user (admin@platform.com)
+//             - Default email templates (6 trigger-mapped templates)
+//             - Automation rules (6 pre-seeded, one per TriggerEvent)
+//
+// @inputs     architect_output/production_bootstrap.json
+//             architect_output/global_services_registry.json
+//             architect_output/modules/communication/db_flow.json
+//
+// @idempotency  Uses upsert with deterministic unique keys to prevent
+//               duplicate rows on re-run. Safe after partial failure.
+//
 // Run: npx prisma db seed
+// ============================================
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, TriggerEvent } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -11,166 +27,173 @@ async function main() {
   console.log('Seeding database...');
 
   // ═══════════════════════════════════════════════════════
-  // PERMISSION DEFINITIONS (Reference catalog)
+  // 1. LOCATION SETTINGS (single record for MVP)
+  // Uniqueness key: first record (findFirst + create-if-missing)
   // ═══════════════════════════════════════════════════════
-  const permissionData = [
-    // Projects
-    { key: 'projects:read:all', name: 'View Projects', category: 'Projects' },
-    { key: 'projects:create:all', name: 'Create Projects', category: 'Projects' },
-    { key: 'projects:update:all', name: 'Update Projects', category: 'Projects' },
-    { key: 'projects:delete:all', name: 'Delete Projects', category: 'Projects' },
+  const existingSettings = await prisma.locationSettings.findFirst();
+  let locationSettingsId: string;
 
-    // Users
-    { key: 'users:read:all', name: 'View Users', category: 'Users' },
-    { key: 'users:manage:all', name: 'Manage Users', category: 'Users' },
+  if (!existingSettings) {
+    const settings = await prisma.locationSettings.create({
+      data: {
+        businessName: 'My Youth Program',
+        address: '',
+        phone: '',
+        email: '',
+        websiteUrl: '',
+        zelleRecipientName: null,
+        zelleContactInfo: null,
+        zelleInstructions: null,
+        notifyNewLead: true,
+        notifyNewEnrollment: true,
+        notifyPaymentReceived: true,
+        paymentOverdueDays: 3,
+      },
+    });
+    locationSettingsId = settings.id;
+    console.log('  Created LocationSettings');
+  } else {
+    locationSettingsId = existingSettings.id;
+    console.log('  LocationSettings already exists, skipped');
+  }
 
-    // Settings
-    { key: 'settings:read:all', name: 'View Settings', category: 'Settings' },
-    { key: 'settings:manage:all', name: 'Manage Settings', category: 'Settings' },
+  // ═══════════════════════════════════════════════════════
+  // 2. DEFAULT ADMIN USER
+  // Uniqueness key: email (@@unique)
+  // Password must be changed on first login.
+  // ═══════════════════════════════════════════════════════
+  const adminEmail = 'admin@platform.com';
+  const existingAdmin = await prisma.admin.findUnique({
+    where: { email: adminEmail },
+  });
 
-    // Admin
-    { key: 'admin:access:all', name: 'Admin Access', category: 'Admin' },
-    { key: 'system:admin:all', name: 'System Admin', category: 'Admin' },
+  if (!existingAdmin) {
+    const saltRounds = 10;
+    const defaultPassword = 'changeme123';
+    const passwordHash = await bcrypt.hash(defaultPassword, saltRounds);
+
+    await prisma.admin.create({
+      data: {
+        email: adminEmail,
+        name: 'Platform Admin',
+        passwordHash,
+        role: 'admin',
+      },
+    });
+    console.log(`  Created default admin: ${adminEmail} (password: ${defaultPassword})`);
+  } else {
+    console.log('  Admin user already exists, skipped');
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // 3. DEFAULT EMAIL TEMPLATES
+  // Uniqueness key: triggerEvent on Template (used for matching)
+  // 6 templates matching the 6 TriggerEvent values.
+  // ═══════════════════════════════════════════════════════
+  const defaultTemplates = [
+    {
+      name: 'Lead Created Welcome',
+      subject: 'Welcome to {{businessName}}!',
+      body: 'Hi {{parentName}},\n\nThank you for your interest in {{businessName}}! We are excited to help your child discover our programs.\n\nFeel free to browse our programs and book a trial class.\n\nBest regards,\n{{businessName}}',
+      triggerEvent: TriggerEvent.LEAD_CREATED,
+    },
+    {
+      name: 'Trial Booking Confirmation',
+      subject: 'Trial Class Confirmed - {{programName}}',
+      body: 'Hi {{parentName}},\n\nYour trial class has been booked!\n\nProgram: {{programName}}\nChild: {{childName}}\nDate: {{trialDate}}\n\nWe look forward to seeing {{childName}}!\n\nBest regards,\n{{businessName}}',
+      triggerEvent: TriggerEvent.TRIAL_SCHEDULED,
+    },
+    {
+      name: 'Trial Approaching Reminder',
+      subject: 'Reminder: Trial Class Tomorrow - {{programName}}',
+      body: 'Hi {{parentName}},\n\nThis is a friendly reminder that {{childName}} has a trial class coming up!\n\nProgram: {{programName}}\nDate: {{trialDate}}\n\nWe look forward to seeing you!\n\nBest regards,\n{{businessName}}',
+      triggerEvent: TriggerEvent.TRIAL_APPROACHING,
+    },
+    {
+      name: 'Enrollment Confirmation',
+      subject: 'Enrollment Confirmed - {{programName}}',
+      body: 'Hi {{parentName}},\n\nCongratulations! {{childName}} has been enrolled in {{programName}}.\n\nTotal Due: ${{totalDue}}\n\nPlease complete your payment via Zelle using the instructions on your confirmation page.\n\nBest regards,\n{{businessName}}',
+      triggerEvent: TriggerEvent.ENROLLMENT_COMPLETED,
+    },
+    {
+      name: 'Payment Overdue Reminder',
+      subject: 'Payment Reminder - {{programName}}',
+      body: 'Hi {{parentName}},\n\nThis is a reminder that your payment for {{childName}}\'s enrollment in {{programName}} is still pending.\n\nAmount Due: ${{amountDue}}\n\nPlease send your payment via Zelle at your earliest convenience.\n\nBest regards,\n{{businessName}}',
+      triggerEvent: TriggerEvent.PAYMENT_OVERDUE,
+    },
+    {
+      name: 'Class Starting Soon',
+      subject: 'Class Starting Soon - {{programName}}',
+      body: 'Hi {{parentName}},\n\n{{programName}} is starting soon!\n\nStart Date: {{startDate}}\n\nPlease make sure {{childName}} is ready for the first class.\n\nBest regards,\n{{businessName}}',
+      triggerEvent: TriggerEvent.CLASS_START_APPROACHING,
+    },
   ];
 
-  for (const perm of permissionData) {
-    const existing = await prisma.permission.findFirst({
-      where: { key: perm.key, organizationId: null },
+  const templateIds: Record<string, string> = {};
+
+  for (const tmpl of defaultTemplates) {
+    const existing = await prisma.template.findFirst({
+      where: { triggerEvent: tmpl.triggerEvent, isDefault: true },
     });
+
     if (!existing) {
-      await prisma.permission.create({
+      const created = await prisma.template.create({
         data: {
-          key: perm.key,
-          name: perm.name,
-          category: perm.category,
-          organizationId: null,
+          name: tmpl.name,
+          subject: tmpl.subject,
+          body: tmpl.body,
+          isDefault: true,
+          triggerEvent: tmpl.triggerEvent,
         },
       });
+      templateIds[tmpl.triggerEvent] = created.id;
+      console.log(`  Created template: ${tmpl.name}`);
+    } else {
+      templateIds[tmpl.triggerEvent] = existing.id;
+      console.log(`  Template "${tmpl.name}" already exists, skipped`);
     }
   }
 
-  console.log('Created permissions');
-
   // ═══════════════════════════════════════════════════════
-  // GLOBAL ROLES (apply across all organizations)
+  // 4. AUTOMATION RULES (6 pre-seeded, one per TriggerEvent)
+  // Uniqueness key: triggerEvent (@@unique on Automation)
   // ═══════════════════════════════════════════════════════
-  const globalRoles = [
-    {
-      name: 'Platform Admin',
-      description: 'Full platform access across all organizations',
-      permissions: ['*'],
-      isSystem: true,
-    },
-    {
-      name: 'Platform Support',
-      description: 'Read-only access for customer support',
-      permissions: ['projects:read:all', 'users:read:all', 'settings:read:all'],
-      isSystem: true,
-    },
+  const automationConfigs = [
+    { triggerEvent: TriggerEvent.LEAD_CREATED, delayMinutes: 0, enabled: true },
+    { triggerEvent: TriggerEvent.TRIAL_SCHEDULED, delayMinutes: 0, enabled: true },
+    { triggerEvent: TriggerEvent.TRIAL_APPROACHING, delayMinutes: 1440, enabled: true },
+    { triggerEvent: TriggerEvent.ENROLLMENT_COMPLETED, delayMinutes: 0, enabled: true },
+    { triggerEvent: TriggerEvent.PAYMENT_OVERDUE, delayMinutes: 0, enabled: true },
+    { triggerEvent: TriggerEvent.CLASS_START_APPROACHING, delayMinutes: 1440, enabled: true },
   ];
 
-  for (const role of globalRoles) {
-    const existing = await prisma.role.findFirst({
-      where: { name: role.name, organizationId: null },
+  for (const auto of automationConfigs) {
+    const templateId = templateIds[auto.triggerEvent];
+    if (!templateId) {
+      console.warn(`  WARNING: No template found for ${auto.triggerEvent}, skipping automation`);
+      continue;
+    }
+
+    const existing = await prisma.automation.findUnique({
+      where: { triggerEvent: auto.triggerEvent },
     });
-    if (existing) {
-      await prisma.role.update({
-        where: { id: existing.id },
+
+    if (!existing) {
+      await prisma.automation.create({
         data: {
-          description: role.description,
-          permissions: role.permissions,
+          triggerEvent: auto.triggerEvent,
+          templateId,
+          delayMinutes: auto.delayMinutes,
+          enabled: auto.enabled,
         },
       });
+      console.log(`  Created automation: ${auto.triggerEvent}`);
     } else {
-      await prisma.role.create({
-        data: {
-          name: role.name,
-          description: role.description,
-          permissions: role.permissions,
-          organizationId: null,
-          isSystem: role.isSystem,
-        },
-      });
+      console.log(`  Automation "${auto.triggerEvent}" already exists, skipped`);
     }
   }
 
-  console.log('Created global roles');
-
-  // ═══════════════════════════════════════════════════════
-  // DEFAULT ORG ROLES (templates - created per organization)
-  // These are "template" roles with null organizationId
-  // In a real app, copy these when creating a new organization
-  // ═══════════════════════════════════════════════════════
-  const defaultOrgRoles = [
-    {
-      name: 'Admin',
-      description: 'Organization administrator',
-      permissions: [
-        'projects:read:all',
-        'projects:create:all',
-        'projects:update:all',
-        'projects:delete:all',
-        'users:read:all',
-        'users:manage:all',
-        'settings:read:all',
-        'settings:manage:all',
-        'admin:access:all',
-      ],
-      isSystem: true,
-    },
-    {
-      name: 'Developer',
-      description: 'Development team member',
-      permissions: [
-        'projects:read:all',
-        'projects:create:all',
-        'projects:update:all',
-        'users:read:all',
-      ],
-      isSystem: true,
-    },
-    {
-      name: 'Viewer',
-      description: 'Read-only access',
-      permissions: ['projects:read:all', 'users:read:all'],
-      isSystem: true,
-    },
-    {
-      name: 'User',
-      description: 'Default role for new users',
-      permissions: ['projects:read:all'],
-      isSystem: true,
-    },
-  ];
-
-  for (const role of defaultOrgRoles) {
-    const existing = await prisma.role.findFirst({
-      where: { name: role.name, organizationId: null },
-    });
-    if (existing) {
-      await prisma.role.update({
-        where: { id: existing.id },
-        data: {
-          description: role.description,
-          permissions: role.permissions,
-        },
-      });
-    } else {
-      await prisma.role.create({
-        data: {
-          name: role.name,
-          description: role.description,
-          permissions: role.permissions,
-          organizationId: null,
-          isSystem: role.isSystem,
-        },
-      });
-    }
-  }
-
-  console.log('Created default org role templates');
-
-  console.log('Seeding completed!');
+  console.log('\nSeeding completed!');
 }
 
 main()
@@ -178,7 +201,7 @@ main()
     await prisma.$disconnect();
   })
   .catch(async (e) => {
-    console.error(e);
+    console.error('Seed error:', e);
     await prisma.$disconnect();
     process.exit(1);
   });

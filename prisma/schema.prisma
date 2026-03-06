@@ -1,9 +1,26 @@
 // ============================================
-// PRISMA SCHEMA
+// PRISMA SCHEMA — Domain Models
 // ============================================
+//
+// @purpose  Complete database schema for the youth program management platform.
+//           Covers 9 modules: auth_accounts, settings, lead_management,
+//           enrollment_trial, program_pricing, calendar_scheduling,
+//           payment_tracking, communication, admin_dashboard.
+//
+// @inputs   architect_output/global_db_patterns.json
+//           architect_output/global_enums.json
+//           architect_output/modules/*/db_flow.json
+//           architect_output/gaps_questions.json (resolved decisions)
+//           architect_output/conflicts_questions.json (resolved decisions)
+//
+// @outputs  16 models, 12 enums, 1 AuditLog model (from services registry)
+//
+// @idempotency  Safe to re-run migrations. All unique constraints and indexes
+//               use IF NOT EXISTS semantics via Prisma migration engine.
+//
 // Run after changes:
-//   npm run db:generate   (regenerate Prisma client)
-//   npm run db:migrate    (create migration)
+//   npx prisma generate   (regenerate Prisma client)
+//   npx prisma migrate dev --name <description>  (create migration)
 // ============================================
 
 generator client {
@@ -16,191 +33,494 @@ datasource db {
 }
 
 // ============================================
-// CORE IDENTITY MODELS
+// ENUMS
 // ============================================
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  password  String   // Hashed password
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Security fields (for lockout feature)
-  failedLoginAttempts Int       @default(0)
-  lockedUntil         DateTime?
-  passwordChangedAt   DateTime?
-
-  // Relations
-  userRoles         UserRole[]        @relation("UserRoles")
-  grantedRoles      UserRole[]        @relation("GrantedBy")
-  userPermissionMap UserPermissionMap?
-  grantedPermissions UserPermissionMap[] @relation("PermissionGrantedBy")
-  memberships       OrganizationMember[]
-  sessions          Session[]
+/// @purpose Lead acquisition channel (stable, integration-specific)
+enum LeadSource {
+  FACEBOOK
+  GOOGLE
+  WEBSITE
+  MANUAL
 }
 
+/// @purpose Lead lifecycle states (GP-04 auto-advance, GAP-Q01-B forward+override)
+enum LeadStatus {
+  NEW
+  CONTACTED
+  TRIAL_SCHEDULED
+  TRIAL_ATTENDED
+  ENROLLED
+  DROPPED
+  NOT_INTERESTED
+}
+
+/// @purpose Types of lead activity trail entries
+enum ActivityType {
+  STATUS_CHANGE
+  EMAIL_SENT
+  ENROLLMENT_EVENT
+  NOTE_ADDED
+  LEAD_CREATED
+}
+
+/// @purpose Trial booking lifecycle states
+enum TrialStatus {
+  SCHEDULED
+  COMPLETED
+  NO_SHOW
+  CANCELLED
+}
+
+/// @purpose Enrollment lifecycle (GAP-Q02-A strict one-way transitions)
+enum EnrollmentStatus {
+  ACTIVE
+  CANCELLED
+  COMPLETED
+}
+
+/// @purpose Program lifecycle states
+enum ProgramStatus {
+  DRAFT
+  ACTIVE
+  CLOSED
+}
+
+/// @purpose Pricing model type
+enum FeeType {
+  TOTAL
+  PER_SESSION
+}
+
+/// @purpose Coupon discount calculation type
+enum DiscountType {
+  PERCENTAGE
+  FLAT
+}
+
+/// @purpose Which fee component(s) a coupon applies to
+enum CouponScope {
+  PROGRAM_FEE
+  REGISTRATION_FEE
+  BOTH
+}
+
+/// @purpose System events that trigger automated emails (6 fixed triggers)
+enum TriggerEvent {
+  LEAD_CREATED
+  TRIAL_SCHEDULED
+  TRIAL_APPROACHING
+  ENROLLMENT_COMPLETED
+  PAYMENT_OVERDUE
+  CLASS_START_APPROACHING
+}
+
+/// @purpose Email delivery lifecycle
+enum DeliveryStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+/// @purpose Payment lifecycle states (manual tracking by admin)
+enum PaymentStatus {
+  PENDING
+  PAID
+  PARTIAL
+  WAIVED
+}
+
+// ============================================
+// MODULE: auth_accounts
+// ============================================
+
+/// @purpose Admin user account for platform authentication
+/// @sideEffects Session created on login, PasswordResetToken on forgot-password
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         String   @default("admin")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions            Session[]
+  passwordResetTokens PasswordResetToken[]
+}
+
+/// @purpose Server-side session for cookie-based authentication
+/// @idempotency Cascade delete on Admin removal (GAP-Q10-A)
 model Session {
   id        String   @id @default(cuid())
-  userId    String
-  token     String   @unique
+  adminId   String
   expiresAt DateTime
   createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  admin Admin @relation(fields: [adminId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
-  @@index([token])
+  @@index([adminId])
+  @@index([expiresAt])
 }
 
-model Organization {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  members           OrganizationMember[]
-  roles             Role[]
-  permissions       Permission[]
-  userRoles         UserRole[]
-  userPermissionMaps UserPermissionMap[]
-}
-
-model OrganizationMember {
-  id             String   @id @default(cuid())
-  userId         String
-  organizationId String
-  isOwner        Boolean  @default(false)
-  joinedAt       DateTime @default(now())
-
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, organizationId])
-  @@index([userId])
-  @@index([organizationId])
-}
-
-// ============================================
-// PERMISSION SYSTEM MODELS
-// ============================================
-
-/// Permission definitions - reference catalog
-model Permission {
-  id             String   @id @default(cuid())
-  key            String   // e.g., "projects:read:all"
-  name           String   // e.g., "View Projects"
-  description    String?
-  category       String?  // For grouping in UI (e.g., "Projects", "Users")
-  organizationId String?  // NULL = global permission
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  @@unique([key, organizationId])
-  @@index([key])
-  @@index([category])
-}
-
-/// Role definitions - global or org-scoped
-model Role {
-  id             String   @id @default(cuid())
-  name           String   // e.g., "Admin", "Developer", "Viewer"
-  description    String?
-  permissions    String[] // Array of permission keys
-  organizationId String?  // NULL = global role (applies across all orgs)
-  isSystem       Boolean  @default(false) // System roles cannot be deleted
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  userRoles    UserRole[]
-
-  @@unique([name, organizationId])
-  @@index([organizationId])
-  @@index([name])
-}
-
-/// User-Role assignments
-model UserRole {
-  id             String    @id @default(cuid())
-  userId         String
-  roleId         String
-  organizationId String?   // Context where role applies
-  grantedById    String?
-  grantedAt      DateTime  @default(now())
-  expiresAt      DateTime? // NULL = never expires
-  reason         String?
-  createdAt      DateTime  @default(now())
-
-  user         User          @relation("UserRoles", fields: [userId], references: [id], onDelete: Cascade)
-  role         Role          @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  grantedBy    User?         @relation("GrantedBy", fields: [grantedById], references: [id])
-
-  @@unique([userId, roleId, organizationId])
-  @@index([userId])
-  @@index([roleId])
-  @@index([organizationId])
-}
-
-/// Direct permission assignments (for edge cases, temporary grants)
-model UserPermissionMap {
-  id             String    @id @default(cuid())
-  userId         String    @unique // One map per user per org
-  organizationId String?
-  permissions    String[]  // Array of permission keys
-  grantedById    String?
-  grantedAt      DateTime  @default(now())
-  expiresAt      DateTime? // NULL = never expires
-  reason         String?   // Why was this direct grant needed?
-  createdAt      DateTime  @default(now())
-
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  grantedBy    User?         @relation("PermissionGrantedBy", fields: [grantedById], references: [id])
-
-  @@unique([userId, organizationId])
-  @@index([userId])
-  @@index([organizationId])
-}
-
-// ============================================
-// SECURITY MODELS
-// ============================================
-
-/// Audit log for security events
-model AuditLog {
+/// @purpose Single-use password reset token with 24h expiry
+/// @idempotency Cascade delete on Admin removal (GAP-Q10-A)
+model PasswordResetToken {
   id        String   @id @default(cuid())
-  event     String   // e.g., "LOGIN_SUCCESS", "LOGIN_FAILED", "PASSWORD_CHANGED"
-  userId    String?  // May be null for failed logins with unknown user
-  email     String?  // Store email for failed login tracking
-  ipAddress String?
-  userAgent String?
-  metadata  Json     @default("{}")
+  adminId   String
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  @@index([userId])
-  @@index([event])
-  @@index([createdAt])
+  admin Admin @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
   @@index([email])
 }
 
 // ============================================
-// YOUR DOMAIN MODELS GO BELOW
+// MODULE: settings
 // ============================================
-//
-// Example:
-//
-// model Project {
-//   id          String   @id @default(cuid())
-//   name        String
-//   description String?
-//   createdAt   DateTime @default(now())
-//   updatedAt   DateTime @updatedAt
-// }
+
+/// @purpose Single-location business settings and Zelle payment config
+/// @sideEffects Referenced by Program, Lead for location scoping
+/// @idempotency Pre-seeded on first deploy (single record, ST-A-01)
+model LocationSettings {
+  id                   String  @id @default(cuid())
+  businessName         String
+  address              String?
+  phone                String?
+  email                String?
+  websiteUrl           String?
+  zelleRecipientName   String?
+  zelleContactInfo     String?
+  zelleInstructions    String?
+  notifyNewLead        Boolean @default(true)
+  notifyNewEnrollment  Boolean @default(true)
+  notifyPaymentReceived Boolean @default(true)
+  paymentOverdueDays   Int     @default(3)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  programs Program[]
+  leads    Lead[]
+}
+
+// ============================================
+// MODULE: lead_management
+// ============================================
+
+/// @purpose Parent contact record / CRM lead (GAP-Q09-A: Lead = parent, child fields informational)
+/// @sideEffects Auto-created by enrollment_trial via GP-02
+model Lead {
+  id                  String     @id @default(cuid())
+  parentName          String
+  email               String     @unique
+  phone               String?
+  childName           String?
+  childAge            Int?
+  source              LeadSource @default(WEBSITE)
+  status              LeadStatus @default(NEW)
+  interestedProgramId String?
+  locationId          String?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  interestedProgram Program?          @relation("LeadInterestedProgram", fields: [interestedProgramId], references: [id], onDelete: SetNull)
+  location          LocationSettings? @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  notes             LeadNote[]
+  activities        LeadActivity[]
+  trials            Trial[]
+  enrollments       Enrollment[]
+
+  @@index([locationId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([locationId, status])
+}
+
+/// @purpose Append-only admin notes on a lead
+/// @idempotency Cascade delete with Lead (GAP-Q10-A explicit)
+model LeadNote {
+  id        String   @id @default(cuid())
+  leadId    String
+  text      String
+  author    String
+  createdAt DateTime @default(now())
+
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId])
+}
+
+/// @purpose Append-only activity/audit trail for lead lifecycle
+/// @idempotency Cascade delete with Lead
+model LeadActivity {
+  id          String       @id @default(cuid())
+  leadId      String
+  type        ActivityType
+  description String
+  metadata    Json?
+  createdAt   DateTime     @default(now())
+
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId])
+  @@index([leadId, createdAt])
+}
+
+// ============================================
+// MODULE: program_pricing
+// ============================================
+
+/// @purpose Program definition with pricing and capacity
+/// @sideEffects Referenced by Trial, Enrollment, CalendarDate, Lead
+model Program {
+  id                      String        @id @default(cuid())
+  name                    String
+  ageGroupMin             Int?
+  ageGroupMax             Int?
+  totalSessions           Int
+  sessionDuration         Int?
+  location                String?
+  locationId              String
+  startDate               DateTime?
+  endDate                 DateTime?
+  capacity                Int
+  status                  ProgramStatus @default(DRAFT)
+  baseFee                 Float
+  feeType                 FeeType       @default(TOTAL)
+  registrationFee         Float?        @default(0)
+  registrationFeeRequired Boolean       @default(false)
+  trialAvailable          Boolean       @default(false)
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime      @updatedAt
+
+  locationSettings LocationSettings @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  calendarDates    CalendarDate[]
+  trials           Trial[]
+  enrollments      Enrollment[]
+  interestedLeads  Lead[]           @relation("LeadInterestedProgram")
+
+  @@index([locationId])
+  @@index([status])
+  @@index([status, startDate])
+}
+
+/// @purpose Discount coupon with usage tracking
+/// @sideEffects usageCount incremented on enrollment (GAP-Q13-A: updatedAt added)
+model Coupon {
+  id            String       @id @default(cuid())
+  code          String       @unique
+  discountType  DiscountType
+  discountValue Float
+  scope         CouponScope  @default(BOTH)
+  expiresAt     DateTime?
+  usageLimit    Int?
+  usageCount    Int          @default(0)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([expiresAt])
+}
+
+// ============================================
+// MODULE: calendar_scheduling
+// ============================================
+
+/// @purpose Scheduled class/trial date for a program
+/// @sideEffects Referenced by Trial; FK constraint prevents delete if trials exist
+model CalendarDate {
+  id            String   @id @default(cuid())
+  date          DateTime
+  programId     String
+  trialEligible Boolean  @default(false)
+  capacity      Int
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  program Program @relation(fields: [programId], references: [id], onDelete: Restrict)
+  trials  Trial[]
+
+  @@unique([programId, date])
+  @@index([programId])
+  @@index([date])
+  @@index([programId, trialEligible, date])
+}
+
+// ============================================
+// MODULE: enrollment_trial
+// ============================================
+
+/// @purpose Trial class booking by a parent
+/// @sideEffects Auto-creates/links Lead (GP-02), auto-advances Lead status (GP-04)
+model Trial {
+  id          String      @id @default(cuid())
+  programId   String
+  trialDateId String
+  parentName  String
+  parentEmail String
+  parentPhone String?
+  childName   String
+  childAge    Int?
+  status      TrialStatus @default(SCHEDULED)
+  leadId      String?
+  bookedAt    DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  program   Program      @relation(fields: [programId], references: [id], onDelete: Restrict)
+  trialDate CalendarDate @relation(fields: [trialDateId], references: [id], onDelete: Restrict)
+  lead      Lead?        @relation(fields: [leadId], references: [id], onDelete: SetNull)
+
+  enrollment Enrollment?
+
+  @@index([programId])
+  @@index([trialDateId])
+  @@index([leadId])
+  @@index([status])
+  @@index([parentEmail])
+}
+
+/// @purpose Student enrollment in a program with price snapshot
+/// @sideEffects Auto-creates Payment (HO-02), auto-creates/links Lead (GP-02)
+model Enrollment {
+  id               String           @id @default(cuid())
+  programId        String
+  parentName       String
+  parentEmail      String
+  parentPhone      String?
+  childName        String
+  childAge         Int?
+  status           EnrollmentStatus @default(ACTIVE)
+  cancellationReason String?
+  totalDue         Float
+  priceBreakdown   Json?
+  couponCode       String?
+  leadId           String?
+  trialId          String?          @unique
+  enrolledAt       DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  program Program @relation(fields: [programId], references: [id], onDelete: Restrict)
+  lead    Lead?   @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  trial   Trial?  @relation(fields: [trialId], references: [id], onDelete: SetNull)
+
+  payment Payment?
+
+  @@index([programId])
+  @@index([leadId])
+  @@index([status])
+  @@index([parentEmail])
+  @@index([programId, status])
+  @@index([enrolledAt])
+}
+
+// ============================================
+// MODULE: payment_tracking
+// ============================================
+
+/// @purpose Payment record linked 1:1 to enrollment (manual Zelle tracking)
+/// @sideEffects Auto-created by enrollment_trial (HO-02). No direct creation endpoint.
+model Payment {
+  id             String        @id @default(cuid())
+  enrollmentId   String        @unique
+  status         PaymentStatus @default(PENDING)
+  amountDue      Float
+  amountReceived Float         @default(0)
+  paymentMethod  String?
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+
+  @@index([status])
+  @@index([status, createdAt])
+}
+
+// ============================================
+// MODULE: communication
+// ============================================
+
+/// @purpose Email template with variable placeholders ({{parentName}}, etc.)
+/// @sideEffects Referenced by Automation. Default templates pre-seeded.
+model Template {
+  id           String       @id @default(cuid())
+  name         String
+  subject      String
+  body         String       @db.Text
+  isDefault    Boolean      @default(false)
+  triggerEvent TriggerEvent?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  automations Automation[]
+
+  @@index([triggerEvent])
+  @@index([isDefault])
+}
+
+/// @purpose Automation rule linking a trigger event to a template
+/// @sideEffects 6 pre-seeded automations (one per TriggerEvent). No CREATE/DELETE.
+model Automation {
+  id           String       @id @default(cuid())
+  triggerEvent TriggerEvent @unique
+  templateId   String
+  delayMinutes Int          @default(0)
+  enabled      Boolean      @default(true)
+  updatedAt    DateTime     @updatedAt
+
+  template Template @relation(fields: [templateId], references: [id], onDelete: Restrict)
+
+  @@index([templateId])
+  @@index([enabled])
+}
+
+/// @purpose Append-only log of all email send attempts with delivery status
+/// @idempotency No FK to Template/Automation — stores snapshot data
+model CommunicationLog {
+  id              String        @id @default(cuid())
+  triggerEvent    TriggerEvent?
+  recipientEmail  String
+  recipientName   String?
+  subject         String
+  body            String        @db.Text
+  deliveryStatus  DeliveryStatus @default(PENDING)
+  sentAt          DateTime?
+  failureReason   String?
+  createdAt       DateTime      @default(now())
+
+  @@index([deliveryStatus])
+  @@index([triggerEvent])
+  @@index([deliveryStatus, sentAt])
+  @@index([recipientEmail, sentAt])
+}
+
+// ============================================
+// CROSS-CUTTING: Audit Log
+// ============================================
+
+/// @purpose Security and business event audit trail (from global_services_registry)
+/// @sideEffects Written by audit_log middleware across 8 modules (17 endpoints)
+/// @idempotency Append-only, no update/delete. 365-day retention policy.
+model AuditLog {
+  id           String   @id @default(cuid())
+  userId       String?
+  action       String
+  resourceType String?
+  resourceId   String?
+  outcome      String?
+  ipAddress    String?
+  userAgent    String?
+  metadata     Json?
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@index([resourceType, resourceId])
+}

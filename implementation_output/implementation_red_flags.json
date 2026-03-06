@@ -1,0 +1,47 @@
+{
+  "version": "1.0.0",
+  "flags": [
+    {
+      "id": "RF-001",
+      "timestampUtc": "2026-03-06T00:00:00Z",
+      "agent": "db",
+      "moduleId": "global",
+      "phase": "global_foundation",
+      "type": "contract_delta",
+      "severity": "medium",
+      "title": "Full schema replacement: generic RBAC system removed",
+      "summary": "The existing Prisma schema contained a generic multi-tenant RBAC system (User, Organization, Role, Permission, UserRole, UserPermissionMap, Session, AuditLog) and seed script that does not match the architecture. These were replaced with the 16 domain-specific models defined in the architecture. User explicitly approved this replacement.",
+      "impact": "All existing DB tables will be dropped and recreated. No production data exists (greenfield project).",
+      "decision": "Approved by user before implementation",
+      "mitigationPlan": "Greenfield project with no production data. Existing scaffold code (routes, components) references old models and will need updates by BE/FE agents.",
+      "owner": "db",
+      "status": "resolved",
+      "blocking": false,
+      "targetPhase": "global_foundation",
+      "evidence": ["prisma/schema.prisma (pre-replacement)", "User confirmation in conversation"],
+      "linkedFiles": ["prisma/schema.prisma", "prisma/seed.ts"],
+      "linkedStatusHistoryIds": ["H-001"]
+    },
+    {
+      "id": "RF-002",
+      "timestampUtc": "2026-03-06T00:00:00Z",
+      "agent": "db",
+      "moduleId": "global",
+      "phase": "global_foundation",
+      "type": "assumption",
+      "severity": "low",
+      "title": "AuditLog model added per global_services_registry",
+      "summary": "The global_services_registry.json defines an auditLogService with database storage. An AuditLog model was added to support this. The model is not explicitly defined in any module's prisma_contract but is required by the audit_log middleware across 8 modules.",
+      "impact": "BE agent must implement audit middleware writing to this table.",
+      "decision": "Added as part of global foundation based on services registry specification",
+      "mitigationPlan": "Model fields derived from global_security_policies.json auditLogging.loggedFields: userId, action, resourceType, resourceId, timestamp, outcome, ipAddress. BE agent to confirm.",
+      "owner": "db+be",
+      "status": "open",
+      "blocking": false,
+      "targetPhase": "module_implementation",
+      "evidence": ["architect_output/global_services_registry.json#auditLogService", "architect_output/global_security_policies.json#auditLogging"],
+      "linkedFiles": ["prisma/schema.prisma"],
+      "linkedStatusHistoryIds": ["H-001"]
+    }
+  ]
+}
