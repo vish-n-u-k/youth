@@ -1,0 +1,1041 @@
+{
+  "moduleId": "communication",
+  "generatedAt": "2026-03-06",
+  "reconcileVersion": "v1.0.0",
+  "nodes": [
+    {
+      "id": "communication.screen.template_manager",
+      "type": "screen",
+      "route": "/admin/communications/templates",
+      "components": ["TemplateList", "TemplateEditorModal"]
+    },
+    {
+      "id": "communication.screen.automation_rules",
+      "type": "screen",
+      "route": "/admin/communications/automations",
+      "components": ["AutomationTable", "AutomationEditModal"]
+    },
+    {
+      "id": "communication.screen.communications_log",
+      "type": "screen",
+      "route": "/admin/communications/log",
+      "components": ["LogFilters", "LogTable", "Pagination", "RetryButton"]
+    },
+    {
+      "id": "communication.endpoint.getTemplates",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/communications/templates",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "communication.endpoint.getTemplate",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/communications/templates/{templateId}",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "communication.endpoint.createTemplate",
+      "type": "endpoint",
+      "method": "POST",
+      "path": "/api/communications/templates",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "communication.endpoint.updateTemplate",
+      "type": "endpoint",
+      "method": "PUT",
+      "path": "/api/communications/templates/{templateId}",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "communication.endpoint.getAutomations",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/communications/automations",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "communication.endpoint.updateAutomation",
+      "type": "endpoint",
+      "method": "PUT",
+      "path": "/api/communications/automations/{automationId}",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "communication.endpoint.getCommunicationsLog",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/communications/log",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "communication.endpoint.retryEmail",
+      "type": "endpoint",
+      "method": "POST",
+      "path": "/api/communications/log/{logId}/retry",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "communication.mw.getTemplates.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "communication.mw.getTemplates.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "communication.mw.getTemplates.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "communication.mw.getTemplate.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "communication.mw.getTemplate.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "communication.mw.getTemplate.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "communication.mw.createTemplate.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "communication.mw.createTemplate.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "communication.mw.createTemplate.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "communication.mw.createTemplate.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "communication.mw.createTemplate.business_rule_guard",
+      "type": "middleware",
+      "middleware": "business_rule_guard",
+      "order": 5,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "communication.mw.updateTemplate.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "communication.mw.updateTemplate.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "communication.mw.updateTemplate.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "communication.mw.updateTemplate.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "communication.mw.updateTemplate.business_rule_guard",
+      "type": "middleware",
+      "middleware": "business_rule_guard",
+      "order": 5,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "communication.mw.getAutomations.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "communication.mw.getAutomations.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "communication.mw.getAutomations.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "communication.mw.updateAutomation.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "communication.mw.updateAutomation.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "communication.mw.updateAutomation.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "communication.mw.updateAutomation.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "communication.mw.updateAutomation.audit_log",
+      "type": "middleware",
+      "middleware": "audit_log",
+      "order": 5,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "communication.mw.getCommunicationsLog.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "communication.mw.getCommunicationsLog.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "communication.mw.getCommunicationsLog.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "communication.mw.getCommunicationsLog.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "communication.mw.retryEmail.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "communication.mw.retryEmail.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "communication.mw.retryEmail.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "communication.mw.retryEmail.business_rule_guard",
+      "type": "middleware",
+      "middleware": "business_rule_guard",
+      "order": 4,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "communication.mw.retryEmail.audit_log",
+      "type": "middleware",
+      "middleware": "audit_log",
+      "order": 5,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "communication.db.getTemplates.Template.READ",
+      "type": "db_operation",
+      "model": "Template",
+      "operation": "READ",
+      "description": "List all email templates"
+    },
+    {
+      "id": "communication.db.getTemplate.Template.READ",
+      "type": "db_operation",
+      "model": "Template",
+      "operation": "READ",
+      "description": "Fetch single template with body content"
+    },
+    {
+      "id": "communication.db.createTemplate.Template.CREATE",
+      "type": "db_operation",
+      "model": "Template",
+      "operation": "CREATE",
+      "description": "Create new custom email template (GP-03: validate template variables like {{parentName}}, {{programName}})"
+    },
+    {
+      "id": "communication.db.updateTemplate.Template.READ",
+      "type": "db_operation",
+      "model": "Template",
+      "operation": "READ",
+      "description": "Read existing template (verify it exists; default templates are editable but not deletable)"
+    },
+    {
+      "id": "communication.db.updateTemplate.Template.UPDATE",
+      "type": "db_operation",
+      "model": "Template",
+      "operation": "UPDATE",
+      "description": "Update template fields (GP-03: validate template variables). Default templates can be edited."
+    },
+    {
+      "id": "communication.db.getAutomations.Automation.READ",
+      "type": "db_operation",
+      "model": "Automation",
+      "operation": "READ",
+      "description": "List all 6 pre-seeded automation rules with linked template info"
+    },
+    {
+      "id": "communication.db.updateAutomation.Template.READ",
+      "type": "db_operation",
+      "model": "Template",
+      "operation": "READ",
+      "description": "Validate templateId exists"
+    },
+    {
+      "id": "communication.db.updateAutomation.Automation.UPDATE",
+      "type": "db_operation",
+      "model": "Automation",
+      "operation": "UPDATE",
+      "description": "Update automation config (templateId, delayMinutes, enabled toggle). No CREATE/DELETE — only 6 pre-seeded."
+    },
+    {
+      "id": "communication.db.getCommunicationsLog.CommunicationLog.READ",
+      "type": "db_operation",
+      "model": "CommunicationLog",
+      "operation": "READ",
+      "description": "Paginated list of communication log entries with filters (deliveryStatus, triggerEvent, search)"
+    },
+    {
+      "id": "communication.db.retryEmail.CommunicationLog.READ",
+      "type": "db_operation",
+      "model": "CommunicationLog",
+      "operation": "READ",
+      "description": "Fetch log entry to validate status is FAILED (only FAILED emails can be retried)"
+    },
+    {
+      "id": "communication.db.retryEmail.CommunicationLog.UPDATE",
+      "type": "db_operation",
+      "model": "CommunicationLog",
+      "operation": "UPDATE",
+      "description": "Update delivery status to PENDING (will be re-sent by email worker), clear failureReason"
+    },
+    {
+      "id": "communication.effect.updateAutomation.audit_automation_toggle",
+      "type": "side_effect",
+      "effectType": "app_event",
+      "name": "audit_automation_toggle",
+      "description": "Audit log records automation enable/disable (affects email delivery behavior)"
+    },
+    {
+      "id": "communication.effect.retryEmail.retry_email_send",
+      "type": "side_effect",
+      "effectType": "email",
+      "name": "retry_email_send",
+      "description": "Re-queues the email for sending via email worker/service"
+    }
+  ],
+  "edges": [
+    {
+      "id": "communication.edge.loadTemplates.getTemplates",
+      "type": "screen_action_to_endpoint",
+      "from": "communication.screen.template_manager",
+      "to": "communication.endpoint.getTemplates",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/communications/templates.get", "fe_details://template_manager.endpointProposals[0]"]
+    },
+    {
+      "id": "communication.edge.loadTemplate.getTemplate",
+      "type": "screen_action_to_endpoint",
+      "from": "communication.screen.template_manager",
+      "to": "communication.endpoint.getTemplate",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/communications/templates/{templateId}.get", "fe_details://template_manager.endpointProposals[1]"]
+    },
+    {
+      "id": "communication.edge.createTemplate.createTemplate",
+      "type": "screen_action_to_endpoint",
+      "from": "communication.screen.template_manager",
+      "to": "communication.endpoint.createTemplate",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/communications/templates.post", "fe_details://template_manager.endpointProposals[2]"]
+    },
+    {
+      "id": "communication.edge.updateTemplate.updateTemplate",
+      "type": "screen_action_to_endpoint",
+      "from": "communication.screen.template_manager",
+      "to": "communication.endpoint.updateTemplate",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/communications/templates/{templateId}.put", "fe_details://template_manager.endpointProposals[3]"]
+    },
+    {
+      "id": "communication.edge.loadAutomations.getAutomations",
+      "type": "screen_action_to_endpoint",
+      "from": "communication.screen.automation_rules",
+      "to": "communication.endpoint.getAutomations",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/communications/automations.get", "fe_details://automation_rules.endpointProposals[0]"]
+    },
+    {
+      "id": "communication.edge.updateAutomation.updateAutomation",
+      "type": "screen_action_to_endpoint",
+      "from": "communication.screen.automation_rules",
+      "to": "communication.endpoint.updateAutomation",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/communications/automations/{automationId}.put", "fe_details://automation_rules.endpointProposals[1]"]
+    },
+    {
+      "id": "communication.edge.loadLog.getCommunicationsLog",
+      "type": "screen_action_to_endpoint",
+      "from": "communication.screen.communications_log",
+      "to": "communication.endpoint.getCommunicationsLog",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/communications/log.get", "fe_details://communications_log.endpointProposals[0]"]
+    },
+    {
+      "id": "communication.edge.retryEmail.retryEmail",
+      "type": "screen_action_to_endpoint",
+      "from": "communication.screen.communications_log",
+      "to": "communication.endpoint.retryEmail",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/communications/log/{logId}/retry.post", "fe_details://communications_log.endpointProposals[1]"]
+    },
+    {
+      "id": "communication.edge.getTemplates.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.getTemplates",
+      "to": "communication.mw.getTemplates.request_id"
+    },
+    {
+      "id": "communication.edge.getTemplates.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.getTemplates",
+      "to": "communication.mw.getTemplates.auth_session"
+    },
+    {
+      "id": "communication.edge.getTemplates.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.getTemplates",
+      "to": "communication.mw.getTemplates.role_permission_check"
+    },
+    {
+      "id": "communication.edge.getTemplate.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.getTemplate",
+      "to": "communication.mw.getTemplate.request_id"
+    },
+    {
+      "id": "communication.edge.getTemplate.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.getTemplate",
+      "to": "communication.mw.getTemplate.auth_session"
+    },
+    {
+      "id": "communication.edge.getTemplate.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.getTemplate",
+      "to": "communication.mw.getTemplate.role_permission_check"
+    },
+    {
+      "id": "communication.edge.createTemplate.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.createTemplate",
+      "to": "communication.mw.createTemplate.request_id"
+    },
+    {
+      "id": "communication.edge.createTemplate.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.createTemplate",
+      "to": "communication.mw.createTemplate.auth_session"
+    },
+    {
+      "id": "communication.edge.createTemplate.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.createTemplate",
+      "to": "communication.mw.createTemplate.role_permission_check"
+    },
+    {
+      "id": "communication.edge.createTemplate.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.createTemplate",
+      "to": "communication.mw.createTemplate.input_validation"
+    },
+    {
+      "id": "communication.edge.createTemplate.mw.business_rule_guard",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.createTemplate",
+      "to": "communication.mw.createTemplate.business_rule_guard"
+    },
+    {
+      "id": "communication.edge.updateTemplate.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.updateTemplate",
+      "to": "communication.mw.updateTemplate.request_id"
+    },
+    {
+      "id": "communication.edge.updateTemplate.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.updateTemplate",
+      "to": "communication.mw.updateTemplate.auth_session"
+    },
+    {
+      "id": "communication.edge.updateTemplate.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.updateTemplate",
+      "to": "communication.mw.updateTemplate.role_permission_check"
+    },
+    {
+      "id": "communication.edge.updateTemplate.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.updateTemplate",
+      "to": "communication.mw.updateTemplate.input_validation"
+    },
+    {
+      "id": "communication.edge.updateTemplate.mw.business_rule_guard",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.updateTemplate",
+      "to": "communication.mw.updateTemplate.business_rule_guard"
+    },
+    {
+      "id": "communication.edge.getAutomations.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.getAutomations",
+      "to": "communication.mw.getAutomations.request_id"
+    },
+    {
+      "id": "communication.edge.getAutomations.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.getAutomations",
+      "to": "communication.mw.getAutomations.auth_session"
+    },
+    {
+      "id": "communication.edge.getAutomations.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.getAutomations",
+      "to": "communication.mw.getAutomations.role_permission_check"
+    },
+    {
+      "id": "communication.edge.updateAutomation.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.updateAutomation",
+      "to": "communication.mw.updateAutomation.request_id"
+    },
+    {
+      "id": "communication.edge.updateAutomation.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.updateAutomation",
+      "to": "communication.mw.updateAutomation.auth_session"
+    },
+    {
+      "id": "communication.edge.updateAutomation.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.updateAutomation",
+      "to": "communication.mw.updateAutomation.role_permission_check"
+    },
+    {
+      "id": "communication.edge.updateAutomation.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.updateAutomation",
+      "to": "communication.mw.updateAutomation.input_validation"
+    },
+    {
+      "id": "communication.edge.updateAutomation.mw.audit_log",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.updateAutomation",
+      "to": "communication.mw.updateAutomation.audit_log"
+    },
+    {
+      "id": "communication.edge.getCommunicationsLog.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.getCommunicationsLog",
+      "to": "communication.mw.getCommunicationsLog.request_id"
+    },
+    {
+      "id": "communication.edge.getCommunicationsLog.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.getCommunicationsLog",
+      "to": "communication.mw.getCommunicationsLog.auth_session"
+    },
+    {
+      "id": "communication.edge.getCommunicationsLog.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.getCommunicationsLog",
+      "to": "communication.mw.getCommunicationsLog.role_permission_check"
+    },
+    {
+      "id": "communication.edge.getCommunicationsLog.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.getCommunicationsLog",
+      "to": "communication.mw.getCommunicationsLog.input_validation"
+    },
+    {
+      "id": "communication.edge.retryEmail.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.retryEmail",
+      "to": "communication.mw.retryEmail.request_id"
+    },
+    {
+      "id": "communication.edge.retryEmail.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.retryEmail",
+      "to": "communication.mw.retryEmail.auth_session"
+    },
+    {
+      "id": "communication.edge.retryEmail.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.retryEmail",
+      "to": "communication.mw.retryEmail.role_permission_check"
+    },
+    {
+      "id": "communication.edge.retryEmail.mw.business_rule_guard",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.retryEmail",
+      "to": "communication.mw.retryEmail.business_rule_guard"
+    },
+    {
+      "id": "communication.edge.retryEmail.mw.audit_log",
+      "type": "endpoint_to_middleware",
+      "from": "communication.endpoint.retryEmail",
+      "to": "communication.mw.retryEmail.audit_log"
+    },
+    {
+      "id": "communication.edge.getTemplates.perm",
+      "type": "endpoint_to_permission",
+      "from": "communication.endpoint.getTemplates",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "communication.edge.getTemplate.perm",
+      "type": "endpoint_to_permission",
+      "from": "communication.endpoint.getTemplate",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "communication.edge.createTemplate.perm",
+      "type": "endpoint_to_permission",
+      "from": "communication.endpoint.createTemplate",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "communication.edge.updateTemplate.perm",
+      "type": "endpoint_to_permission",
+      "from": "communication.endpoint.updateTemplate",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "communication.edge.getAutomations.perm",
+      "type": "endpoint_to_permission",
+      "from": "communication.endpoint.getAutomations",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "communication.edge.updateAutomation.perm",
+      "type": "endpoint_to_permission",
+      "from": "communication.endpoint.updateAutomation",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "communication.edge.getCommunicationsLog.perm",
+      "type": "endpoint_to_permission",
+      "from": "communication.endpoint.getCommunicationsLog",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "communication.edge.retryEmail.perm",
+      "type": "endpoint_to_permission",
+      "from": "communication.endpoint.retryEmail",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "communication.edge.getTemplates.db.Template.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "communication.endpoint.getTemplates",
+      "to": "communication.db.getTemplates.Template.READ"
+    },
+    {
+      "id": "communication.edge.getTemplate.db.Template.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "communication.endpoint.getTemplate",
+      "to": "communication.db.getTemplate.Template.READ"
+    },
+    {
+      "id": "communication.edge.createTemplate.db.Template.CREATE",
+      "type": "endpoint_to_db_operation",
+      "from": "communication.endpoint.createTemplate",
+      "to": "communication.db.createTemplate.Template.CREATE"
+    },
+    {
+      "id": "communication.edge.updateTemplate.db.Template.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "communication.endpoint.updateTemplate",
+      "to": "communication.db.updateTemplate.Template.READ"
+    },
+    {
+      "id": "communication.edge.updateTemplate.db.Template.UPDATE",
+      "type": "endpoint_to_db_operation",
+      "from": "communication.endpoint.updateTemplate",
+      "to": "communication.db.updateTemplate.Template.UPDATE"
+    },
+    {
+      "id": "communication.edge.getAutomations.db.Automation.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "communication.endpoint.getAutomations",
+      "to": "communication.db.getAutomations.Automation.READ"
+    },
+    {
+      "id": "communication.edge.updateAutomation.db.Template.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "communication.endpoint.updateAutomation",
+      "to": "communication.db.updateAutomation.Template.READ"
+    },
+    {
+      "id": "communication.edge.updateAutomation.db.Automation.UPDATE",
+      "type": "endpoint_to_db_operation",
+      "from": "communication.endpoint.updateAutomation",
+      "to": "communication.db.updateAutomation.Automation.UPDATE"
+    },
+    {
+      "id": "communication.edge.getCommunicationsLog.db.CommunicationLog.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "communication.endpoint.getCommunicationsLog",
+      "to": "communication.db.getCommunicationsLog.CommunicationLog.READ"
+    },
+    {
+      "id": "communication.edge.retryEmail.db.CommunicationLog.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "communication.endpoint.retryEmail",
+      "to": "communication.db.retryEmail.CommunicationLog.READ"
+    },
+    {
+      "id": "communication.edge.retryEmail.db.CommunicationLog.UPDATE",
+      "type": "endpoint_to_db_operation",
+      "from": "communication.endpoint.retryEmail",
+      "to": "communication.db.retryEmail.CommunicationLog.UPDATE"
+    },
+    {
+      "id": "communication.edge.updateAutomation.effect.audit_automation_toggle",
+      "type": "db_to_side_effect",
+      "from": "communication.db.updateAutomation.Automation.UPDATE",
+      "to": "communication.effect.updateAutomation.audit_automation_toggle"
+    },
+    {
+      "id": "communication.edge.retryEmail.effect.retry_email_send",
+      "type": "db_to_side_effect",
+      "from": "communication.db.retryEmail.CommunicationLog.UPDATE",
+      "to": "communication.effect.retryEmail.retry_email_send"
+    }
+  ],
+  "guards": [
+    {
+      "route": "/admin/communications/templates",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "redirectIfUnauthenticated": "/admin/login",
+      "confidence": "high",
+      "evidenceRefs": ["fe_details://template_manager"]
+    },
+    {
+      "route": "/admin/communications/automations",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "redirectIfUnauthenticated": "/admin/login",
+      "confidence": "high",
+      "evidenceRefs": ["fe_details://automation_rules"]
+    },
+    {
+      "route": "/admin/communications/log",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "redirectIfUnauthenticated": "/admin/login",
+      "confidence": "high",
+      "evidenceRefs": ["fe_details://communications_log"]
+    }
+  ],
+  "crossModuleDependencies": [],
+  "issues": {
+    "unresolvedLinks": [],
+    "gaps": [
+      {
+        "id": "CM-GAP-01",
+        "source": "be_policy_flow",
+        "description": "All admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles.",
+        "severity": "low"
+      },
+      {
+        "id": "CM-GAP-02",
+        "source": "be_policy_flow",
+        "description": "No DELETE endpoint for templates — default templates are not deletable (CM-A-01). Custom template deletion not in scope. Acceptable for MVP.",
+        "severity": "low"
+      }
+    ],
+    "inferredItems": [
+      {
+        "nodeId": "communication.mw.getTemplates.request_id",
+        "type": "middleware",
+        "middleware": "request_id",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.mw.getTemplates.role_permission_check",
+        "type": "middleware",
+        "middleware": "role_permission_check",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.mw.getTemplate.request_id",
+        "type": "middleware",
+        "middleware": "request_id",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.mw.getTemplate.role_permission_check",
+        "type": "middleware",
+        "middleware": "role_permission_check",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.mw.createTemplate.request_id",
+        "type": "middleware",
+        "middleware": "request_id",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.mw.createTemplate.role_permission_check",
+        "type": "middleware",
+        "middleware": "role_permission_check",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.mw.createTemplate.business_rule_guard",
+        "type": "middleware",
+        "middleware": "business_rule_guard",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.mw.updateTemplate.request_id",
+        "type": "middleware",
+        "middleware": "request_id",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.mw.updateTemplate.role_permission_check",
+        "type": "middleware",
+        "middleware": "role_permission_check",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.mw.updateTemplate.business_rule_guard",
+        "type": "middleware",
+        "middleware": "business_rule_guard",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.mw.getAutomations.request_id",
+        "type": "middleware",
+        "middleware": "request_id",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.mw.getAutomations.role_permission_check",
+        "type": "middleware",
+        "middleware": "role_permission_check",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.mw.updateAutomation.request_id",
+        "type": "middleware",
+        "middleware": "request_id",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.mw.updateAutomation.role_permission_check",
+        "type": "middleware",
+        "middleware": "role_permission_check",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.mw.updateAutomation.audit_log",
+        "type": "middleware",
+        "middleware": "audit_log",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.mw.getCommunicationsLog.request_id",
+        "type": "middleware",
+        "middleware": "request_id",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.mw.getCommunicationsLog.role_permission_check",
+        "type": "middleware",
+        "middleware": "role_permission_check",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.mw.retryEmail.request_id",
+        "type": "middleware",
+        "middleware": "request_id",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.mw.retryEmail.role_permission_check",
+        "type": "middleware",
+        "middleware": "role_permission_check",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.mw.retryEmail.business_rule_guard",
+        "type": "middleware",
+        "middleware": "business_rule_guard",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.mw.retryEmail.audit_log",
+        "type": "middleware",
+        "middleware": "audit_log",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "communication.effect.updateAutomation.audit_automation_toggle",
+        "type": "side_effect",
+        "name": "audit_automation_toggle",
+        "confidence": "medium",
+        "source": "db_flow"
+      },
+      {
+        "nodeId": "communication.effect.retryEmail.retry_email_send",
+        "type": "side_effect",
+        "name": "retry_email_send",
+        "confidence": "high",
+        "source": "db_flow"
+      }
+    ]
+  }
+}

@@ -1,0 +1,957 @@
+{
+  "generatedAt": "2026-03-06",
+  "reconcileVersion": "v1.0.0",
+  "modules": [
+    {
+      "moduleId": "auth_accounts",
+      "screens": [
+        "admin_login",
+        "password_reset_request",
+        "set_new_password",
+        "parent_login_stub"
+      ],
+      "endpoints": [
+        {
+          "operationId": "adminLogin",
+          "method": "POST",
+          "path": "/api/auth/login"
+        },
+        {
+          "operationId": "adminLogout",
+          "method": "POST",
+          "path": "/api/auth/logout"
+        },
+        {
+          "operationId": "getSession",
+          "method": "GET",
+          "path": "/api/auth/me"
+        },
+        {
+          "operationId": "requestPasswordReset",
+          "method": "POST",
+          "path": "/api/auth/forgot-password"
+        },
+        {
+          "operationId": "setNewPassword",
+          "method": "POST",
+          "path": "/api/auth/reset-password"
+        }
+      ],
+      "models": [
+        "Admin",
+        "Session",
+        "PasswordResetToken"
+      ],
+      "endpointCount": 5,
+      "nodeCount": 44,
+      "edgeCount": 41
+    },
+    {
+      "moduleId": "admin_dashboard",
+      "screens": [
+        "dashboard_overview"
+      ],
+      "endpoints": [
+        {
+          "operationId": "getDashboardMetrics",
+          "method": "GET",
+          "path": "/api/dashboard/metrics"
+        },
+        {
+          "operationId": "getDashboardRecentLeads",
+          "method": "GET",
+          "path": "/api/dashboard/recent-leads"
+        },
+        {
+          "operationId": "getDashboardUpcomingTrials",
+          "method": "GET",
+          "path": "/api/dashboard/upcoming-trials"
+        },
+        {
+          "operationId": "getDashboardPendingPayments",
+          "method": "GET",
+          "path": "/api/dashboard/pending-payments"
+        }
+      ],
+      "models": [
+        "Lead",
+        "Trial",
+        "Enrollment",
+        "Payment"
+      ],
+      "endpointCount": 4,
+      "nodeCount": 24,
+      "edgeCount": 27
+    },
+    {
+      "moduleId": "settings",
+      "screens": [
+        "general_settings",
+        "staff_roles_stub"
+      ],
+      "endpoints": [
+        {
+          "operationId": "getSettings",
+          "method": "GET",
+          "path": "/api/settings"
+        },
+        {
+          "operationId": "updateSettings",
+          "method": "PUT",
+          "path": "/api/settings"
+        }
+      ],
+      "models": [
+        "LocationSettings"
+      ],
+      "endpointCount": 2,
+      "nodeCount": 16,
+      "edgeCount": 16
+    },
+    {
+      "moduleId": "lead_management",
+      "screens": [
+        "lead_list",
+        "lead_detail"
+      ],
+      "endpoints": [
+        {
+          "operationId": "getLeads",
+          "method": "GET",
+          "path": "/api/leads"
+        },
+        {
+          "operationId": "getLead",
+          "method": "GET",
+          "path": "/api/leads/{leadId}"
+        },
+        {
+          "operationId": "updateLead",
+          "method": "PUT",
+          "path": "/api/leads/{leadId}"
+        },
+        {
+          "operationId": "updateLeadStatus",
+          "method": "PATCH",
+          "path": "/api/leads/{leadId}/status"
+        },
+        {
+          "operationId": "getLeadNotes",
+          "method": "GET",
+          "path": "/api/leads/{leadId}/notes"
+        },
+        {
+          "operationId": "addLeadNote",
+          "method": "POST",
+          "path": "/api/leads/{leadId}/notes"
+        },
+        {
+          "operationId": "getLeadActivity",
+          "method": "GET",
+          "path": "/api/leads/{leadId}/activity"
+        },
+        {
+          "operationId": "sendTrialBookingLink",
+          "method": "POST",
+          "path": "/api/leads/{leadId}/send-trial-link"
+        }
+      ],
+      "models": [
+        "Lead",
+        "LeadActivity",
+        "LeadNote"
+      ],
+      "endpointCount": 8,
+      "nodeCount": 58,
+      "edgeCount": 64
+    },
+    {
+      "moduleId": "calendar_scheduling",
+      "screens": [
+        "admin_calendar",
+        "parent_calendar"
+      ],
+      "endpoints": [
+        {
+          "operationId": "getCalendarDates",
+          "method": "GET",
+          "path": "/api/calendar"
+        },
+        {
+          "operationId": "addCalendarDate",
+          "method": "POST",
+          "path": "/api/calendar"
+        },
+        {
+          "operationId": "updateCalendarDate",
+          "method": "PUT",
+          "path": "/api/calendar/{dateId}"
+        },
+        {
+          "operationId": "deleteCalendarDate",
+          "method": "DELETE",
+          "path": "/api/calendar/{dateId}"
+        },
+        {
+          "operationId": "getAvailableTrialDates",
+          "method": "GET",
+          "path": "/api/programs/{programId}/trial-dates"
+        }
+      ],
+      "models": [
+        "CalendarDate",
+        "Program",
+        "Trial"
+      ],
+      "endpointCount": 5,
+      "nodeCount": 35,
+      "edgeCount": 38
+    },
+    {
+      "moduleId": "program_pricing",
+      "screens": [
+        "program_list",
+        "program_setup",
+        "coupon_management"
+      ],
+      "endpoints": [
+        {
+          "operationId": "getPrograms",
+          "method": "GET",
+          "path": "/api/programs"
+        },
+        {
+          "operationId": "createProgram",
+          "method": "POST",
+          "path": "/api/programs"
+        },
+        {
+          "operationId": "getProgram",
+          "method": "GET",
+          "path": "/api/programs/{programId}"
+        },
+        {
+          "operationId": "updateProgram",
+          "method": "PUT",
+          "path": "/api/programs/{programId}"
+        },
+        {
+          "operationId": "getCoupons",
+          "method": "GET",
+          "path": "/api/coupons"
+        },
+        {
+          "operationId": "createCoupon",
+          "method": "POST",
+          "path": "/api/coupons"
+        },
+        {
+          "operationId": "updateCoupon",
+          "method": "PUT",
+          "path": "/api/coupons/{couponId}"
+        },
+        {
+          "operationId": "deleteCoupon",
+          "method": "DELETE",
+          "path": "/api/coupons/{couponId}"
+        }
+      ],
+      "models": [
+        "Program",
+        "LocationSettings",
+        "Enrollment",
+        "Coupon"
+      ],
+      "endpointCount": 8,
+      "nodeCount": 61,
+      "edgeCount": 66
+    },
+    {
+      "moduleId": "payment_tracking",
+      "screens": [
+        "payment_dashboard",
+        "payment_detail",
+        "zelle_instructions"
+      ],
+      "endpoints": [
+        {
+          "operationId": "getPayments",
+          "method": "GET",
+          "path": "/api/payments"
+        },
+        {
+          "operationId": "getPayment",
+          "method": "GET",
+          "path": "/api/payments/{paymentId}"
+        },
+        {
+          "operationId": "updatePayment",
+          "method": "PUT",
+          "path": "/api/payments/{paymentId}"
+        },
+        {
+          "operationId": "getZelleInstructions",
+          "method": "GET",
+          "path": "/api/public/enrollments/{enrollmentId}/payment-instructions"
+        }
+      ],
+      "models": [
+        "Payment",
+        "Enrollment",
+        "Program",
+        "LocationSettings"
+      ],
+      "endpointCount": 4,
+      "nodeCount": 31,
+      "edgeCount": 32
+    },
+    {
+      "moduleId": "enrollment_trial",
+      "screens": [
+        "admin_enrollment_list",
+        "admin_enrollment_detail",
+        "program_discovery",
+        "trial_booking_form",
+        "enrollment_form",
+        "enrollment_confirmation"
+      ],
+      "endpoints": [
+        {
+          "operationId": "getEnrollments",
+          "method": "GET",
+          "path": "/api/enrollments"
+        },
+        {
+          "operationId": "getEnrollment",
+          "method": "GET",
+          "path": "/api/enrollments/{enrollmentId}"
+        },
+        {
+          "operationId": "updateEnrollmentStatus",
+          "method": "PATCH",
+          "path": "/api/enrollments/{enrollmentId}/status"
+        },
+        {
+          "operationId": "getPublicPrograms",
+          "method": "GET",
+          "path": "/api/public/programs"
+        },
+        {
+          "operationId": "getPublicProgram",
+          "method": "GET",
+          "path": "/api/public/programs/{programId}"
+        },
+        {
+          "operationId": "getPriceBreakdown",
+          "method": "POST",
+          "path": "/api/public/programs/{programId}/price"
+        },
+        {
+          "operationId": "bookTrial",
+          "method": "POST",
+          "path": "/api/public/trials"
+        },
+        {
+          "operationId": "submitEnrollment",
+          "method": "POST",
+          "path": "/api/public/enrollments"
+        },
+        {
+          "operationId": "getEnrollmentConfirmation",
+          "method": "GET",
+          "path": "/api/public/enrollments/{enrollmentId}/confirmation"
+        }
+      ],
+      "models": [
+        "Enrollment",
+        "Program",
+        "Coupon",
+        "CalendarDate",
+        "Trial",
+        "Lead",
+        "LeadActivity",
+        "Payment",
+        "LocationSettings"
+      ],
+      "endpointCount": 9,
+      "nodeCount": 80,
+      "edgeCount": 83
+    },
+    {
+      "moduleId": "communication",
+      "screens": [
+        "template_manager",
+        "automation_rules",
+        "communications_log"
+      ],
+      "endpoints": [
+        {
+          "operationId": "getTemplates",
+          "method": "GET",
+          "path": "/api/communications/templates"
+        },
+        {
+          "operationId": "getTemplate",
+          "method": "GET",
+          "path": "/api/communications/templates/{templateId}"
+        },
+        {
+          "operationId": "createTemplate",
+          "method": "POST",
+          "path": "/api/communications/templates"
+        },
+        {
+          "operationId": "updateTemplate",
+          "method": "PUT",
+          "path": "/api/communications/templates/{templateId}"
+        },
+        {
+          "operationId": "getAutomations",
+          "method": "GET",
+          "path": "/api/communications/automations"
+        },
+        {
+          "operationId": "updateAutomation",
+          "method": "PUT",
+          "path": "/api/communications/automations/{automationId}"
+        },
+        {
+          "operationId": "getCommunicationsLog",
+          "method": "GET",
+          "path": "/api/communications/log"
+        },
+        {
+          "operationId": "retryEmail",
+          "method": "POST",
+          "path": "/api/communications/log/{logId}/retry"
+        }
+      ],
+      "models": [
+        "Template",
+        "Automation",
+        "CommunicationLog"
+      ],
+      "endpointCount": 8,
+      "nodeCount": 57,
+      "edgeCount": 62
+    }
+  ],
+  "crossModuleEdges": [
+    {
+      "id": "xmod.admin_dashboard.lead_management.aggregate_lead_source_counts_fetch_recen",
+      "type": "data_dependency",
+      "sourceModule": "admin_dashboard",
+      "targetModule": "lead_management",
+      "models": [
+        "Lead"
+      ],
+      "accessType": "READ",
+      "reason": "Aggregate lead source counts; fetch recent leads",
+      "confidence": "high"
+    },
+    {
+      "id": "xmod.admin_dashboard.enrollment_trial.conversion_rate_metrics_upcoming_trial_l",
+      "type": "data_dependency",
+      "sourceModule": "admin_dashboard",
+      "targetModule": "enrollment_trial",
+      "models": [
+        "Trial",
+        "Enrollment"
+      ],
+      "accessType": "READ",
+      "reason": "Conversion rate metrics; upcoming trial list",
+      "confidence": "high"
+    },
+    {
+      "id": "xmod.admin_dashboard.payment_tracking.payment_status_summary_pending_payment_l",
+      "type": "data_dependency",
+      "sourceModule": "admin_dashboard",
+      "targetModule": "payment_tracking",
+      "models": [
+        "Payment"
+      ],
+      "accessType": "READ",
+      "reason": "Payment status summary; pending payment list",
+      "confidence": "high"
+    },
+    {
+      "id": "xmod.admin_dashboard.program_pricing.program_name_joins_for_trial_payment_dis",
+      "type": "data_dependency",
+      "sourceModule": "admin_dashboard",
+      "targetModule": "program_pricing",
+      "models": [
+        "Program"
+      ],
+      "accessType": "READ",
+      "reason": "Program name joins for trial/payment displays",
+      "confidence": "high"
+    },
+    {
+      "id": "xmod.admin_dashboard.calendar_scheduling.trial_date_info_for_upcoming_trials_disp",
+      "type": "data_dependency",
+      "sourceModule": "admin_dashboard",
+      "targetModule": "calendar_scheduling",
+      "models": [
+        "CalendarDate"
+      ],
+      "accessType": "READ",
+      "reason": "Trial date info for upcoming trials display",
+      "confidence": "high"
+    },
+    {
+      "id": "xmod.lead_management.program_pricing.join_for_interestedprogram_name_on_lead_",
+      "type": "data_dependency",
+      "sourceModule": "lead_management",
+      "targetModule": "program_pricing",
+      "models": [
+        "Program"
+      ],
+      "accessType": "READ",
+      "reason": "Join for interestedProgram name on lead detail/list",
+      "confidence": "high"
+    },
+    {
+      "id": "xmod.lead_management.settings.join_for_location_name_on_lead_detail",
+      "type": "data_dependency",
+      "sourceModule": "lead_management",
+      "targetModule": "settings",
+      "models": [
+        "LocationSettings"
+      ],
+      "accessType": "READ",
+      "reason": "Join for location name on lead detail",
+      "confidence": "high"
+    },
+    {
+      "id": "xmod.calendar_scheduling.program_pricing.validate_programid_program_name_for_disp",
+      "type": "data_dependency",
+      "sourceModule": "calendar_scheduling",
+      "targetModule": "program_pricing",
+      "models": [
+        "Program"
+      ],
+      "accessType": "READ",
+      "reason": "Validate programId; program name for display",
+      "confidence": "high"
+    },
+    {
+      "id": "xmod.calendar_scheduling.enrollment_trial.trial_count_for_spotsremaining_computati",
+      "type": "data_dependency",
+      "sourceModule": "calendar_scheduling",
+      "targetModule": "enrollment_trial",
+      "models": [
+        "Trial"
+      ],
+      "accessType": "READ",
+      "reason": "Trial count for spotsRemaining computation; FK check before delete",
+      "confidence": "high"
+    },
+    {
+      "id": "xmod.program_pricing.settings.validate_zelle_config_before_active_stat",
+      "type": "data_dependency",
+      "sourceModule": "program_pricing",
+      "targetModule": "settings",
+      "models": [
+        "LocationSettings"
+      ],
+      "accessType": "READ",
+      "reason": "Validate Zelle config before ACTIVE status transition; location name for display",
+      "confidence": "high"
+    },
+    {
+      "id": "xmod.program_pricing.enrollment_trial.enrollment_count_aggregate_for_program_l",
+      "type": "data_dependency",
+      "sourceModule": "program_pricing",
+      "targetModule": "enrollment_trial",
+      "models": [
+        "Enrollment"
+      ],
+      "accessType": "READ",
+      "reason": "Enrollment count aggregate for program list/detail; capacity validation on update",
+      "confidence": "high"
+    },
+    {
+      "id": "xmod.payment_tracking.enrollment_trial.payment_references_enrollment_for_parent",
+      "type": "data_dependency",
+      "sourceModule": "payment_tracking",
+      "targetModule": "enrollment_trial",
+      "models": [
+        "Enrollment"
+      ],
+      "accessType": "READ",
+      "reason": "Payment references enrollment for parent/program context",
+      "confidence": "high"
+    },
+    {
+      "id": "xmod.payment_tracking.program_pricing.program_name_for_payment_display_locatio",
+      "type": "data_dependency",
+      "sourceModule": "payment_tracking",
+      "targetModule": "program_pricing",
+      "models": [
+        "Program"
+      ],
+      "accessType": "READ",
+      "reason": "Program name for payment display; locationId for Zelle instructions",
+      "confidence": "high"
+    },
+    {
+      "id": "xmod.payment_tracking.settings.zelle_payment_config_for_public_payment_",
+      "type": "data_dependency",
+      "sourceModule": "payment_tracking",
+      "targetModule": "settings",
+      "models": [
+        "LocationSettings"
+      ],
+      "accessType": "READ",
+      "reason": "Zelle payment config for public payment instructions",
+      "confidence": "high"
+    },
+    {
+      "id": "xmod.enrollment_trial.program_pricing.program_validation_pricing_for_booking_e",
+      "type": "data_dependency",
+      "sourceModule": "enrollment_trial",
+      "targetModule": "program_pricing",
+      "models": [
+        "Program",
+        "Coupon"
+      ],
+      "accessType": "READ+UPDATE",
+      "reason": "Program validation/pricing for booking/enrollment; coupon validation and usage increment",
+      "confidence": "high"
+    },
+    {
+      "id": "xmod.enrollment_trial.calendar_scheduling.trial_date_validation_and_capacity_check",
+      "type": "data_dependency",
+      "sourceModule": "enrollment_trial",
+      "targetModule": "calendar_scheduling",
+      "models": [
+        "CalendarDate"
+      ],
+      "accessType": "READ",
+      "reason": "Trial date validation and capacity check for bookTrial",
+      "confidence": "high"
+    },
+    {
+      "id": "xmod.enrollment_trial.lead_management.auto_create_link_leads_on_trial_enrollme",
+      "type": "data_dependency",
+      "sourceModule": "enrollment_trial",
+      "targetModule": "lead_management",
+      "models": [
+        "Lead",
+        "LeadActivity"
+      ],
+      "accessType": "CREATE+READ+UPDATE",
+      "reason": "Auto-create/link leads on trial/enrollment (GP-02); auto-advance status (GP-04); create activity records",
+      "confidence": "high"
+    },
+    {
+      "id": "xmod.enrollment_trial.payment_tracking.auto_create_payment_record_on_enrollment",
+      "type": "data_dependency",
+      "sourceModule": "enrollment_trial",
+      "targetModule": "payment_tracking",
+      "models": [
+        "Payment"
+      ],
+      "accessType": "CREATE",
+      "reason": "Auto-create payment record on enrollment (HO-02)",
+      "confidence": "high"
+    },
+    {
+      "id": "xmod.enrollment_trial.settings.location_info_for_enrollment_confirmatio",
+      "type": "data_dependency",
+      "sourceModule": "enrollment_trial",
+      "targetModule": "settings",
+      "models": [
+        "LocationSettings"
+      ],
+      "accessType": "READ",
+      "reason": "Location info for enrollment confirmation and lead creation",
+      "confidence": "high"
+    }
+  ],
+  "routeTransitions": [
+    {
+      "id": "xroute.auth_accounts.admin_dashboard.loginSuccess",
+      "type": "cross_module_navigation",
+      "fromModule": "auth_accounts",
+      "fromRoute": "/admin/login",
+      "toModule": "admin_dashboard",
+      "toRoute": "/admin/dashboard",
+      "trigger": "loginSuccess",
+      "confidence": "high"
+    },
+    {
+      "id": "xroute.admin_dashboard.lead_management.recentLeadsWidgetClick",
+      "type": "cross_module_navigation",
+      "fromModule": "admin_dashboard",
+      "fromRoute": "/admin/dashboard",
+      "toModule": "lead_management",
+      "toRoute": "/admin/leads",
+      "trigger": "recentLeadsWidgetClick",
+      "confidence": "high"
+    },
+    {
+      "id": "xroute.admin_dashboard.enrollment_trial.upcomingTrialsWidgetClick",
+      "type": "cross_module_navigation",
+      "fromModule": "admin_dashboard",
+      "fromRoute": "/admin/dashboard",
+      "toModule": "enrollment_trial",
+      "toRoute": "/admin/enrollments",
+      "trigger": "upcomingTrialsWidgetClick",
+      "confidence": "high"
+    },
+    {
+      "id": "xroute.admin_dashboard.payment_tracking.pendingPaymentsWidgetClick",
+      "type": "cross_module_navigation",
+      "fromModule": "admin_dashboard",
+      "fromRoute": "/admin/dashboard",
+      "toModule": "payment_tracking",
+      "toRoute": "/admin/payments",
+      "trigger": "pendingPaymentsWidgetClick",
+      "confidence": "high"
+    },
+    {
+      "id": "xroute.calendar_scheduling.enrollment_trial.trialDateSelected",
+      "type": "cross_module_navigation",
+      "fromModule": "calendar_scheduling",
+      "fromRoute": "/programs/{programId}/trial-dates",
+      "toModule": "enrollment_trial",
+      "toRoute": "/programs/{programId}/book-trial",
+      "trigger": "trialDateSelected",
+      "confidence": "high"
+    },
+    {
+      "id": "xroute.enrollment_trial.calendar_scheduling.selectTrialDate",
+      "type": "cross_module_navigation",
+      "fromModule": "enrollment_trial",
+      "fromRoute": "/programs/{programId}/book-trial",
+      "toModule": "calendar_scheduling",
+      "toRoute": "/programs/{programId}/trial-dates",
+      "trigger": "selectTrialDate",
+      "confidence": "high"
+    },
+    {
+      "id": "xroute.enrollment_trial.payment_tracking.proceedToPayClick",
+      "type": "cross_module_navigation",
+      "fromModule": "enrollment_trial",
+      "fromRoute": "/enrollment/{enrollmentId}/confirmation",
+      "toModule": "payment_tracking",
+      "toRoute": "/enrollment/{enrollmentId}/pay",
+      "trigger": "proceedToPayClick",
+      "confidence": "high"
+    }
+  ],
+  "handoffs": [
+    {
+      "id": "handoff.HO-01",
+      "name": "Send Trial Booking Link",
+      "sourceModule": "lead_management",
+      "targetModule": "enrollment_trial",
+      "trigger": "sendTrialBookingLink endpoint",
+      "description": "Admin sends trial booking link email to lead parent. Email contains URL to /programs/{programId}/book-trial. Links lead_management to enrollment_trial public booking flow."
+    },
+    {
+      "id": "handoff.HO-02",
+      "name": "Auto-Create Payment on Enrollment",
+      "sourceModule": "enrollment_trial",
+      "targetModule": "payment_tracking",
+      "trigger": "submitEnrollment endpoint (on success)",
+      "description": "When a new enrollment is created, a Payment record is automatically created with status PENDING and amountDue computed from program pricing minus coupon discount."
+    },
+    {
+      "id": "handoff.HO-03",
+      "name": "Enrollment Confirmation Emails",
+      "sourceModule": "enrollment_trial",
+      "targetModule": "communication",
+      "trigger": "submitEnrollment / bookTrial endpoints (on success)",
+      "description": "Enrollment and trial booking trigger automated confirmation emails via communication module automation rules (trial_booking_confirmation, enrollment_confirmation)."
+    },
+    {
+      "id": "handoff.HO-04",
+      "name": "Payment Overdue Reminders",
+      "sourceModule": "payment_tracking",
+      "targetModule": "communication",
+      "trigger": "Scheduled cron / overdue threshold check",
+      "description": "When payment exceeds the overdue threshold (admin-configurable), the communication module sends overdue payment reminder emails via automation rules (payment_overdue_reminder)."
+    }
+  ],
+  "globalStats": {
+    "totalModules": 9,
+    "totalScreens": 26,
+    "totalEndpoints": 53,
+    "totalNodes": 406,
+    "totalEdges": 429,
+    "totalGaps": 23,
+    "totalInferredItems": 163,
+    "totalUnresolvedLinks": 0
+  },
+  "issues": {
+    "allGaps": [
+      {
+        "id": "AA-GAP-01",
+        "source": "be_policy_flow",
+        "description": "No explicit rate-limit config in OpenAPI for public auth endpoints — values must be decided. Defaults applied: 5 req/15min for login/reset, 3 req/15min for forgot-password.",
+        "severity": "medium",
+        "moduleId": "auth_accounts"
+      },
+      {
+        "id": "AA-GAP-02",
+        "source": "be_policy_flow",
+        "description": "adminLogout has no x-required-roles — role 'admin' inferred from cookieAuth + rbac section, not explicitly from OpenAPI security extensions.",
+        "severity": "low",
+        "moduleId": "auth_accounts"
+      },
+      {
+        "id": "AA-DB-U-01",
+        "source": "db_flow",
+        "description": "Session cleanup strategy (expired sessions) — cron job vs lazy deletion on read. Recommend scheduled cleanup job.",
+        "severity": "low",
+        "decision": "deferred_to_implementation",
+        "moduleId": "auth_accounts"
+      },
+      {
+        "id": "AD-GAP-01",
+        "source": "be_policy_flow",
+        "description": "Role 'admin' inferred from FE allowedRoles, not from explicit x-required-roles in OpenAPI. Applies to all 4 endpoints.",
+        "severity": "low",
+        "moduleId": "admin_dashboard"
+      },
+      {
+        "id": "AD-GAP-02",
+        "source": "be_policy_flow",
+        "description": "No query parameters defined — if date-range filtering is added later, input_validation middleware will be needed.",
+        "severity": "low",
+        "moduleId": "admin_dashboard"
+      },
+      {
+        "id": "ST-GAP-01",
+        "description": "Admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles.",
+        "severity": "low",
+        "source": "be_policy_flow",
+        "moduleId": "settings"
+      },
+      {
+        "id": "LM-GAP-01",
+        "source": "be_policy_flow",
+        "description": "All admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles on all endpoints.",
+        "severity": "low",
+        "moduleId": "lead_management"
+      },
+      {
+        "id": "LM-GAP-02",
+        "source": "be_policy_flow",
+        "description": "No explicit lead status transition validation rules in OpenAPI. Business rule guard on updateLeadStatus inferred from GP-04 policy ref.",
+        "severity": "medium",
+        "moduleId": "lead_management"
+      },
+      {
+        "id": "LM-DB-U-01",
+        "source": "db_flow",
+        "description": "Facebook/Google lead ingestion method (webhook vs polling) deferred to implementation (LM-A-02, LM-A-03). Will create leads + LEAD_CREATED activity records.",
+        "confidence": "low",
+        "decision": "deferred_to_implementation",
+        "moduleId": "lead_management"
+      },
+      {
+        "id": "CS-GAP-01",
+        "description": "Admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles.",
+        "severity": "low",
+        "source": "be_policy_flow",
+        "moduleId": "calendar_scheduling"
+      },
+      {
+        "id": "PP-GAP-01",
+        "source": "be_policy_flow",
+        "description": "All admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles.",
+        "severity": "low",
+        "moduleId": "program_pricing"
+      },
+      {
+        "id": "PP-GAP-02",
+        "source": "be_policy_flow",
+        "description": "No explicit Zelle config pre-check rule in OpenAPI for program ACTIVE status transition. Business rule guard inferred from db notes.",
+        "severity": "medium",
+        "moduleId": "program_pricing"
+      },
+      {
+        "id": "PT-GAP-01",
+        "source": "be_policy_flow",
+        "description": "Zelle instructions accessible by anyone with enrollmentId (unguessable CUID). No additional auth — relies on ID obscurity. Acceptable for MVP.",
+        "severity": "low",
+        "moduleId": "payment_tracking"
+      },
+      {
+        "id": "PT-GAP-02",
+        "source": "be_policy_flow",
+        "description": "Admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles.",
+        "severity": "low",
+        "moduleId": "payment_tracking"
+      },
+      {
+        "id": "PT-GAP-03",
+        "source": "be_policy_flow",
+        "description": "Payment overdue threshold is admin-configurable (PT-A-01) but storage location (LocationSettings vs app config) not specified.",
+        "severity": "medium",
+        "moduleId": "payment_tracking"
+      },
+      {
+        "id": "PT-DB-U-01",
+        "source": "db_flow",
+        "description": "Payment overdue threshold storage location not specified — LocationSettings vs app env config. Recommend LocationSettings for admin configurability.",
+        "severity": "low",
+        "decision": "deferred_to_implementation",
+        "moduleId": "payment_tracking"
+      },
+      {
+        "id": "ET-GAP-01",
+        "source": "be_policy_flow",
+        "description": "Enrollment confirmation is accessible by anyone with the enrollmentId (unguessable CUID). No additional auth — relies on ID obscurity. Acceptable for MVP.",
+        "severity": "low",
+        "moduleId": "enrollment_trial"
+      },
+      {
+        "id": "ET-GAP-02",
+        "source": "be_policy_flow",
+        "description": "Admin roles on getEnrollments/getEnrollment/updateEnrollmentStatus inferred from FE allowedRoles — OpenAPI lacks x-required-roles.",
+        "severity": "low",
+        "moduleId": "enrollment_trial"
+      },
+      {
+        "id": "ET-GAP-03",
+        "source": "be_policy_flow",
+        "description": "No explicit enrollment status transition rules in OpenAPI. Business rule guard on updateEnrollmentStatus is inferred.",
+        "severity": "medium",
+        "moduleId": "enrollment_trial"
+      },
+      {
+        "id": "ET-GAP-04",
+        "source": "be_policy_flow",
+        "description": "Public write endpoints (bookTrial, submitEnrollment) have no CAPTCHA or bot-protection specified. Rate limiting applied as mitigation.",
+        "severity": "medium",
+        "moduleId": "enrollment_trial"
+      },
+      {
+        "id": "ET-DB-U-01",
+        "source": "db_flow",
+        "description": "Capacity check race condition: concurrent enrollments could exceed program capacity. Recommend SELECT FOR UPDATE or optimistic locking.",
+        "severity": "medium",
+        "moduleId": "enrollment_trial"
+      },
+      {
+        "id": "CM-GAP-01",
+        "source": "be_policy_flow",
+        "description": "All admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles.",
+        "severity": "low",
+        "moduleId": "communication"
+      },
+      {
+        "id": "CM-GAP-02",
+        "source": "be_policy_flow",
+        "description": "No DELETE endpoint for templates — default templates are not deletable (CM-A-01). Custom template deletion not in scope. Acceptable for MVP.",
+        "severity": "low",
+        "moduleId": "communication"
+      }
+    ],
+    "allUnresolvedLinks": []
+  }
+}

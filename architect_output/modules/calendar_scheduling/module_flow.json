@@ -1,0 +1,653 @@
+{
+  "moduleId": "calendar_scheduling",
+  "generatedAt": "2026-03-06",
+  "reconcileVersion": "v1.0.0",
+  "nodes": [
+    {
+      "id": "calendar_scheduling.screen.admin_calendar",
+      "type": "screen",
+      "route": "/admin/calendar",
+      "components": ["ProgramFilter", "CalendarGrid", "DateFormModal"]
+    },
+    {
+      "id": "calendar_scheduling.screen.parent_calendar",
+      "type": "screen",
+      "route": "/programs/{programId}/trial-dates",
+      "components": ["AvailableDatesList"]
+    },
+    {
+      "id": "calendar_scheduling.endpoint.getCalendarDates",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/calendar",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "calendar_scheduling.endpoint.addCalendarDate",
+      "type": "endpoint",
+      "method": "POST",
+      "path": "/api/calendar",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "calendar_scheduling.endpoint.updateCalendarDate",
+      "type": "endpoint",
+      "method": "PUT",
+      "path": "/api/calendar/{dateId}",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "calendar_scheduling.endpoint.deleteCalendarDate",
+      "type": "endpoint",
+      "method": "DELETE",
+      "path": "/api/calendar/{dateId}",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "calendar_scheduling.endpoint.getAvailableTrialDates",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/programs/{programId}/trial-dates",
+      "auth": { "type": "none", "source": "openapi", "note": "Public endpoint — only trialEligible dates with available spots returned" },
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" }
+    },
+    {
+      "id": "calendar_scheduling.mw.getCalendarDates.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "calendar_scheduling.mw.getCalendarDates.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "calendar_scheduling.mw.getCalendarDates.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "calendar_scheduling.mw.getCalendarDates.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "calendar_scheduling.mw.addCalendarDate.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "calendar_scheduling.mw.addCalendarDate.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "calendar_scheduling.mw.addCalendarDate.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "calendar_scheduling.mw.addCalendarDate.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "calendar_scheduling.mw.addCalendarDate.business_rule_guard",
+      "type": "middleware",
+      "middleware": "business_rule_guard",
+      "order": 5,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "calendar_scheduling.mw.updateCalendarDate.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "calendar_scheduling.mw.updateCalendarDate.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "calendar_scheduling.mw.updateCalendarDate.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "calendar_scheduling.mw.updateCalendarDate.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "calendar_scheduling.mw.deleteCalendarDate.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "calendar_scheduling.mw.deleteCalendarDate.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "calendar_scheduling.mw.deleteCalendarDate.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "calendar_scheduling.mw.deleteCalendarDate.business_rule_guard",
+      "type": "middleware",
+      "middleware": "business_rule_guard",
+      "order": 4,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "calendar_scheduling.mw.deleteCalendarDate.audit_log",
+      "type": "middleware",
+      "middleware": "audit_log",
+      "order": 5,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "calendar_scheduling.mw.getAvailableTrialDates.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "calendar_scheduling.mw.getAvailableTrialDates.rate_limit",
+      "type": "middleware",
+      "middleware": "rate_limit",
+      "order": 2,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "calendar_scheduling.db.getCalendarDates.CalendarDate.READ",
+      "type": "db_operation",
+      "model": "CalendarDate",
+      "operation": "READ",
+      "description": "Fetch calendar dates filtered by programId, month, year. Includes computed spotsRemaining."
+    },
+    {
+      "id": "calendar_scheduling.db.addCalendarDate.Program.READ",
+      "type": "db_operation",
+      "model": "Program",
+      "operation": "READ",
+      "description": "Validate programId exists"
+    },
+    {
+      "id": "calendar_scheduling.db.addCalendarDate.CalendarDate.CREATE",
+      "type": "db_operation",
+      "model": "CalendarDate",
+      "operation": "CREATE",
+      "description": "Create new calendar date (unique constraint on programId+date enforced at DB level)"
+    },
+    {
+      "id": "calendar_scheduling.db.updateCalendarDate.CalendarDate.UPDATE",
+      "type": "db_operation",
+      "model": "CalendarDate",
+      "operation": "UPDATE",
+      "description": "Update calendar date fields (date, trialEligible, capacity, notes)"
+    },
+    {
+      "id": "calendar_scheduling.db.deleteCalendarDate.Trial.READ",
+      "type": "db_operation",
+      "model": "Trial",
+      "operation": "READ",
+      "description": "Check for existing trial bookings on this date (FK constraint guard)"
+    },
+    {
+      "id": "calendar_scheduling.db.deleteCalendarDate.CalendarDate.DELETE",
+      "type": "db_operation",
+      "model": "CalendarDate",
+      "operation": "DELETE",
+      "description": "Hard delete calendar date (only if no active trial bookings)"
+    },
+    {
+      "id": "calendar_scheduling.db.getAvailableTrialDates.CalendarDate.READ",
+      "type": "db_operation",
+      "model": "CalendarDate",
+      "operation": "READ",
+      "description": "Fetch future trial-eligible dates with available spots for public booking form"
+    },
+    {
+      "id": "calendar_scheduling.effect.deleteCalendarDate.audit_calendar_date_deleted",
+      "type": "side_effect",
+      "effectType": "app_event",
+      "name": "audit_calendar_date_deleted",
+      "description": "Audit log records calendar date deletion"
+    }
+  ],
+  "edges": [
+    {
+      "id": "calendar_scheduling.edge.loadCalendarDates.getCalendarDates",
+      "type": "screen_action_to_endpoint",
+      "from": "calendar_scheduling.screen.admin_calendar",
+      "to": "calendar_scheduling.endpoint.getCalendarDates",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/calendar.get", "fe_details://admin_calendar.endpointProposals[0]"]
+    },
+    {
+      "id": "calendar_scheduling.edge.addCalendarDate.addCalendarDate",
+      "type": "screen_action_to_endpoint",
+      "from": "calendar_scheduling.screen.admin_calendar",
+      "to": "calendar_scheduling.endpoint.addCalendarDate",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/calendar.post", "fe_details://admin_calendar.endpointProposals[1]"]
+    },
+    {
+      "id": "calendar_scheduling.edge.updateCalendarDate.updateCalendarDate",
+      "type": "screen_action_to_endpoint",
+      "from": "calendar_scheduling.screen.admin_calendar",
+      "to": "calendar_scheduling.endpoint.updateCalendarDate",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/calendar/{dateId}.put", "fe_details://admin_calendar.endpointProposals[2]"]
+    },
+    {
+      "id": "calendar_scheduling.edge.deleteCalendarDate.deleteCalendarDate",
+      "type": "screen_action_to_endpoint",
+      "from": "calendar_scheduling.screen.admin_calendar",
+      "to": "calendar_scheduling.endpoint.deleteCalendarDate",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/calendar/{dateId}.delete", "fe_details://admin_calendar.endpointProposals[3]"]
+    },
+    {
+      "id": "calendar_scheduling.edge.loadAvailableTrialDates.getAvailableTrialDates",
+      "type": "screen_action_to_endpoint",
+      "from": "calendar_scheduling.screen.parent_calendar",
+      "to": "calendar_scheduling.endpoint.getAvailableTrialDates",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/programs/{programId}/trial-dates.get", "fe_details://parent_calendar.endpointProposals[0]"]
+    },
+    {
+      "id": "calendar_scheduling.edge.getCalendarDates.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "calendar_scheduling.endpoint.getCalendarDates",
+      "to": "calendar_scheduling.mw.getCalendarDates.request_id"
+    },
+    {
+      "id": "calendar_scheduling.edge.getCalendarDates.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "calendar_scheduling.endpoint.getCalendarDates",
+      "to": "calendar_scheduling.mw.getCalendarDates.auth_session"
+    },
+    {
+      "id": "calendar_scheduling.edge.getCalendarDates.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "calendar_scheduling.endpoint.getCalendarDates",
+      "to": "calendar_scheduling.mw.getCalendarDates.role_permission_check"
+    },
+    {
+      "id": "calendar_scheduling.edge.getCalendarDates.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "calendar_scheduling.endpoint.getCalendarDates",
+      "to": "calendar_scheduling.mw.getCalendarDates.input_validation"
+    },
+    {
+      "id": "calendar_scheduling.edge.getCalendarDates.perm",
+      "type": "endpoint_to_permission",
+      "from": "calendar_scheduling.endpoint.getCalendarDates",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "calendar_scheduling.edge.addCalendarDate.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "calendar_scheduling.endpoint.addCalendarDate",
+      "to": "calendar_scheduling.mw.addCalendarDate.request_id"
+    },
+    {
+      "id": "calendar_scheduling.edge.addCalendarDate.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "calendar_scheduling.endpoint.addCalendarDate",
+      "to": "calendar_scheduling.mw.addCalendarDate.auth_session"
+    },
+    {
+      "id": "calendar_scheduling.edge.addCalendarDate.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "calendar_scheduling.endpoint.addCalendarDate",
+      "to": "calendar_scheduling.mw.addCalendarDate.role_permission_check"
+    },
+    {
+      "id": "calendar_scheduling.edge.addCalendarDate.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "calendar_scheduling.endpoint.addCalendarDate",
+      "to": "calendar_scheduling.mw.addCalendarDate.input_validation"
+    },
+    {
+      "id": "calendar_scheduling.edge.addCalendarDate.mw.business_rule_guard",
+      "type": "endpoint_to_middleware",
+      "from": "calendar_scheduling.endpoint.addCalendarDate",
+      "to": "calendar_scheduling.mw.addCalendarDate.business_rule_guard"
+    },
+    {
+      "id": "calendar_scheduling.edge.addCalendarDate.perm",
+      "type": "endpoint_to_permission",
+      "from": "calendar_scheduling.endpoint.addCalendarDate",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "calendar_scheduling.edge.updateCalendarDate.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "calendar_scheduling.endpoint.updateCalendarDate",
+      "to": "calendar_scheduling.mw.updateCalendarDate.request_id"
+    },
+    {
+      "id": "calendar_scheduling.edge.updateCalendarDate.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "calendar_scheduling.endpoint.updateCalendarDate",
+      "to": "calendar_scheduling.mw.updateCalendarDate.auth_session"
+    },
+    {
+      "id": "calendar_scheduling.edge.updateCalendarDate.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "calendar_scheduling.endpoint.updateCalendarDate",
+      "to": "calendar_scheduling.mw.updateCalendarDate.role_permission_check"
+    },
+    {
+      "id": "calendar_scheduling.edge.updateCalendarDate.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "calendar_scheduling.endpoint.updateCalendarDate",
+      "to": "calendar_scheduling.mw.updateCalendarDate.input_validation"
+    },
+    {
+      "id": "calendar_scheduling.edge.updateCalendarDate.perm",
+      "type": "endpoint_to_permission",
+      "from": "calendar_scheduling.endpoint.updateCalendarDate",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "calendar_scheduling.edge.deleteCalendarDate.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "calendar_scheduling.endpoint.deleteCalendarDate",
+      "to": "calendar_scheduling.mw.deleteCalendarDate.request_id"
+    },
+    {
+      "id": "calendar_scheduling.edge.deleteCalendarDate.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "calendar_scheduling.endpoint.deleteCalendarDate",
+      "to": "calendar_scheduling.mw.deleteCalendarDate.auth_session"
+    },
+    {
+      "id": "calendar_scheduling.edge.deleteCalendarDate.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "calendar_scheduling.endpoint.deleteCalendarDate",
+      "to": "calendar_scheduling.mw.deleteCalendarDate.role_permission_check"
+    },
+    {
+      "id": "calendar_scheduling.edge.deleteCalendarDate.mw.business_rule_guard",
+      "type": "endpoint_to_middleware",
+      "from": "calendar_scheduling.endpoint.deleteCalendarDate",
+      "to": "calendar_scheduling.mw.deleteCalendarDate.business_rule_guard"
+    },
+    {
+      "id": "calendar_scheduling.edge.deleteCalendarDate.mw.audit_log",
+      "type": "endpoint_to_middleware",
+      "from": "calendar_scheduling.endpoint.deleteCalendarDate",
+      "to": "calendar_scheduling.mw.deleteCalendarDate.audit_log"
+    },
+    {
+      "id": "calendar_scheduling.edge.deleteCalendarDate.perm",
+      "type": "endpoint_to_permission",
+      "from": "calendar_scheduling.endpoint.deleteCalendarDate",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "calendar_scheduling.edge.getAvailableTrialDates.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "calendar_scheduling.endpoint.getAvailableTrialDates",
+      "to": "calendar_scheduling.mw.getAvailableTrialDates.request_id"
+    },
+    {
+      "id": "calendar_scheduling.edge.getAvailableTrialDates.mw.rate_limit",
+      "type": "endpoint_to_middleware",
+      "from": "calendar_scheduling.endpoint.getAvailableTrialDates",
+      "to": "calendar_scheduling.mw.getAvailableTrialDates.rate_limit"
+    },
+    {
+      "id": "calendar_scheduling.edge.getAvailableTrialDates.perm",
+      "type": "endpoint_to_permission",
+      "from": "calendar_scheduling.endpoint.getAvailableTrialDates",
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" }
+    },
+    {
+      "id": "calendar_scheduling.edge.getCalendarDates.db.CalendarDate.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "calendar_scheduling.endpoint.getCalendarDates",
+      "to": "calendar_scheduling.db.getCalendarDates.CalendarDate.READ"
+    },
+    {
+      "id": "calendar_scheduling.edge.addCalendarDate.db.Program.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "calendar_scheduling.endpoint.addCalendarDate",
+      "to": "calendar_scheduling.db.addCalendarDate.Program.READ"
+    },
+    {
+      "id": "calendar_scheduling.edge.addCalendarDate.db.CalendarDate.CREATE",
+      "type": "endpoint_to_db_operation",
+      "from": "calendar_scheduling.endpoint.addCalendarDate",
+      "to": "calendar_scheduling.db.addCalendarDate.CalendarDate.CREATE"
+    },
+    {
+      "id": "calendar_scheduling.edge.updateCalendarDate.db.CalendarDate.UPDATE",
+      "type": "endpoint_to_db_operation",
+      "from": "calendar_scheduling.endpoint.updateCalendarDate",
+      "to": "calendar_scheduling.db.updateCalendarDate.CalendarDate.UPDATE"
+    },
+    {
+      "id": "calendar_scheduling.edge.deleteCalendarDate.db.Trial.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "calendar_scheduling.endpoint.deleteCalendarDate",
+      "to": "calendar_scheduling.db.deleteCalendarDate.Trial.READ"
+    },
+    {
+      "id": "calendar_scheduling.edge.deleteCalendarDate.db.CalendarDate.DELETE",
+      "type": "endpoint_to_db_operation",
+      "from": "calendar_scheduling.endpoint.deleteCalendarDate",
+      "to": "calendar_scheduling.db.deleteCalendarDate.CalendarDate.DELETE"
+    },
+    {
+      "id": "calendar_scheduling.edge.getAvailableTrialDates.db.CalendarDate.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "calendar_scheduling.endpoint.getAvailableTrialDates",
+      "to": "calendar_scheduling.db.getAvailableTrialDates.CalendarDate.READ"
+    },
+    {
+      "id": "calendar_scheduling.edge.deleteCalendarDate.effect.audit_calendar_date_deleted",
+      "type": "db_to_side_effect",
+      "from": "calendar_scheduling.db.deleteCalendarDate.CalendarDate.DELETE",
+      "to": "calendar_scheduling.effect.deleteCalendarDate.audit_calendar_date_deleted"
+    }
+  ],
+  "guards": [
+    {
+      "route": "/admin/calendar",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "redirectIfUnauthenticated": "/admin/login",
+      "confidence": "high",
+      "evidenceRefs": ["fe_details://admin_calendar"]
+    },
+    {
+      "route": "/programs/{programId}/trial-dates",
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "confidence": "high",
+      "evidenceRefs": ["fe_details://parent_calendar"]
+    }
+  ],
+  "crossModuleDependencies": [
+    {
+      "targetModule": "program_pricing",
+      "models": ["Program"],
+      "accessType": "READ",
+      "reason": "Validate programId; program name for display",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.CalendarDate.relations.program"]
+    },
+    {
+      "targetModule": "enrollment_trial",
+      "models": ["Trial"],
+      "accessType": "READ",
+      "reason": "Trial count for spotsRemaining computation; FK check before delete",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.CalendarDate.relations.trials"]
+    }
+  ],
+  "issues": {
+    "unresolvedLinks": [],
+    "gaps": [
+      {
+        "id": "CS-GAP-01",
+        "description": "Admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles.",
+        "severity": "low",
+        "source": "be_policy_flow"
+      }
+    ],
+    "inferredItems": [
+      {
+        "nodeId": "calendar_scheduling.mw.getCalendarDates.request_id",
+        "type": "middleware",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "calendar_scheduling.mw.getCalendarDates.role_permission_check",
+        "type": "middleware",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "calendar_scheduling.mw.addCalendarDate.request_id",
+        "type": "middleware",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "calendar_scheduling.mw.addCalendarDate.role_permission_check",
+        "type": "middleware",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "calendar_scheduling.mw.addCalendarDate.business_rule_guard",
+        "type": "middleware",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "calendar_scheduling.mw.updateCalendarDate.request_id",
+        "type": "middleware",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "calendar_scheduling.mw.updateCalendarDate.role_permission_check",
+        "type": "middleware",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "calendar_scheduling.mw.deleteCalendarDate.request_id",
+        "type": "middleware",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "calendar_scheduling.mw.deleteCalendarDate.role_permission_check",
+        "type": "middleware",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "calendar_scheduling.mw.deleteCalendarDate.business_rule_guard",
+        "type": "middleware",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "calendar_scheduling.mw.deleteCalendarDate.audit_log",
+        "type": "middleware",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "calendar_scheduling.mw.getAvailableTrialDates.request_id",
+        "type": "middleware",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "calendar_scheduling.mw.getAvailableTrialDates.rate_limit",
+        "type": "middleware",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "calendar_scheduling.db.deleteCalendarDate.Trial.READ",
+        "type": "db_operation",
+        "confidence": "high",
+        "source": "db_flow"
+      },
+      {
+        "nodeId": "calendar_scheduling.effect.deleteCalendarDate.audit_calendar_date_deleted",
+        "type": "side_effect",
+        "confidence": "medium",
+        "source": "db_flow"
+      }
+    ]
+  }
+}

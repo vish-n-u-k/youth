@@ -1,0 +1,255 @@
+{
+  "moduleId": "settings",
+  "generatedAt": "2026-03-06",
+  "reconcileVersion": "v1.0.0",
+  "nodes": [
+    {
+      "id": "settings.screen.general_settings",
+      "type": "screen",
+      "route": "/admin/settings",
+      "components": ["SettingsForm", "ZelleConfigSection", "NotificationPreferences"]
+    },
+    {
+      "id": "settings.screen.staff_roles_stub",
+      "type": "screen",
+      "route": "/admin/settings/staff",
+      "components": ["Phase2StubMessage"]
+    },
+    {
+      "id": "settings.endpoint.getSettings",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/settings",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "settings.endpoint.updateSettings",
+      "type": "endpoint",
+      "method": "PUT",
+      "path": "/api/settings",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "settings.mw.getSettings.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "settings.mw.getSettings.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "settings.mw.getSettings.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "settings.mw.updateSettings.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "settings.mw.updateSettings.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "settings.mw.updateSettings.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "settings.mw.updateSettings.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "settings.mw.updateSettings.business_rule_guard",
+      "type": "middleware",
+      "middleware": "business_rule_guard",
+      "order": 5,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "settings.mw.updateSettings.audit_log",
+      "type": "middleware",
+      "middleware": "audit_log",
+      "order": 6,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "settings.db.getSettings.LocationSettings.READ",
+      "type": "db_operation",
+      "model": "LocationSettings",
+      "operation": "READ",
+      "description": "Fetch the single LocationSettings record (single-location MVP per ST-A-01)"
+    },
+    {
+      "id": "settings.db.updateSettings.LocationSettings.UPDATE",
+      "type": "db_operation",
+      "model": "LocationSettings",
+      "operation": "UPDATE",
+      "description": "Update location settings (business info, Zelle config, notification preferences). ST-A-02: Zelle fields validated — required before any program can be ACTIVE."
+    },
+    {
+      "id": "settings.effect.updateSettings.audit_settings_update",
+      "type": "side_effect",
+      "effectType": "app_event",
+      "name": "audit_settings_update",
+      "description": "Audit log records settings change (affects global business behavior)"
+    }
+  ],
+  "edges": [
+    {
+      "id": "settings.edge.loadSettings.getSettings",
+      "type": "screen_action_to_endpoint",
+      "from": "settings.screen.general_settings",
+      "to": "settings.endpoint.getSettings",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/settings.get", "fe_details://general_settings.endpointProposals[0]"]
+    },
+    {
+      "id": "settings.edge.saveSettings.updateSettings",
+      "type": "screen_action_to_endpoint",
+      "from": "settings.screen.general_settings",
+      "to": "settings.endpoint.updateSettings",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/settings.put", "fe_details://general_settings.endpointProposals[1]"]
+    },
+    {
+      "id": "settings.edge.getSettings.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "settings.endpoint.getSettings",
+      "to": "settings.mw.getSettings.request_id"
+    },
+    {
+      "id": "settings.edge.getSettings.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "settings.endpoint.getSettings",
+      "to": "settings.mw.getSettings.auth_session"
+    },
+    {
+      "id": "settings.edge.getSettings.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "settings.endpoint.getSettings",
+      "to": "settings.mw.getSettings.role_permission_check"
+    },
+    {
+      "id": "settings.edge.getSettings.perm",
+      "type": "endpoint_to_permission",
+      "from": "settings.endpoint.getSettings",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "settings.edge.updateSettings.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "settings.endpoint.updateSettings",
+      "to": "settings.mw.updateSettings.request_id"
+    },
+    {
+      "id": "settings.edge.updateSettings.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "settings.endpoint.updateSettings",
+      "to": "settings.mw.updateSettings.auth_session"
+    },
+    {
+      "id": "settings.edge.updateSettings.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "settings.endpoint.updateSettings",
+      "to": "settings.mw.updateSettings.role_permission_check"
+    },
+    {
+      "id": "settings.edge.updateSettings.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "settings.endpoint.updateSettings",
+      "to": "settings.mw.updateSettings.input_validation"
+    },
+    {
+      "id": "settings.edge.updateSettings.mw.business_rule_guard",
+      "type": "endpoint_to_middleware",
+      "from": "settings.endpoint.updateSettings",
+      "to": "settings.mw.updateSettings.business_rule_guard"
+    },
+    {
+      "id": "settings.edge.updateSettings.mw.audit_log",
+      "type": "endpoint_to_middleware",
+      "from": "settings.endpoint.updateSettings",
+      "to": "settings.mw.updateSettings.audit_log"
+    },
+    {
+      "id": "settings.edge.updateSettings.perm",
+      "type": "endpoint_to_permission",
+      "from": "settings.endpoint.updateSettings",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "settings.edge.getSettings.db.LocationSettings.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "settings.endpoint.getSettings",
+      "to": "settings.db.getSettings.LocationSettings.READ"
+    },
+    {
+      "id": "settings.edge.updateSettings.db.LocationSettings.UPDATE",
+      "type": "endpoint_to_db_operation",
+      "from": "settings.endpoint.updateSettings",
+      "to": "settings.db.updateSettings.LocationSettings.UPDATE"
+    },
+    {
+      "id": "settings.edge.updateSettings.effect.audit_settings_update",
+      "type": "db_to_side_effect",
+      "from": "settings.db.updateSettings.LocationSettings.UPDATE",
+      "to": "settings.effect.updateSettings.audit_settings_update"
+    }
+  ],
+  "guards": [
+    { "route": "/admin/settings", "authRequired": true, "allowedRoles": ["admin"], "redirectIfUnauthenticated": "/admin/login", "confidence": "high", "evidenceRefs": ["fe_details://general_settings"] },
+    { "route": "/admin/settings/staff", "authRequired": true, "allowedRoles": ["admin"], "redirectIfUnauthenticated": "/admin/login", "confidence": "high", "evidenceRefs": ["fe_details://staff_roles_stub"] }
+  ],
+  "crossModuleDependencies": [],
+  "issues": {
+    "unresolvedLinks": [],
+    "gaps": [
+      {
+        "id": "ST-GAP-01",
+        "description": "Admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles.",
+        "severity": "low",
+        "source": "be_policy_flow"
+      }
+    ],
+    "inferredItems": [
+      { "nodeId": "settings.mw.getSettings.request_id", "type": "middleware", "confidence": "high", "source": "be_policy_flow" },
+      { "nodeId": "settings.mw.getSettings.role_permission_check", "type": "middleware", "confidence": "medium", "source": "be_policy_flow" },
+      { "nodeId": "settings.mw.updateSettings.request_id", "type": "middleware", "confidence": "high", "source": "be_policy_flow" },
+      { "nodeId": "settings.mw.updateSettings.role_permission_check", "type": "middleware", "confidence": "medium", "source": "be_policy_flow" },
+      { "nodeId": "settings.mw.updateSettings.business_rule_guard", "type": "middleware", "confidence": "medium", "source": "be_policy_flow" },
+      { "nodeId": "settings.mw.updateSettings.audit_log", "type": "middleware", "confidence": "medium", "source": "be_policy_flow" },
+      { "nodeId": "settings.effect.updateSettings.audit_settings_update", "type": "side_effect", "confidence": "medium", "source": "db_flow" }
+    ]
+  }
+}

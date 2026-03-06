@@ -1,0 +1,203 @@
+{
+  "systemRoles": [
+    {
+      "id": "admin",
+      "name": "Admin",
+      "description": "Platform administrator with full access to all authenticated endpoints. The only role in the system — access is binary (authenticated admin or public visitor).",
+      "isPlatformRole": true,
+      "isOrganizationRole": false,
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi://auth_accounts#AdminLoginResponse.role.enum[admin]",
+        "be_policy_flow://auth_accounts#adminLogout.roles[admin]",
+        "be_policy_flow://admin_dashboard#all_endpoints.roles[admin]",
+        "be_policy_flow://lead_management#all_endpoints.roles[admin]",
+        "be_policy_flow://enrollment_trial#admin_endpoints.roles[admin]",
+        "be_policy_flow://program_pricing#all_endpoints.roles[admin]",
+        "be_policy_flow://payment_tracking#admin_endpoints.roles[admin]",
+        "be_policy_flow://calendar_scheduling#admin_endpoints.roles[admin]",
+        "be_policy_flow://communication#all_endpoints.roles[admin]",
+        "be_policy_flow://settings#all_endpoints.roles[admin]"
+      ]
+    }
+  ],
+  "systemPermissions": [],
+  "rolePermissionMatrix": {
+    "admin": {
+      "permissions": [],
+      "inheritsFrom": null,
+      "confidence": "high",
+      "notes": "No granular permissions defined in specs. All 35 cookieAuth-protected endpoints use binary auth — if the user has the admin role and a valid session, they have full access. Every permissionMatrix in be_policy_flow.json has permissions: []."
+    }
+  },
+  "superAdminUser": {
+    "email": "admin@platform.com",
+    "role": "admin",
+    "mustChangePassword": true,
+    "initialPassword": "generate-random-on-deployment",
+    "notes": "First admin user created on initial deployment. Password must be changed on first login. This is the only user role in the system."
+  },
+  "endpointAccessMap": {
+    "authenticated": {
+      "description": "Endpoints requiring cookieAuth session with admin role",
+      "count": 35,
+      "modules": {
+        "auth_accounts": [
+          "POST /api/auth/logout",
+          "GET /api/auth/me"
+        ],
+        "admin_dashboard": [
+          "GET /api/dashboard/metrics",
+          "GET /api/dashboard/recent-leads",
+          "GET /api/dashboard/upcoming-trials",
+          "GET /api/dashboard/pending-payments"
+        ],
+        "lead_management": [
+          "GET /api/leads",
+          "GET /api/leads/{leadId}",
+          "PUT /api/leads/{leadId}",
+          "PATCH /api/leads/{leadId}/status",
+          "GET /api/leads/{leadId}/notes",
+          "POST /api/leads/{leadId}/notes",
+          "GET /api/leads/{leadId}/activity",
+          "POST /api/leads/{leadId}/send-trial-link"
+        ],
+        "program_pricing": [
+          "GET /api/programs",
+          "POST /api/programs",
+          "GET /api/programs/{programId}",
+          "PUT /api/programs/{programId}",
+          "GET /api/coupons",
+          "POST /api/coupons",
+          "PUT /api/coupons/{couponId}",
+          "DELETE /api/coupons/{couponId}"
+        ],
+        "calendar_scheduling": [
+          "GET /api/calendar",
+          "POST /api/calendar",
+          "PUT /api/calendar/{dateId}",
+          "DELETE /api/calendar/{dateId}"
+        ],
+        "payment_tracking": [
+          "GET /api/payments",
+          "GET /api/payments/{paymentId}",
+          "PUT /api/payments/{paymentId}"
+        ],
+        "communication": [
+          "GET /api/communications/templates",
+          "POST /api/communications/templates",
+          "GET /api/communications/templates/{templateId}",
+          "PUT /api/communications/templates/{templateId}",
+          "GET /api/communications/automations",
+          "PUT /api/communications/automations/{automationId}",
+          "GET /api/communications/log",
+          "POST /api/communications/log/{logId}/retry"
+        ],
+        "enrollment_trial": [
+          "GET /api/enrollments",
+          "GET /api/enrollments/{enrollmentId}",
+          "PATCH /api/enrollments/{enrollmentId}/status"
+        ],
+        "settings": [
+          "GET /api/settings",
+          "PUT /api/settings"
+        ]
+      }
+    },
+    "public": {
+      "description": "Endpoints requiring no authentication — accessible by parents/visitors",
+      "count": 11,
+      "modules": {
+        "auth_accounts": [
+          "POST /api/auth/login",
+          "POST /api/auth/forgot-password",
+          "POST /api/auth/reset-password"
+        ],
+        "enrollment_trial": [
+          "GET /api/public/programs",
+          "GET /api/public/programs/{programId}",
+          "POST /api/public/programs/{programId}/price",
+          "POST /api/public/trials",
+          "POST /api/public/enrollments",
+          "GET /api/public/enrollments/{enrollmentId}/confirmation"
+        ],
+        "payment_tracking": [
+          "GET /api/public/enrollments/{enrollmentId}/payment-instructions"
+        ],
+        "calendar_scheduling": [
+          "GET /api/programs/{programId}/trial-dates"
+        ]
+      }
+    }
+  },
+  "systemDefaults": {
+    "notificationTemplates": [
+      {
+        "id": "welcome_email",
+        "name": "Welcome Email",
+        "description": "Sent when a new admin user is created"
+      },
+      {
+        "id": "password_reset_email",
+        "name": "Password Reset Email",
+        "description": "Sent when admin requests password reset via /api/auth/forgot-password"
+      },
+      {
+        "id": "trial_booking_confirmation",
+        "name": "Trial Booking Confirmation",
+        "description": "Sent to parent when trial is booked via /api/public/trials"
+      },
+      {
+        "id": "enrollment_confirmation",
+        "name": "Enrollment Confirmation",
+        "description": "Sent to parent when enrollment is submitted via /api/public/enrollments"
+      },
+      {
+        "id": "trial_booking_link",
+        "name": "Trial Booking Link",
+        "description": "Sent to lead when admin triggers /api/leads/{leadId}/send-trial-link"
+      }
+    ],
+    "featureFlags": {
+      "email_notifications_enabled": true
+    }
+  },
+  "unknowns": [
+    {
+      "description": "No granular permissions exist in any OpenAPI spec or be_policy_flow — every permissionMatrix has permissions: []",
+      "recommendation": "Current binary auth model (admin vs public) is sufficient for a single-admin platform. If multi-role RBAC is needed later, add x-required-roles and x-required-permissions to OpenAPI endpoints.",
+      "confidence": "high"
+    },
+    {
+      "description": "Admin role is inferred from frontend allowedRoles and be_policy_flow, not explicitly declared via x-required-roles in OpenAPI specs",
+      "recommendation": "Document this as a known gap. The be_policy_flow files consistently flag this (e.g., AD-GAP-01, LM-GAP-01, etc.) at low severity.",
+      "confidence": "high"
+    },
+    {
+      "description": "Public endpoints for enrollment confirmation and payment instructions rely on unguessable CUID-based IDs for access control instead of authentication",
+      "recommendation": "Acceptable pattern for public-facing confirmation pages. Ensure CUIDs are cryptographically random.",
+      "confidence": "medium"
+    }
+  ],
+  "metadata": {
+    "totalRoles": 1,
+    "totalPermissions": 0,
+    "totalEndpoints": 46,
+    "authenticatedEndpoints": 35,
+    "publicEndpoints": 11,
+    "totalModulesScanned": 9,
+    "modules": [
+      "auth_accounts",
+      "admin_dashboard",
+      "lead_management",
+      "enrollment_trial",
+      "program_pricing",
+      "payment_tracking",
+      "calendar_scheduling",
+      "communication",
+      "settings"
+    ],
+    "extractionTimestamp": "2026-03-06T00:00:00Z",
+    "notes": "System uses binary authentication model: cookieAuth (admin) or no auth (public). No RBAC or granular permissions are defined in the current specifications."
+  }
+}

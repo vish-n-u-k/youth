@@ -1,0 +1,524 @@
+{
+  "authentication": {
+    "strategy": "session_based",
+    "mechanism": "cookieAuth",
+    "sessionConfig": {
+      "cookieName": "session",
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "lax",
+      "maxAge": "7d",
+      "validateOnEveryRequest": true
+    },
+    "sessionManagement": {
+      "allowConcurrentSessions": true,
+      "maxConcurrentSessions": 5,
+      "invalidateOnPasswordChange": true
+    },
+    "oauth": {
+      "providers": [],
+      "note": "No OAuth providers found in any module — admin-only app uses email/password auth"
+    },
+    "passwordPolicy": {
+      "minLength": 8,
+      "requireUppercase": false,
+      "requireLowercase": false,
+      "requireNumbers": false,
+      "requireSpecialChars": false,
+      "note": "Only minLength:8 is enforced in OpenAPI schemas. Additional complexity rules not specified — recommend adding post-MVP."
+    },
+    "passwordReset": {
+      "tokenTTL": "24h",
+      "singleUse": true,
+      "emailEnumerationProtection": true,
+      "emailEnumerationNote": "Always returns success message regardless of email existence to prevent information leakage (AA-A-03)"
+    },
+    "tokenInResponseBody": false,
+    "tokenNote": "FE schema includes 'token' field. BE uses httpOnly session cookie instead — token field removed from response. Session is managed server-side.",
+    "confidence": "high",
+    "evidenceRefs": [
+      "openapi://auth_accounts#/components/securitySchemes/cookieAuth",
+      "openapi://admin_dashboard#/components/securitySchemes/cookieAuth",
+      "openapi://lead_management#/components/securitySchemes/cookieAuth",
+      "openapi://enrollment_trial#/components/securitySchemes/cookieAuth",
+      "openapi://program_pricing#/components/securitySchemes/cookieAuth",
+      "openapi://payment_tracking#/components/securitySchemes/cookieAuth",
+      "openapi://calendar_scheduling#/components/securitySchemes/cookieAuth",
+      "openapi://communication#/components/securitySchemes/cookieAuth",
+      "openapi://settings#/components/securitySchemes/cookieAuth",
+      "global_middleware_registry#/middlewares/auth_session",
+      "openapi://auth_accounts#/paths/auth-forgot-password (x-security-note: AA-A-03)",
+      "openapi://auth_accounts#/components/schemas/AdminLoginResponse (x-be-note: httpOnly cookie)"
+    ]
+  },
+  "authorization": {
+    "strategy": "rbac",
+    "mechanism": "role_permission_check",
+    "roles": ["admin"],
+    "defaultDeny": true,
+    "endpointBreakdown": {
+      "public": 11,
+      "protected": 42
+    },
+    "publicEndpoints": [
+      "POST /api/auth/login",
+      "POST /api/auth/forgot-password",
+      "POST /api/auth/reset-password",
+      "GET /api/public/programs",
+      "GET /api/public/programs/{programId}",
+      "POST /api/public/programs/{programId}/price",
+      "POST /api/public/trials",
+      "POST /api/public/enrollments",
+      "GET /api/public/enrollments/{enrollmentId}/confirmation",
+      "GET /api/public/enrollments/{enrollmentId}/payment-instructions",
+      "GET /api/programs/{programId}/trial-dates"
+    ],
+    "publicEndpointSecurityNotes": {
+      "enrollmentConfirmation": "Accessible by anyone with unguessable CUID — relies on ID obscurity (ET-GAP-01). Acceptable for MVP.",
+      "paymentInstructions": "Accessible by anyone with unguessable CUID — relies on ID obscurity (PT-GAP-01). Acceptable for MVP."
+    },
+    "knownGap": "Admin role inferred from FE allowedRoles across 8 modules — OpenAPI lacks explicit x-required-roles annotations. Flagged as low-severity gaps: AD-GAP-01, LM-GAP-01, ET-GAP-02, PP-GAP-01, PT-GAP-02, CS-GAP-01, CM-GAP-01, ST-GAP-01. Single-role (admin) so low risk currently.",
+    "recommendation": "Add x-required-roles to all protected endpoints in OpenAPI specs before introducing additional roles",
+    "confidence": "medium",
+    "evidenceRefs": [
+      "global_middleware_registry#/middlewares/role_permission_check",
+      "global_middleware_registry#/unresolvedMiddleware/UNRESOLVED-01",
+      "be_policy_flow://*/endpoints/*/permissionMatrix (role: admin across all modules)"
+    ]
+  },
+  "errorHandling": {
+    "standardErrorSchema": "ApiError",
+    "errorFormat": {
+      "error": "string (error code)",
+      "message": "string (human-readable message)",
+      "statusCode": "integer (HTTP status code)"
+    },
+    "zodValidation": "x-zod-schema: ApiError (consistent across all 9 modules)",
+    "httpStatusCodes": {
+      "200": {
+        "name": "OK",
+        "usage": "Successful GET, PUT, PATCH, POST operations",
+        "usageCount": 33
+      },
+      "201": {
+        "name": "Created",
+        "usage": "Resource successfully created (POST)",
+        "usageCount": 6
+      },
+      "400": {
+        "name": "Bad Request",
+        "usage": "Validation errors, invalid status transitions, invalid input",
+        "usageCount": 18
+      },
+      "401": {
+        "name": "Unauthorized",
+        "usage": "Missing or invalid session cookie",
+        "usageCount": 44
+      },
+      "403": {
+        "name": "Forbidden",
+        "usage": "Authenticated but insufficient role (RBAC enforcement)",
+        "usageCount": 0,
+        "note": "In error handler known codes but generated by rbac middleware, not declared in OpenAPI responses"
+      },
+      "404": {
+        "name": "Not Found",
+        "usage": "Resource does not exist",
+        "usageCount": 25
+      },
+      "409": {
+        "name": "Conflict",
+        "usage": "Duplicate enrollment, coupon code exists, retry already queued",
+        "usageCount": 4
+      },
+      "410": {
+        "name": "Gone",
+        "usage": "Password reset link expired (24h TTL)",
+        "usageCount": 1
+      },
+      "429": {
+        "name": "Too Many Requests",
+        "usage": "Rate limit exceeded on public endpoints",
+        "usageCount": 2
+      },
+      "500": {
+        "name": "Internal Server Error",
+        "usage": "Unhandled server error",
+        "usageCount": 45
+      }
+    },
+    "globalErrorHandler": {
+      "enabled": true,
+      "appliesTo": "all 53 endpoints (always last in middleware chain)",
+      "logErrors": true,
+      "sanitizeErrors": true,
+      "exposeStackTrace": false,
+      "knownStatusCodes": [400, 401, 403, 404, 409, 410, 429, 500]
+    },
+    "confidence": "high",
+    "evidenceRefs": [
+      "openapi://*/components/schemas/ApiError (identical across all 9 modules)",
+      "global_middleware_registry#/middlewares/error_handler",
+      "openapi://auth_accounts#/paths/*/responses (401, 410, 429, 500)",
+      "openapi://enrollment_trial#/paths/*/responses (400, 409)",
+      "openapi://lead_management#/paths/*/responses (400, 404)"
+    ]
+  },
+  "rateLimiting": {
+    "enabled": true,
+    "appliesTo": "public endpoints only (11 of 53)",
+    "authenticatedEndpoints": {
+      "rateLimited": false,
+      "rationale": "Single-tenant admin app — session auth + RBAC is sufficient protection for authenticated endpoints"
+    },
+    "tiers": [
+      {
+        "name": "auth_login",
+        "description": "Login endpoint — prevents brute-force credential attacks",
+        "windowMs": 900000,
+        "maxRequests": 5,
+        "scope": "ip+email",
+        "endpoints": ["POST /api/auth/login"]
+      },
+      {
+        "name": "auth_recovery",
+        "description": "Forgot-password — stricter limit to prevent email enumeration",
+        "windowMs": 900000,
+        "maxRequests": 3,
+        "scope": "ip",
+        "endpoints": ["POST /api/auth/forgot-password"]
+      },
+      {
+        "name": "auth_reset",
+        "description": "Password reset — prevents token brute-force",
+        "windowMs": 900000,
+        "maxRequests": 5,
+        "scope": "ip",
+        "endpoints": ["POST /api/auth/reset-password"]
+      },
+      {
+        "name": "public_read",
+        "description": "Public read endpoints — generous limit for parent-facing browsing",
+        "windowMs": 60000,
+        "maxRequests": 60,
+        "scope": "ip",
+        "endpoints": [
+          "GET /api/public/programs",
+          "GET /api/public/programs/{programId}",
+          "GET /api/public/enrollments/{enrollmentId}/confirmation",
+          "GET /api/public/enrollments/{enrollmentId}/payment-instructions",
+          "GET /api/programs/{programId}/trial-dates"
+        ]
+      },
+      {
+        "name": "public_write",
+        "description": "Public write endpoints (trial booking, enrollment) — prevents spam submissions",
+        "windowMs": 900000,
+        "maxRequests": 5,
+        "scope": "ip",
+        "endpoints": [
+          "POST /api/public/trials",
+          "POST /api/public/enrollments"
+        ]
+      },
+      {
+        "name": "coupon_check",
+        "description": "Price breakdown with coupon validation — prevents coupon code brute-force",
+        "windowMs": 60000,
+        "maxRequests": 30,
+        "scope": "ip",
+        "endpoints": ["POST /api/public/programs/{programId}/price"]
+      }
+    ],
+    "responseStatus": 429,
+    "responseMessage": "Too many requests, please try again later",
+    "postMvpRecommendation": "ET-GAP-04: Add CAPTCHA or bot-protection middleware for public write endpoints (bookTrial, submitEnrollment). Rate limiting alone may be insufficient for determined abuse.",
+    "confidence": "high",
+    "evidenceRefs": [
+      "global_middleware_registry#/middlewares/rate_limit",
+      "global_middleware_registry#/rateLimitTierMap",
+      "be_policy_flow://auth_accounts#/endpoints/adminLogin/middleware (rate_limit: 5/900s ip+email)",
+      "be_policy_flow://auth_accounts#/endpoints/requestPasswordReset/middleware (rate_limit: 3/900s ip)",
+      "be_policy_flow://enrollment_trial#/endpoints/bookTrial/middleware (rate_limit: 5/900s ip)",
+      "be_policy_flow://enrollment_trial#/endpoints/getPriceBreakdown/middleware (rate_limit: 30/60s ip)",
+      "global_middleware_registry#/unresolvedMiddleware/UNRESOLVED-02 (CAPTCHA gap)"
+    ]
+  },
+  "cors": {
+    "enabled": true,
+    "appliesTo": "all 53 endpoints (order 2 in middleware chain)",
+    "allowedOrigins": ["${FRONTEND_URL}"],
+    "allowedMethods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    "allowedHeaders": ["Content-Type", "X-Request-ID"],
+    "exposedHeaders": ["X-Request-ID"],
+    "credentials": true,
+    "credentialsNote": "Required for cookie-based auth — cookieAuth sends session cookie cross-origin",
+    "maxAge": 86400,
+    "confidence": "medium",
+    "evidenceRefs": [
+      "global_middleware_registry#/middlewares/cors",
+      "global_middleware_registry#/meta/decisions/cors_included"
+    ]
+  },
+  "securityHeaders": {
+    "enabled": true,
+    "appliesTo": "all 53 endpoints (order 3 in middleware chain)",
+    "helmet": {
+      "contentSecurityPolicy": {
+        "enabled": true,
+        "directives": {
+          "defaultSrc": ["'self'"],
+          "scriptSrc": ["'self'"],
+          "styleSrc": ["'self'", "'unsafe-inline'"],
+          "imgSrc": ["'self'", "data:", "https:"],
+          "connectSrc": ["'self'"],
+          "fontSrc": ["'self'"],
+          "objectSrc": ["'none'"],
+          "frameAncestors": ["'none'"]
+        },
+        "note": "Directives are Helmet defaults with adjustments for SPA. Refine once frontend asset sources are known."
+      },
+      "hsts": {
+        "maxAge": 31536000,
+        "includeSubDomains": true,
+        "preload": false,
+        "note": "Preload not set — requires HTTPS deployment verification before enabling"
+      },
+      "xContentTypeOptions": "nosniff",
+      "xFrameOptions": "DENY",
+      "crossOriginEmbedderPolicy": false,
+      "crossOriginEmbedderPolicyNote": "Disabled — not needed for API-only backend",
+      "xssFilter": true
+    },
+    "confidence": "low",
+    "confidenceNote": "Inferred as standard security practice for Express/Node.js APIs — not explicitly designed in any spec. CSP directives are recommended defaults.",
+    "evidenceRefs": [
+      "global_middleware_registry#/middlewares/helmet",
+      "global_middleware_registry#/meta/decisions/helmet_included"
+    ]
+  },
+  "auditLogging": {
+    "enabled": true,
+    "totalAuditedEndpoints": 17,
+    "appliesTo": [
+      "Authentication events (login, logout, password change)",
+      "State-changing operations on core resources",
+      "Destructive operations (deletes)",
+      "Financially sensitive operations (payment updates)",
+      "External communication triggers (email sends, retries)",
+      "Global configuration changes (settings)"
+    ],
+    "auditedEndpoints": [
+      { "endpoint": "POST /api/auth/login", "event": "admin_login", "note": "Logs both success and failure" },
+      { "endpoint": "POST /api/auth/logout", "event": "admin_logout", "note": "Session termination" },
+      { "endpoint": "POST /api/auth/reset-password", "event": "password_change", "note": "Security-sensitive credential change" },
+      { "endpoint": "PUT /api/leads/{leadId}", "event": "lead_update", "note": "Lead record modification" },
+      { "endpoint": "PATCH /api/leads/{leadId}/status", "event": "lead_status_change", "note": "Status transition with LeadActivity record" },
+      { "endpoint": "POST /api/leads/{leadId}/send-trial-link", "event": "trial_link_sent", "note": "External email send with cross-module handoff" },
+      { "endpoint": "PATCH /api/enrollments/{enrollmentId}/status", "event": "enrollment_status_change", "note": "Critical state transition" },
+      { "endpoint": "POST /api/public/trials", "event": "trial_booked", "note": "Trial creation + auto-lead create/link + HO-03 email trigger" },
+      { "endpoint": "POST /api/public/enrollments", "event": "enrollment_submitted", "note": "Enrollment + Payment records created + confirmation email" },
+      { "endpoint": "POST /api/programs", "event": "program_created", "note": "Business-critical resource creation" },
+      { "endpoint": "PUT /api/programs/{programId}", "event": "program_updated", "note": "Business-critical resource modification" },
+      { "endpoint": "DELETE /api/coupons/{couponId}", "event": "coupon_deleted", "note": "Destructive delete operation" },
+      { "endpoint": "PUT /api/payments/{paymentId}", "event": "payment_updated", "note": "Financially sensitive — triggers HO-04 overdue check" },
+      { "endpoint": "DELETE /api/calendar/{dateId}", "event": "calendar_date_deleted", "note": "Destructive delete with FK constraint check" },
+      { "endpoint": "PUT /api/communications/automations/{automationId}", "event": "automation_toggled", "note": "Automation enable/disable affecting email delivery" },
+      { "endpoint": "POST /api/communications/log/{logId}/retry", "event": "email_retried", "note": "External email send (only FAILED emails)" },
+      { "endpoint": "PUT /api/settings", "event": "settings_updated", "note": "Global config change (Zelle, notifications)" }
+    ],
+    "loggedFields": ["userId", "action", "resourceType", "resourceId", "timestamp", "outcome", "ipAddress"],
+    "asyncWrite": true,
+    "retentionDays": 365,
+    "storage": "database",
+    "confidence": "medium",
+    "evidenceRefs": [
+      "global_middleware_registry#/middlewares/audit_log",
+      "be_policy_flow://auth_accounts#/endpoints/adminLogin/middleware (login success/failure)",
+      "be_policy_flow://lead_management#/endpoints/updateLead/middleware",
+      "be_policy_flow://enrollment_trial#/endpoints/bookTrial/middleware",
+      "be_policy_flow://program_pricing#/endpoints/createProgram/middleware",
+      "be_policy_flow://payment_tracking#/endpoints/updatePayment/middleware",
+      "be_policy_flow://calendar_scheduling#/endpoints/deleteCalendarDate/middleware",
+      "be_policy_flow://communication#/endpoints/updateAutomation/middleware",
+      "be_policy_flow://settings#/endpoints/updateSettings/middleware"
+    ]
+  },
+  "inputValidation": {
+    "strategy": "zod_schemas",
+    "schemaSource": "x-zod-schema annotations in OpenAPI spec",
+    "validateBody": true,
+    "validateQuery": true,
+    "validateParams": true,
+    "stripUnknown": true,
+    "abortEarly": false,
+    "totalValidatedEndpoints": 28,
+    "totalEndpoints": 53,
+    "confidence": "high",
+    "evidenceRefs": [
+      "global_middleware_registry#/middlewares/input_validation",
+      "openapi://*/components/schemas (x-zod-schema annotations on all request/response schemas)"
+    ]
+  },
+  "dataProtection": {
+    "passwordHashing": {
+      "algorithm": "bcrypt",
+      "note": "Inferred as industry standard — not explicitly specified in source artifacts. Must be confirmed during implementation."
+    },
+    "sensitiveFields": ["password", "token", "newPassword", "confirmPassword"],
+    "sessionCookieSecurity": {
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "lax"
+    },
+    "noTokenInResponseBody": true,
+    "resetTokenSingleUse": true,
+    "resetTokenExpiry": "24h",
+    "confidence": "medium",
+    "evidenceRefs": [
+      "openapi://auth_accounts#/components/schemas/AdminLoginResponse (x-be-note: httpOnly cookie, no token in response)",
+      "openapi://auth_accounts#/components/schemas/SetNewPasswordRequest (token, newPassword, confirmPassword)",
+      "be_policy_flow://auth_accounts#/endpoints/setNewPassword/middleware (single-use token, 24h expiry)"
+    ]
+  },
+  "requestTracing": {
+    "enabled": true,
+    "headerName": "X-Request-ID",
+    "generateUUID": true,
+    "appliesTo": "all 53 endpoints (order 1 — always first in middleware chain)",
+    "purpose": "Distributed tracing and log correlation",
+    "confidence": "high",
+    "evidenceRefs": [
+      "global_middleware_registry#/middlewares/request_id"
+    ]
+  },
+  "policyGaps": [
+    {
+      "id": "AD-GAP-01",
+      "module": "admin_dashboard",
+      "severity": "low",
+      "description": "Role 'admin' inferred from FE allowedRoles, not explicit x-required-roles in OpenAPI"
+    },
+    {
+      "id": "AD-GAP-02",
+      "module": "admin_dashboard",
+      "severity": "low",
+      "description": "No query parameters defined — input_validation middleware needed if date-range filtering is added"
+    },
+    {
+      "id": "LM-GAP-01",
+      "module": "lead_management",
+      "severity": "low",
+      "description": "Admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles"
+    },
+    {
+      "id": "LM-GAP-02",
+      "module": "lead_management",
+      "severity": "medium",
+      "description": "No explicit lead status transition validation rules in OpenAPI. Business rule guard inferred from GP-04"
+    },
+    {
+      "id": "ET-GAP-01",
+      "module": "enrollment_trial",
+      "severity": "low",
+      "description": "Enrollment confirmation accessible by anyone with unguessable CUID — relies on ID obscurity. Acceptable for MVP"
+    },
+    {
+      "id": "ET-GAP-02",
+      "module": "enrollment_trial",
+      "severity": "low",
+      "description": "Admin roles on enrollment endpoints inferred from FE allowedRoles — OpenAPI lacks x-required-roles"
+    },
+    {
+      "id": "ET-GAP-03",
+      "module": "enrollment_trial",
+      "severity": "medium",
+      "description": "No explicit enrollment status transition rules in OpenAPI. Business rule guard inferred"
+    },
+    {
+      "id": "ET-GAP-04",
+      "module": "enrollment_trial",
+      "severity": "medium",
+      "description": "Public write endpoints (bookTrial, submitEnrollment) have no CAPTCHA or bot-protection. Rate limiting applied as mitigation"
+    },
+    {
+      "id": "PP-GAP-01",
+      "module": "program_pricing",
+      "severity": "low",
+      "description": "Admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles"
+    },
+    {
+      "id": "PP-GAP-02",
+      "module": "program_pricing",
+      "severity": "medium",
+      "description": "No explicit Zelle config pre-check rule in OpenAPI for program ACTIVE status transition. Business rule guard inferred"
+    },
+    {
+      "id": "PT-GAP-01",
+      "module": "payment_tracking",
+      "severity": "low",
+      "description": "Zelle instructions accessible by anyone with unguessable CUID — relies on ID obscurity. Acceptable for MVP"
+    },
+    {
+      "id": "PT-GAP-02",
+      "module": "payment_tracking",
+      "severity": "low",
+      "description": "Admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles"
+    },
+    {
+      "id": "PT-GAP-03",
+      "module": "payment_tracking",
+      "severity": "medium",
+      "description": "Payment overdue threshold is admin-configurable but storage location not specified"
+    },
+    {
+      "id": "CS-GAP-01",
+      "module": "calendar_scheduling",
+      "severity": "low",
+      "description": "Admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles"
+    },
+    {
+      "id": "CM-GAP-01",
+      "module": "communication",
+      "severity": "low",
+      "description": "Admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles"
+    },
+    {
+      "id": "CM-GAP-02",
+      "module": "communication",
+      "severity": "low",
+      "description": "No DELETE endpoint for templates — default templates not deletable (CM-A-01). Acceptable for MVP"
+    },
+    {
+      "id": "ST-GAP-01",
+      "module": "settings",
+      "severity": "low",
+      "description": "Admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles"
+    }
+  ],
+  "meta": {
+    "generatedAt": "2026-03-06",
+    "totalPolicies": 9,
+    "totalEndpoints": 53,
+    "totalModules": 9,
+    "totalPolicyGaps": 17,
+    "confidenceSummary": {
+      "high": 4,
+      "medium": 4,
+      "low": 1
+    },
+    "highConfidencePolicies": ["authentication", "errorHandling", "rateLimiting", "inputValidation"],
+    "mediumConfidencePolicies": ["authorization", "cors", "auditLogging", "dataProtection"],
+    "lowConfidencePolicies": ["securityHeaders"],
+    "gapSeveritySummary": {
+      "low": 12,
+      "medium": 5,
+      "high": 0
+    },
+    "sourceArtifacts": [
+      "architect_output/modules/*/be_policy_flow.json (9 modules)",
+      "contract_output/modules/*/openapi.json (9 modules)",
+      "architect_output/global_middleware_registry.json"
+    ]
+  }
+}

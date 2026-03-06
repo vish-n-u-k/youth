@@ -1,0 +1,208 @@
+{
+  "integrations": [
+    {
+      "id": "email_service",
+      "name": "Transactional Email Service",
+      "provider": "unspecified",
+      "providerCandidates": ["SendGrid", "AWS SES", "Postmark", "Resend", "Mailgun"],
+      "type": "email",
+      "purpose": "Send all parent-facing transactional emails: trial confirmations, enrollment confirmations, payment overdue reminders, class approaching notifications, password reset links, and admin-triggered trial booking links",
+      "usedInModules": [
+        "auth_accounts",
+        "lead_management",
+        "enrollment_trial",
+        "payment_tracking",
+        "communication"
+      ],
+      "endpoints": [
+        {
+          "path": "/api/auth/forgot-password",
+          "operation": "requestPasswordReset",
+          "description": "Sends password reset link email to admin"
+        },
+        {
+          "path": "/api/leads/{leadId}/send-trial-link",
+          "operation": "sendTrialBookingLink",
+          "description": "Admin-triggered email sending trial booking link to parent"
+        },
+        {
+          "path": "/api/public/trials",
+          "operation": "bookTrial",
+          "description": "Triggers trial confirmation email to parent (HO-03)"
+        },
+        {
+          "path": "/api/public/enrollments",
+          "operation": "submitEnrollment",
+          "description": "Triggers enrollment confirmation email to parent (HO-03)"
+        },
+        {
+          "path": "/api/communications/log/{logId}/retry",
+          "operation": "retryEmail",
+          "description": "Retries a previously failed email send"
+        }
+      ],
+      "automationTriggers": [
+        {
+          "event": "LEAD_CREATED",
+          "description": "Welcome or follow-up email when a new lead is captured"
+        },
+        {
+          "event": "TRIAL_SCHEDULED",
+          "description": "Confirmation email when trial is booked"
+        },
+        {
+          "event": "TRIAL_APPROACHING",
+          "description": "Reminder email before upcoming trial date (background job)"
+        },
+        {
+          "event": "ENROLLMENT_COMPLETED",
+          "description": "Confirmation email with Zelle payment instructions after enrollment"
+        },
+        {
+          "event": "PAYMENT_OVERDUE",
+          "description": "Reminder email when payment is overdue past configurable threshold (HO-04, background job)"
+        },
+        {
+          "event": "CLASS_START_APPROACHING",
+          "description": "Reminder email before program start date (background job)"
+        }
+      ],
+      "config": {
+        "required": [
+          "EMAIL_PROVIDER",
+          "EMAIL_API_KEY",
+          "EMAIL_FROM_ADDRESS",
+          "EMAIL_FROM_NAME"
+        ],
+        "optional": [
+          "EMAIL_REPLY_TO_ADDRESS",
+          "EMAIL_API_ENDPOINT",
+          "EMAIL_RATE_LIMIT_PER_SECOND"
+        ],
+        "notes": {
+          "EMAIL_PROVIDER": "Identifier for the chosen provider (e.g. 'sendgrid', 'ses', 'postmark', 'resend', 'mailgun'). Used to select the correct adapter at runtime.",
+          "EMAIL_API_KEY": "Provider-specific API key or credentials. For AWS SES, use AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY instead.",
+          "EMAIL_FROM_ADDRESS": "Verified sender email address (e.g. noreply@yourdomain.com). Must be verified with the provider.",
+          "EMAIL_FROM_NAME": "Display name for the sender (e.g. the business name from LocationSettings)."
+        }
+      },
+      "implementationGuidance": {
+        "abstractionLayer": "Implement an EmailService interface with send(to, subject, htmlBody) method. Use an adapter pattern so the provider can be swapped without changing business logic.",
+        "templateRendering": "Templates use {{variable_name}} placeholders stored in the Template model. Variable interpolation happens at the application level before calling the email provider — do NOT rely on provider-side template features.",
+        "deliveryTracking": "Every email send attempt must create a CommunicationLog entry with deliveryStatus (PENDING → SENT or FAILED). The retry endpoint re-sends FAILED entries only.",
+        "backgroundJobs": "TRIAL_APPROACHING, PAYMENT_OVERDUE, and CLASS_START_APPROACHING triggers require a background job/cron system to evaluate conditions and fire emails. This is internal infrastructure, not an external integration."
+      },
+      "webhooks": {
+        "enabled": false,
+        "note": "No inbound webhook endpoints for email delivery status callbacks found in contracts. Delivery status is tracked application-side (success/failure of the API call). Provider webhooks for bounce/open/click tracking can be added post-MVP."
+      },
+      "rateLimit": {
+        "note": "Provider-dependent. Most providers allow 100+ emails/second on paid plans. MVP volume is low (single-tenant admin app). No application-level email rate limiting is specified in contracts."
+      },
+      "confidence": "high",
+      "confidenceNote": "High confidence that a transactional email service is required — email sending is referenced across 5 modules with explicit endpoints, automation triggers, delivery logging, and retry mechanisms. Provider is unspecified in all source artifacts.",
+      "evidenceRefs": [
+        "openapi://communication#/paths/~1api~1communications~1templates (email template CRUD)",
+        "openapi://communication#/paths/~1api~1communications~1automations (6 trigger events)",
+        "openapi://communication#/paths/~1api~1communications~1log (delivery status tracking)",
+        "openapi://communication#/paths/~1api~1communications~1log~1{logId}~1retry (failed email retry)",
+        "openapi://lead_management#/paths/~1api~1leads~1{leadId}~1send-trial-link (admin sends trial link email)",
+        "openapi://enrollment_trial#/paths/~1api~1public~1trials POST (confirmationEmailSent in response)",
+        "openapi://enrollment_trial#/paths/~1api~1public~1enrollments POST (confirmationEmailSent in response)",
+        "openapi://auth_accounts#/paths/~1api~1auth~1forgot-password (password reset email)",
+        "prisma://communication#/models/CommunicationLog (deliveryStatus: PENDING/SENT/FAILED)",
+        "prisma://communication#/enumDefs/TriggerEvent (6 automation triggers)",
+        "prisma://communication#/dbNotes/handoffs (HO-03, HO-04 email triggers)",
+        "be_policy_flow://auth_accounts#/endpoints/requestPasswordReset (email send implied by timing-safe response)"
+      ]
+    }
+  ],
+  "nonIntegrations": [
+    {
+      "candidate": "Zelle",
+      "verdict": "not_an_integration",
+      "reason": "Zelle payment instructions (recipient name, contact info, reference note) are stored as text in LocationSettings and displayed to parents on the enrollment confirmation page. No Zelle API is called. Payments are processed manually offline by parents, and admin manually updates payment status.",
+      "evidenceRefs": [
+        "prisma://settings#/models/LocationSettings (zelleRecipientName, zelleContactInfo, zelleInstructions fields)",
+        "openapi://payment_tracking#/paths/~1api~1public~1enrollments~1{enrollmentId}~1payment-instructions (displays stored text)",
+        "openapi://enrollment_trial#/components/schemas/EnrollmentConfirmationResponse (zelleInstructions object)",
+        "prisma://payment_tracking#/dbNotes/manualPayments ('Partial payments tracked manually by admin')"
+      ]
+    },
+    {
+      "candidate": "Facebook / Google Ads API",
+      "verdict": "not_an_integration",
+      "reason": "Lead sources (facebook, google, website, manual) are enum labels indicating how a lead was acquired. No API integration with Facebook Ads or Google Ads exists — leads are entered manually or captured via the public-facing forms.",
+      "evidenceRefs": [
+        "openapi://lead_management#/components/schemas/LeadListResponse (source enum: facebook, google, website, manual)",
+        "prisma://lead_management (LeadSource enum with same values)"
+      ]
+    },
+    {
+      "candidate": "OAuth Providers (GitHub, Google, etc.)",
+      "verdict": "not_present",
+      "reason": "Admin-only app uses email/password authentication with server-side sessions (cookieAuth). No OAuth flows exist.",
+      "evidenceRefs": [
+        "global_security_policies#/authentication/oauth ('No OAuth providers found in any module')",
+        "openapi://auth_accounts#/paths/~1api~1auth~1login (email + password only)"
+      ]
+    },
+    {
+      "candidate": "Payment Processors (Stripe, PayPal, etc.)",
+      "verdict": "not_present",
+      "reason": "All payments are manual/offline via Zelle. Admin manually records payment amounts and updates statuses. No automated payment processing.",
+      "evidenceRefs": [
+        "openapi://payment_tracking#/paths/~1api~1payments~1{paymentId} PUT (admin manually updates status/amount)",
+        "prisma://payment_tracking#/dbNotes/manualPayments"
+      ]
+    },
+    {
+      "candidate": "Cloud Storage (S3, etc.)",
+      "verdict": "not_present",
+      "reason": "No file upload endpoints exist in any of the 9 modules. No blob/object storage needed.",
+      "evidenceRefs": []
+    },
+    {
+      "candidate": "Monitoring / Analytics (Sentry, Mixpanel, etc.)",
+      "verdict": "not_in_contracts",
+      "reason": "No monitoring or analytics integrations are referenced in any API contract or policy flow. These are implementation-level concerns that may be added during development but are not part of the application's business logic contracts.",
+      "evidenceRefs": []
+    }
+  ],
+  "unresolvedIntegrations": [
+    {
+      "id": "UNRESOLVED-INT-01",
+      "candidateNames": ["email service", "transactional email provider"],
+      "modules": ["auth_accounts", "lead_management", "enrollment_trial", "payment_tracking", "communication"],
+      "reason": "Email sending is required across 5 modules with 6 automation triggers, delivery tracking, and retry — but no specific provider (SendGrid, SES, Postmark, etc.) is named in any source artifact. Provider selection is an implementation decision.",
+      "recommendation": "Choose a provider based on deployment environment. If deploying on AWS, SES is cheapest. For simplicity and good DX, Resend or Postmark are strong choices. SendGrid is the most commonly documented. Implement behind an adapter interface so the provider can be swapped later.",
+      "severity": "medium",
+      "mustResolveBeforeImplementation": true
+    }
+  ],
+  "meta": {
+    "generatedAt": "2026-03-06",
+    "totalIntegrations": 1,
+    "totalNonIntegrations": 6,
+    "totalUnresolved": 1,
+    "byType": {
+      "authentication": 0,
+      "payment": 0,
+      "email": 1,
+      "storage": 0,
+      "monitoring": 0,
+      "analytics": 0,
+      "external_api": 0,
+      "communication": 0
+    },
+    "highConfidence": 1,
+    "mediumConfidence": 0,
+    "lowConfidence": 0,
+    "sourceArtifacts": [
+      "architect_output/modules/*/be_policy_flow.json (9 modules)",
+      "contract_output/modules/*/openapi.json (9 modules)",
+      "contract_output/modules/*/prisma_contract.json (9 modules)",
+      "architect_output/global_security_policies.json"
+    ]
+  }
+}

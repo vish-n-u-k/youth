@@ -1,0 +1,1169 @@
+{
+  "moduleId": "program_pricing",
+  "generatedAt": "2026-03-06",
+  "reconcileVersion": "v1.0.0",
+  "nodes": [
+    {
+      "id": "program_pricing.screen.program_list",
+      "type": "screen",
+      "route": "/admin/programs",
+      "components": ["ProgramTable", "StatusFilter", "CreateProgramButton", "Pagination"]
+    },
+    {
+      "id": "program_pricing.screen.program_setup",
+      "type": "screen",
+      "route": "/admin/programs/{programId}",
+      "components": ["ProgramForm", "PricingSection", "TrialToggle"]
+    },
+    {
+      "id": "program_pricing.screen.coupon_management",
+      "type": "screen",
+      "route": "/admin/programs/coupons",
+      "components": ["CouponTable", "CouponFormModal"]
+    },
+    {
+      "id": "program_pricing.endpoint.getPrograms",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/programs",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "program_pricing.endpoint.createProgram",
+      "type": "endpoint",
+      "method": "POST",
+      "path": "/api/programs",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "program_pricing.endpoint.getProgram",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/programs/{programId}",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "program_pricing.endpoint.updateProgram",
+      "type": "endpoint",
+      "method": "PUT",
+      "path": "/api/programs/{programId}",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "program_pricing.endpoint.getCoupons",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/coupons",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "program_pricing.endpoint.createCoupon",
+      "type": "endpoint",
+      "method": "POST",
+      "path": "/api/coupons",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "program_pricing.endpoint.updateCoupon",
+      "type": "endpoint",
+      "method": "PUT",
+      "path": "/api/coupons/{couponId}",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "program_pricing.endpoint.deleteCoupon",
+      "type": "endpoint",
+      "method": "DELETE",
+      "path": "/api/coupons/{couponId}",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "program_pricing.mw.getPrograms.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.getPrograms.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.getPrograms.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "program_pricing.mw.getPrograms.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.createProgram.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.createProgram.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.createProgram.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "program_pricing.mw.createProgram.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.createProgram.audit_log",
+      "type": "middleware",
+      "middleware": "audit_log",
+      "order": 5,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "program_pricing.mw.getProgram.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.getProgram.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.getProgram.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "program_pricing.mw.updateProgram.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.updateProgram.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.updateProgram.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "program_pricing.mw.updateProgram.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.updateProgram.business_rule_guard",
+      "type": "middleware",
+      "middleware": "business_rule_guard",
+      "order": 5,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "program_pricing.mw.updateProgram.audit_log",
+      "type": "middleware",
+      "middleware": "audit_log",
+      "order": 6,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "program_pricing.mw.getCoupons.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.getCoupons.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.getCoupons.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "program_pricing.mw.createCoupon.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.createCoupon.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.createCoupon.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "program_pricing.mw.createCoupon.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.createCoupon.business_rule_guard",
+      "type": "middleware",
+      "middleware": "business_rule_guard",
+      "order": 5,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "program_pricing.mw.updateCoupon.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.updateCoupon.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.updateCoupon.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "program_pricing.mw.updateCoupon.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.updateCoupon.business_rule_guard",
+      "type": "middleware",
+      "middleware": "business_rule_guard",
+      "order": 5,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "program_pricing.mw.deleteCoupon.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.deleteCoupon.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "program_pricing.mw.deleteCoupon.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "program_pricing.mw.deleteCoupon.audit_log",
+      "type": "middleware",
+      "middleware": "audit_log",
+      "order": 4,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "program_pricing.db.getPrograms.Program.READ",
+      "type": "db_operation",
+      "model": "Program",
+      "operation": "READ",
+      "description": "Paginated list of programs with status filter, includes computed enrollmentCount"
+    },
+    {
+      "id": "program_pricing.db.createProgram.LocationSettings.READ",
+      "type": "db_operation",
+      "model": "LocationSettings",
+      "operation": "READ",
+      "description": "Validate locationId exists"
+    },
+    {
+      "id": "program_pricing.db.createProgram.Program.CREATE",
+      "type": "db_operation",
+      "model": "Program",
+      "operation": "CREATE",
+      "description": "Create new program (default status DRAFT)"
+    },
+    {
+      "id": "program_pricing.db.getProgram.Program.READ",
+      "type": "db_operation",
+      "model": "Program",
+      "operation": "READ",
+      "description": "Fetch single program with computed fields"
+    },
+    {
+      "id": "program_pricing.db.updateProgram.Program.READ",
+      "type": "db_operation",
+      "model": "Program",
+      "operation": "READ",
+      "description": "Read current program state for transition validation"
+    },
+    {
+      "id": "program_pricing.db.updateProgram.LocationSettings.READ",
+      "type": "db_operation",
+      "model": "LocationSettings",
+      "operation": "READ",
+      "description": "If transitioning to ACTIVE, validate Zelle config is complete (zelleRecipientName, zelleContactInfo required)"
+    },
+    {
+      "id": "program_pricing.db.updateProgram.Enrollment.READ",
+      "type": "db_operation",
+      "model": "Enrollment",
+      "operation": "READ",
+      "description": "Check enrollment count vs capacity if capacity is being reduced"
+    },
+    {
+      "id": "program_pricing.db.updateProgram.Program.UPDATE",
+      "type": "db_operation",
+      "model": "Program",
+      "operation": "UPDATE",
+      "description": "Update program fields"
+    },
+    {
+      "id": "program_pricing.db.getCoupons.Coupon.READ",
+      "type": "db_operation",
+      "model": "Coupon",
+      "operation": "READ",
+      "description": "List all coupons"
+    },
+    {
+      "id": "program_pricing.db.createCoupon.Coupon.CREATE",
+      "type": "db_operation",
+      "model": "Coupon",
+      "operation": "CREATE",
+      "description": "Create new coupon (code uniqueness enforced at DB level)"
+    },
+    {
+      "id": "program_pricing.db.updateCoupon.Coupon.UPDATE",
+      "type": "db_operation",
+      "model": "Coupon",
+      "operation": "UPDATE",
+      "description": "Update coupon fields (code uniqueness re-validated at DB level)"
+    },
+    {
+      "id": "program_pricing.db.deleteCoupon.Coupon.DELETE",
+      "type": "db_operation",
+      "model": "Coupon",
+      "operation": "DELETE",
+      "description": "Hard delete coupon record"
+    },
+    {
+      "id": "program_pricing.effect.createProgram.audit_program_created",
+      "type": "side_effect",
+      "effectType": "app_event",
+      "name": "audit_program_created",
+      "description": "Audit log records program creation"
+    },
+    {
+      "id": "program_pricing.effect.updateProgram.audit_program_updated",
+      "type": "side_effect",
+      "effectType": "app_event",
+      "name": "audit_program_updated",
+      "description": "Audit log records program update (especially status transitions)"
+    },
+    {
+      "id": "program_pricing.effect.deleteCoupon.audit_coupon_deleted",
+      "type": "side_effect",
+      "effectType": "app_event",
+      "name": "audit_coupon_deleted",
+      "description": "Audit log records coupon deletion"
+    }
+  ],
+  "edges": [
+    {
+      "id": "program_pricing.edge.loadPrograms.getPrograms",
+      "type": "screen_action_to_endpoint",
+      "from": "program_pricing.screen.program_list",
+      "to": "program_pricing.endpoint.getPrograms",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/programs.get", "fe_details://program_list.endpointProposals[0]"]
+    },
+    {
+      "id": "program_pricing.edge.loadProgram.getProgram",
+      "type": "screen_action_to_endpoint",
+      "from": "program_pricing.screen.program_setup",
+      "to": "program_pricing.endpoint.getProgram",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/programs/{programId}.get", "fe_details://program_setup.endpointProposals[0]"]
+    },
+    {
+      "id": "program_pricing.edge.createProgram.createProgram",
+      "type": "screen_action_to_endpoint",
+      "from": "program_pricing.screen.program_setup",
+      "to": "program_pricing.endpoint.createProgram",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/programs.post", "fe_details://program_setup.endpointProposals[1]"]
+    },
+    {
+      "id": "program_pricing.edge.updateProgram.updateProgram",
+      "type": "screen_action_to_endpoint",
+      "from": "program_pricing.screen.program_setup",
+      "to": "program_pricing.endpoint.updateProgram",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/programs/{programId}.put", "fe_details://program_setup.endpointProposals[2]"]
+    },
+    {
+      "id": "program_pricing.edge.loadCoupons.getCoupons",
+      "type": "screen_action_to_endpoint",
+      "from": "program_pricing.screen.coupon_management",
+      "to": "program_pricing.endpoint.getCoupons",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/coupons.get", "fe_details://coupon_management.endpointProposals[0]"]
+    },
+    {
+      "id": "program_pricing.edge.createCoupon.createCoupon",
+      "type": "screen_action_to_endpoint",
+      "from": "program_pricing.screen.coupon_management",
+      "to": "program_pricing.endpoint.createCoupon",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/coupons.post", "fe_details://coupon_management.endpointProposals[1]"]
+    },
+    {
+      "id": "program_pricing.edge.updateCoupon.updateCoupon",
+      "type": "screen_action_to_endpoint",
+      "from": "program_pricing.screen.coupon_management",
+      "to": "program_pricing.endpoint.updateCoupon",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/coupons/{couponId}.put", "fe_details://coupon_management.endpointProposals[2]"]
+    },
+    {
+      "id": "program_pricing.edge.deleteCoupon.deleteCoupon",
+      "type": "screen_action_to_endpoint",
+      "from": "program_pricing.screen.coupon_management",
+      "to": "program_pricing.endpoint.deleteCoupon",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/coupons/{couponId}.delete", "fe_details://coupon_management.endpointProposals[3]"]
+    },
+    {
+      "id": "program_pricing.edge.getPrograms.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.getPrograms",
+      "to": "program_pricing.mw.getPrograms.request_id"
+    },
+    {
+      "id": "program_pricing.edge.getPrograms.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.getPrograms",
+      "to": "program_pricing.mw.getPrograms.auth_session"
+    },
+    {
+      "id": "program_pricing.edge.getPrograms.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.getPrograms",
+      "to": "program_pricing.mw.getPrograms.role_permission_check"
+    },
+    {
+      "id": "program_pricing.edge.getPrograms.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.getPrograms",
+      "to": "program_pricing.mw.getPrograms.input_validation"
+    },
+    {
+      "id": "program_pricing.edge.createProgram.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.createProgram",
+      "to": "program_pricing.mw.createProgram.request_id"
+    },
+    {
+      "id": "program_pricing.edge.createProgram.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.createProgram",
+      "to": "program_pricing.mw.createProgram.auth_session"
+    },
+    {
+      "id": "program_pricing.edge.createProgram.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.createProgram",
+      "to": "program_pricing.mw.createProgram.role_permission_check"
+    },
+    {
+      "id": "program_pricing.edge.createProgram.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.createProgram",
+      "to": "program_pricing.mw.createProgram.input_validation"
+    },
+    {
+      "id": "program_pricing.edge.createProgram.mw.audit_log",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.createProgram",
+      "to": "program_pricing.mw.createProgram.audit_log"
+    },
+    {
+      "id": "program_pricing.edge.getProgram.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.getProgram",
+      "to": "program_pricing.mw.getProgram.request_id"
+    },
+    {
+      "id": "program_pricing.edge.getProgram.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.getProgram",
+      "to": "program_pricing.mw.getProgram.auth_session"
+    },
+    {
+      "id": "program_pricing.edge.getProgram.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.getProgram",
+      "to": "program_pricing.mw.getProgram.role_permission_check"
+    },
+    {
+      "id": "program_pricing.edge.updateProgram.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.updateProgram",
+      "to": "program_pricing.mw.updateProgram.request_id"
+    },
+    {
+      "id": "program_pricing.edge.updateProgram.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.updateProgram",
+      "to": "program_pricing.mw.updateProgram.auth_session"
+    },
+    {
+      "id": "program_pricing.edge.updateProgram.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.updateProgram",
+      "to": "program_pricing.mw.updateProgram.role_permission_check"
+    },
+    {
+      "id": "program_pricing.edge.updateProgram.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.updateProgram",
+      "to": "program_pricing.mw.updateProgram.input_validation"
+    },
+    {
+      "id": "program_pricing.edge.updateProgram.mw.business_rule_guard",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.updateProgram",
+      "to": "program_pricing.mw.updateProgram.business_rule_guard"
+    },
+    {
+      "id": "program_pricing.edge.updateProgram.mw.audit_log",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.updateProgram",
+      "to": "program_pricing.mw.updateProgram.audit_log"
+    },
+    {
+      "id": "program_pricing.edge.getCoupons.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.getCoupons",
+      "to": "program_pricing.mw.getCoupons.request_id"
+    },
+    {
+      "id": "program_pricing.edge.getCoupons.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.getCoupons",
+      "to": "program_pricing.mw.getCoupons.auth_session"
+    },
+    {
+      "id": "program_pricing.edge.getCoupons.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.getCoupons",
+      "to": "program_pricing.mw.getCoupons.role_permission_check"
+    },
+    {
+      "id": "program_pricing.edge.createCoupon.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.createCoupon",
+      "to": "program_pricing.mw.createCoupon.request_id"
+    },
+    {
+      "id": "program_pricing.edge.createCoupon.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.createCoupon",
+      "to": "program_pricing.mw.createCoupon.auth_session"
+    },
+    {
+      "id": "program_pricing.edge.createCoupon.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.createCoupon",
+      "to": "program_pricing.mw.createCoupon.role_permission_check"
+    },
+    {
+      "id": "program_pricing.edge.createCoupon.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.createCoupon",
+      "to": "program_pricing.mw.createCoupon.input_validation"
+    },
+    {
+      "id": "program_pricing.edge.createCoupon.mw.business_rule_guard",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.createCoupon",
+      "to": "program_pricing.mw.createCoupon.business_rule_guard"
+    },
+    {
+      "id": "program_pricing.edge.updateCoupon.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.updateCoupon",
+      "to": "program_pricing.mw.updateCoupon.request_id"
+    },
+    {
+      "id": "program_pricing.edge.updateCoupon.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.updateCoupon",
+      "to": "program_pricing.mw.updateCoupon.auth_session"
+    },
+    {
+      "id": "program_pricing.edge.updateCoupon.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.updateCoupon",
+      "to": "program_pricing.mw.updateCoupon.role_permission_check"
+    },
+    {
+      "id": "program_pricing.edge.updateCoupon.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.updateCoupon",
+      "to": "program_pricing.mw.updateCoupon.input_validation"
+    },
+    {
+      "id": "program_pricing.edge.updateCoupon.mw.business_rule_guard",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.updateCoupon",
+      "to": "program_pricing.mw.updateCoupon.business_rule_guard"
+    },
+    {
+      "id": "program_pricing.edge.deleteCoupon.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.deleteCoupon",
+      "to": "program_pricing.mw.deleteCoupon.request_id"
+    },
+    {
+      "id": "program_pricing.edge.deleteCoupon.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.deleteCoupon",
+      "to": "program_pricing.mw.deleteCoupon.auth_session"
+    },
+    {
+      "id": "program_pricing.edge.deleteCoupon.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.deleteCoupon",
+      "to": "program_pricing.mw.deleteCoupon.role_permission_check"
+    },
+    {
+      "id": "program_pricing.edge.deleteCoupon.mw.audit_log",
+      "type": "endpoint_to_middleware",
+      "from": "program_pricing.endpoint.deleteCoupon",
+      "to": "program_pricing.mw.deleteCoupon.audit_log"
+    },
+    {
+      "id": "program_pricing.edge.getPrograms.perm",
+      "type": "endpoint_to_permission",
+      "from": "program_pricing.endpoint.getPrograms",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "program_pricing.edge.createProgram.perm",
+      "type": "endpoint_to_permission",
+      "from": "program_pricing.endpoint.createProgram",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "program_pricing.edge.getProgram.perm",
+      "type": "endpoint_to_permission",
+      "from": "program_pricing.endpoint.getProgram",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "program_pricing.edge.updateProgram.perm",
+      "type": "endpoint_to_permission",
+      "from": "program_pricing.endpoint.updateProgram",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "program_pricing.edge.getCoupons.perm",
+      "type": "endpoint_to_permission",
+      "from": "program_pricing.endpoint.getCoupons",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "program_pricing.edge.createCoupon.perm",
+      "type": "endpoint_to_permission",
+      "from": "program_pricing.endpoint.createCoupon",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "program_pricing.edge.updateCoupon.perm",
+      "type": "endpoint_to_permission",
+      "from": "program_pricing.endpoint.updateCoupon",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "program_pricing.edge.deleteCoupon.perm",
+      "type": "endpoint_to_permission",
+      "from": "program_pricing.endpoint.deleteCoupon",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "program_pricing.edge.getPrograms.db.Program.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "program_pricing.endpoint.getPrograms",
+      "to": "program_pricing.db.getPrograms.Program.READ"
+    },
+    {
+      "id": "program_pricing.edge.createProgram.db.LocationSettings.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "program_pricing.endpoint.createProgram",
+      "to": "program_pricing.db.createProgram.LocationSettings.READ"
+    },
+    {
+      "id": "program_pricing.edge.createProgram.db.Program.CREATE",
+      "type": "endpoint_to_db_operation",
+      "from": "program_pricing.endpoint.createProgram",
+      "to": "program_pricing.db.createProgram.Program.CREATE"
+    },
+    {
+      "id": "program_pricing.edge.getProgram.db.Program.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "program_pricing.endpoint.getProgram",
+      "to": "program_pricing.db.getProgram.Program.READ"
+    },
+    {
+      "id": "program_pricing.edge.updateProgram.db.Program.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "program_pricing.endpoint.updateProgram",
+      "to": "program_pricing.db.updateProgram.Program.READ"
+    },
+    {
+      "id": "program_pricing.edge.updateProgram.db.LocationSettings.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "program_pricing.endpoint.updateProgram",
+      "to": "program_pricing.db.updateProgram.LocationSettings.READ"
+    },
+    {
+      "id": "program_pricing.edge.updateProgram.db.Enrollment.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "program_pricing.endpoint.updateProgram",
+      "to": "program_pricing.db.updateProgram.Enrollment.READ"
+    },
+    {
+      "id": "program_pricing.edge.updateProgram.db.Program.UPDATE",
+      "type": "endpoint_to_db_operation",
+      "from": "program_pricing.endpoint.updateProgram",
+      "to": "program_pricing.db.updateProgram.Program.UPDATE"
+    },
+    {
+      "id": "program_pricing.edge.getCoupons.db.Coupon.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "program_pricing.endpoint.getCoupons",
+      "to": "program_pricing.db.getCoupons.Coupon.READ"
+    },
+    {
+      "id": "program_pricing.edge.createCoupon.db.Coupon.CREATE",
+      "type": "endpoint_to_db_operation",
+      "from": "program_pricing.endpoint.createCoupon",
+      "to": "program_pricing.db.createCoupon.Coupon.CREATE"
+    },
+    {
+      "id": "program_pricing.edge.updateCoupon.db.Coupon.UPDATE",
+      "type": "endpoint_to_db_operation",
+      "from": "program_pricing.endpoint.updateCoupon",
+      "to": "program_pricing.db.updateCoupon.Coupon.UPDATE"
+    },
+    {
+      "id": "program_pricing.edge.deleteCoupon.db.Coupon.DELETE",
+      "type": "endpoint_to_db_operation",
+      "from": "program_pricing.endpoint.deleteCoupon",
+      "to": "program_pricing.db.deleteCoupon.Coupon.DELETE"
+    },
+    {
+      "id": "program_pricing.edge.createProgram.effect.audit_program_created",
+      "type": "db_to_side_effect",
+      "from": "program_pricing.db.createProgram.Program.CREATE",
+      "to": "program_pricing.effect.createProgram.audit_program_created"
+    },
+    {
+      "id": "program_pricing.edge.updateProgram.effect.audit_program_updated",
+      "type": "db_to_side_effect",
+      "from": "program_pricing.db.updateProgram.Program.UPDATE",
+      "to": "program_pricing.effect.updateProgram.audit_program_updated"
+    },
+    {
+      "id": "program_pricing.edge.deleteCoupon.effect.audit_coupon_deleted",
+      "type": "db_to_side_effect",
+      "from": "program_pricing.db.deleteCoupon.Coupon.DELETE",
+      "to": "program_pricing.effect.deleteCoupon.audit_coupon_deleted"
+    }
+  ],
+  "guards": [
+    {
+      "route": "/admin/programs",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "redirectIfUnauthenticated": "/admin/login",
+      "confidence": "high",
+      "evidenceRefs": ["fe_details://program_list"]
+    },
+    {
+      "route": "/admin/programs/{programId}",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "redirectIfUnauthenticated": "/admin/login",
+      "confidence": "high",
+      "evidenceRefs": ["fe_details://program_setup"]
+    },
+    {
+      "route": "/admin/programs/coupons",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "redirectIfUnauthenticated": "/admin/login",
+      "confidence": "high",
+      "evidenceRefs": ["fe_details://coupon_management"]
+    }
+  ],
+  "crossModuleDependencies": [
+    {
+      "targetModule": "settings",
+      "models": ["LocationSettings"],
+      "accessType": "READ",
+      "reason": "Validate Zelle config before ACTIVE status transition; location name for display",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.Program.relations.locationSettings"]
+    },
+    {
+      "targetModule": "enrollment_trial",
+      "models": ["Enrollment"],
+      "accessType": "READ",
+      "reason": "Enrollment count aggregate for program list/detail; capacity validation on update",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.Program.relations.enrollments"]
+    }
+  ],
+  "issues": {
+    "unresolvedLinks": [],
+    "gaps": [
+      {
+        "id": "PP-GAP-01",
+        "source": "be_policy_flow",
+        "description": "All admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles.",
+        "severity": "low"
+      },
+      {
+        "id": "PP-GAP-02",
+        "source": "be_policy_flow",
+        "description": "No explicit Zelle config pre-check rule in OpenAPI for program ACTIVE status transition. Business rule guard inferred from db notes.",
+        "severity": "medium"
+      }
+    ],
+    "inferredItems": [
+      {
+        "nodeId": "program_pricing.mw.getPrograms.request_id",
+        "type": "middleware",
+        "middleware": "request_id",
+        "endpoint": "getPrograms",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.getPrograms.role_permission_check",
+        "type": "middleware",
+        "middleware": "role_permission_check",
+        "endpoint": "getPrograms",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.createProgram.request_id",
+        "type": "middleware",
+        "middleware": "request_id",
+        "endpoint": "createProgram",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.createProgram.role_permission_check",
+        "type": "middleware",
+        "middleware": "role_permission_check",
+        "endpoint": "createProgram",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.createProgram.audit_log",
+        "type": "middleware",
+        "middleware": "audit_log",
+        "endpoint": "createProgram",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.getProgram.request_id",
+        "type": "middleware",
+        "middleware": "request_id",
+        "endpoint": "getProgram",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.getProgram.role_permission_check",
+        "type": "middleware",
+        "middleware": "role_permission_check",
+        "endpoint": "getProgram",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.updateProgram.request_id",
+        "type": "middleware",
+        "middleware": "request_id",
+        "endpoint": "updateProgram",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.updateProgram.role_permission_check",
+        "type": "middleware",
+        "middleware": "role_permission_check",
+        "endpoint": "updateProgram",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.updateProgram.business_rule_guard",
+        "type": "middleware",
+        "middleware": "business_rule_guard",
+        "endpoint": "updateProgram",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.updateProgram.audit_log",
+        "type": "middleware",
+        "middleware": "audit_log",
+        "endpoint": "updateProgram",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.getCoupons.request_id",
+        "type": "middleware",
+        "middleware": "request_id",
+        "endpoint": "getCoupons",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.getCoupons.role_permission_check",
+        "type": "middleware",
+        "middleware": "role_permission_check",
+        "endpoint": "getCoupons",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.createCoupon.request_id",
+        "type": "middleware",
+        "middleware": "request_id",
+        "endpoint": "createCoupon",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.createCoupon.role_permission_check",
+        "type": "middleware",
+        "middleware": "role_permission_check",
+        "endpoint": "createCoupon",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.createCoupon.business_rule_guard",
+        "type": "middleware",
+        "middleware": "business_rule_guard",
+        "endpoint": "createCoupon",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.updateCoupon.request_id",
+        "type": "middleware",
+        "middleware": "request_id",
+        "endpoint": "updateCoupon",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.updateCoupon.role_permission_check",
+        "type": "middleware",
+        "middleware": "role_permission_check",
+        "endpoint": "updateCoupon",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.updateCoupon.business_rule_guard",
+        "type": "middleware",
+        "middleware": "business_rule_guard",
+        "endpoint": "updateCoupon",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.deleteCoupon.request_id",
+        "type": "middleware",
+        "middleware": "request_id",
+        "endpoint": "deleteCoupon",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.deleteCoupon.role_permission_check",
+        "type": "middleware",
+        "middleware": "role_permission_check",
+        "endpoint": "deleteCoupon",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.mw.deleteCoupon.audit_log",
+        "type": "middleware",
+        "middleware": "audit_log",
+        "endpoint": "deleteCoupon",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "program_pricing.db.updateProgram.LocationSettings.READ",
+        "type": "db_operation",
+        "model": "LocationSettings",
+        "operation": "READ",
+        "endpoint": "updateProgram",
+        "confidence": "medium",
+        "source": "db_flow"
+      },
+      {
+        "nodeId": "program_pricing.db.updateProgram.Enrollment.READ",
+        "type": "db_operation",
+        "model": "Enrollment",
+        "operation": "READ",
+        "endpoint": "updateProgram",
+        "confidence": "medium",
+        "source": "db_flow"
+      },
+      {
+        "nodeId": "program_pricing.effect.createProgram.audit_program_created",
+        "type": "side_effect",
+        "name": "audit_program_created",
+        "endpoint": "createProgram",
+        "confidence": "medium",
+        "source": "db_flow"
+      },
+      {
+        "nodeId": "program_pricing.effect.updateProgram.audit_program_updated",
+        "type": "side_effect",
+        "name": "audit_program_updated",
+        "endpoint": "updateProgram",
+        "confidence": "medium",
+        "source": "db_flow"
+      },
+      {
+        "nodeId": "program_pricing.effect.deleteCoupon.audit_coupon_deleted",
+        "type": "side_effect",
+        "name": "audit_coupon_deleted",
+        "endpoint": "deleteCoupon",
+        "confidence": "medium",
+        "source": "db_flow"
+      }
+    ]
+  }
+}

@@ -1,0 +1,794 @@
+{
+  "generatedAt": "2026-03-06",
+  "agentVersion": "module-priority-sequencer-v1.0.0",
+  "sourceInputs": [
+    "architect_output/global_flow.json",
+    "architect_output/traceability.json",
+    "architect_output/global_services_registry.json",
+    "architect_output/global_middleware_registry.json",
+    "architect_output/global_integrations.json",
+    "architect_output/modules/admin_dashboard/module_flow.json",
+    "architect_output/modules/auth_accounts/module_flow.json",
+    "architect_output/modules/calendar_scheduling/module_flow.json",
+    "architect_output/modules/communication/module_flow.json",
+    "architect_output/modules/enrollment_trial/module_flow.json",
+    "architect_output/modules/lead_management/module_flow.json",
+    "architect_output/modules/payment_tracking/module_flow.json",
+    "architect_output/modules/program_pricing/module_flow.json",
+    "architect_output/modules/settings/module_flow.json",
+    "contract_output/modules/admin_dashboard/navigation_graph.json",
+    "contract_output/modules/auth_accounts/navigation_graph.json",
+    "contract_output/modules/calendar_scheduling/navigation_graph.json",
+    "contract_output/modules/communication/navigation_graph.json",
+    "contract_output/modules/enrollment_trial/navigation_graph.json",
+    "contract_output/modules/lead_management/navigation_graph.json",
+    "contract_output/modules/payment_tracking/navigation_graph.json",
+    "contract_output/modules/program_pricing/navigation_graph.json",
+    "contract_output/modules/settings/navigation_graph.json"
+  ],
+  "totalModules": 9,
+  "dependencyGraph": {
+    "edges": [
+      {
+        "from": "auth_accounts",
+        "to": "admin_dashboard",
+        "reasonType": "cross_module_navigation",
+        "reason": "Login success navigates to dashboard",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#routeTransitions[xroute.auth_accounts.admin_dashboard.loginSuccess]"
+        ]
+      },
+      {
+        "from": "auth_accounts",
+        "to": "admin_dashboard",
+        "reasonType": "soft_navigation_dependency",
+        "reason": "auth-e-01 toScreenId references admin_dashboard:dashboard_overview",
+        "evidenceRefs": [
+          "contract_output/modules/auth_accounts/navigation_graph.json#edges[auth-e-01]"
+        ]
+      },
+      {
+        "from": "lead_management",
+        "to": "admin_dashboard",
+        "reasonType": "data_dependency",
+        "reason": "Aggregate lead source counts; fetch recent leads",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#crossModuleEdges[xmod.admin_dashboard.lead_management]"
+        ]
+      },
+      {
+        "from": "enrollment_trial",
+        "to": "admin_dashboard",
+        "reasonType": "data_dependency",
+        "reason": "Conversion rate metrics; upcoming trial list",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#crossModuleEdges[xmod.admin_dashboard.enrollment_trial]"
+        ]
+      },
+      {
+        "from": "payment_tracking",
+        "to": "admin_dashboard",
+        "reasonType": "data_dependency",
+        "reason": "Payment status summary; pending payment list",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#crossModuleEdges[xmod.admin_dashboard.payment_tracking]"
+        ]
+      },
+      {
+        "from": "program_pricing",
+        "to": "admin_dashboard",
+        "reasonType": "data_dependency",
+        "reason": "Program name joins for trial/payment displays",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#crossModuleEdges[xmod.admin_dashboard.program_pricing]"
+        ]
+      },
+      {
+        "from": "calendar_scheduling",
+        "to": "admin_dashboard",
+        "reasonType": "data_dependency",
+        "reason": "Trial date info for upcoming trials display",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#crossModuleEdges[xmod.admin_dashboard.calendar_scheduling]"
+        ]
+      },
+      {
+        "from": "admin_dashboard",
+        "to": "lead_management",
+        "reasonType": "cross_module_navigation",
+        "reason": "Recent leads widget click navigates to lead list",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#routeTransitions[xroute.admin_dashboard.lead_management.recentLeadsWidgetClick]"
+        ]
+      },
+      {
+        "from": "admin_dashboard",
+        "to": "lead_management",
+        "reasonType": "soft_navigation_dependency",
+        "reason": "ad-e-01/ad-e-02/ad-e-04/ad-e-05 toScreenId references lead_management:lead_detail and lead_management:lead_list",
+        "evidenceRefs": [
+          "contract_output/modules/admin_dashboard/navigation_graph.json#edges[ad-e-01,ad-e-02,ad-e-04,ad-e-05]"
+        ]
+      },
+      {
+        "from": "program_pricing",
+        "to": "lead_management",
+        "reasonType": "data_dependency",
+        "reason": "Join for interestedProgram name on lead detail/list",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#crossModuleEdges[xmod.lead_management.program_pricing]"
+        ]
+      },
+      {
+        "from": "settings",
+        "to": "lead_management",
+        "reasonType": "data_dependency",
+        "reason": "Join for location name on lead detail",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#crossModuleEdges[xmod.lead_management.settings]"
+        ]
+      },
+      {
+        "from": "program_pricing",
+        "to": "calendar_scheduling",
+        "reasonType": "data_dependency",
+        "reason": "Validate programId; program name for display",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#crossModuleEdges[xmod.calendar_scheduling.program_pricing]"
+        ]
+      },
+      {
+        "from": "enrollment_trial",
+        "to": "calendar_scheduling",
+        "reasonType": "data_dependency",
+        "reason": "Trial count for spotsRemaining computation; FK check before delete",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#crossModuleEdges[xmod.calendar_scheduling.enrollment_trial]"
+        ]
+      },
+      {
+        "from": "calendar_scheduling",
+        "to": "enrollment_trial",
+        "reasonType": "cross_module_navigation",
+        "reason": "Trial date selected navigates to trial booking form",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#routeTransitions[xroute.calendar_scheduling.enrollment_trial.trialDateSelected]"
+        ]
+      },
+      {
+        "from": "calendar_scheduling",
+        "to": "enrollment_trial",
+        "reasonType": "soft_navigation_dependency",
+        "reason": "cs-e-01 toScreenId references enrollment_trial:trial_booking_form",
+        "evidenceRefs": [
+          "contract_output/modules/calendar_scheduling/navigation_graph.json#edges[cs-e-01]"
+        ]
+      },
+      {
+        "from": "enrollment_trial",
+        "to": "calendar_scheduling",
+        "reasonType": "cross_module_navigation",
+        "reason": "Select trial date navigates to trial date picker",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#routeTransitions[xroute.enrollment_trial.calendar_scheduling.selectTrialDate]"
+        ]
+      },
+      {
+        "from": "settings",
+        "to": "program_pricing",
+        "reasonType": "data_dependency",
+        "reason": "Validate Zelle config before ACTIVE status transition; location name for display",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#crossModuleEdges[xmod.program_pricing.settings]"
+        ]
+      },
+      {
+        "from": "enrollment_trial",
+        "to": "program_pricing",
+        "reasonType": "data_dependency",
+        "reason": "Enrollment count aggregate for program list/detail; capacity validation on update",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#crossModuleEdges[xmod.program_pricing.enrollment_trial]"
+        ]
+      },
+      {
+        "from": "program_pricing",
+        "to": "enrollment_trial",
+        "reasonType": "data_dependency",
+        "reason": "Program validation/pricing for booking/enrollment; coupon validation and usage increment",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#crossModuleEdges[xmod.enrollment_trial.program_pricing]"
+        ]
+      },
+      {
+        "from": "calendar_scheduling",
+        "to": "enrollment_trial",
+        "reasonType": "data_dependency",
+        "reason": "Trial date validation and capacity check for bookTrial",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#crossModuleEdges[xmod.enrollment_trial.calendar_scheduling]"
+        ]
+      },
+      {
+        "from": "lead_management",
+        "to": "enrollment_trial",
+        "reasonType": "data_dependency",
+        "reason": "Auto-create/link leads on trial/enrollment (GP-02); auto-advance status (GP-04); create activity records",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#crossModuleEdges[xmod.enrollment_trial.lead_management]"
+        ]
+      },
+      {
+        "from": "payment_tracking",
+        "to": "enrollment_trial",
+        "reasonType": "data_dependency",
+        "reason": "Auto-create payment record on enrollment (HO-02)",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#crossModuleEdges[xmod.enrollment_trial.payment_tracking]"
+        ]
+      },
+      {
+        "from": "settings",
+        "to": "enrollment_trial",
+        "reasonType": "data_dependency",
+        "reason": "Location info for enrollment confirmation and lead creation",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#crossModuleEdges[xmod.enrollment_trial.settings]"
+        ]
+      },
+      {
+        "from": "admin_dashboard",
+        "to": "enrollment_trial",
+        "reasonType": "cross_module_navigation",
+        "reason": "Upcoming trials widget click navigates to enrollments",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#routeTransitions[xroute.admin_dashboard.enrollment_trial.upcomingTrialsWidgetClick]"
+        ]
+      },
+      {
+        "from": "enrollment_trial",
+        "to": "payment_tracking",
+        "reasonType": "data_dependency",
+        "reason": "Payment references enrollment for parent/program context",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#crossModuleEdges[xmod.payment_tracking.enrollment_trial]"
+        ]
+      },
+      {
+        "from": "program_pricing",
+        "to": "payment_tracking",
+        "reasonType": "data_dependency",
+        "reason": "Program name for payment display; locationId for Zelle instructions",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#crossModuleEdges[xmod.payment_tracking.program_pricing]"
+        ]
+      },
+      {
+        "from": "settings",
+        "to": "payment_tracking",
+        "reasonType": "data_dependency",
+        "reason": "Zelle payment config for public payment instructions",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#crossModuleEdges[xmod.payment_tracking.settings]"
+        ]
+      },
+      {
+        "from": "admin_dashboard",
+        "to": "payment_tracking",
+        "reasonType": "cross_module_navigation",
+        "reason": "Pending payments widget click navigates to payments",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#routeTransitions[xroute.admin_dashboard.payment_tracking.pendingPaymentsWidgetClick]"
+        ]
+      },
+      {
+        "from": "admin_dashboard",
+        "to": "payment_tracking",
+        "reasonType": "soft_navigation_dependency",
+        "reason": "ad-e-03/ad-e-06 toScreenId references payment_tracking:payment_detail and payment_tracking:payment_dashboard",
+        "evidenceRefs": [
+          "contract_output/modules/admin_dashboard/navigation_graph.json#edges[ad-e-03,ad-e-06]"
+        ]
+      },
+      {
+        "from": "enrollment_trial",
+        "to": "payment_tracking",
+        "reasonType": "cross_module_navigation",
+        "reason": "Proceed to pay click navigates from enrollment confirmation to payment",
+        "evidenceRefs": [
+          "architect_output/global_flow.json#routeTransitions[xroute.enrollment_trial.payment_tracking.proceedToPayClick]"
+        ]
+      }
+    ],
+    "totalEdges": 30,
+    "uniqueDirectionalPairs": 23
+  },
+  "moduleAnalysis": [
+    {
+      "moduleId": "admin_dashboard",
+      "inDegree": 6,
+      "outDegree": 3,
+      "screens": 1,
+      "endpoints": 4,
+      "dbModels": 4,
+      "webhooks": 0,
+      "scheduledJobs": 0,
+      "complexityLevel": "unknown",
+      "complexityWeight": 0,
+      "sharedModelCount": 6,
+      "integrationCount": 0,
+      "coreScore": 24,
+      "priorityScore": 47,
+      "classification": ["core"],
+      "prerequisites": ["auth_accounts", "calendar_scheduling", "enrollment_trial", "lead_management", "payment_tracking", "program_pricing"],
+      "dependents": ["enrollment_trial", "lead_management", "payment_tracking"],
+      "confidence": "high",
+      "evidenceRefs": [
+        "architect_output/global_flow.json#crossModuleEdges (5 data dependency edges as sourceModule)",
+        "architect_output/global_flow.json#routeTransitions (3 outbound + 1 inbound route transitions)",
+        "contract_output/modules/admin_dashboard/navigation_graph.json#edges (6 cross-module toScreenId references)"
+      ]
+    },
+    {
+      "moduleId": "auth_accounts",
+      "inDegree": 0,
+      "outDegree": 1,
+      "screens": 4,
+      "endpoints": 5,
+      "dbModels": 3,
+      "webhooks": 0,
+      "scheduledJobs": 1,
+      "complexityLevel": "unknown",
+      "complexityWeight": 0,
+      "sharedModelCount": 0,
+      "integrationCount": 1,
+      "coreScore": 6,
+      "priorityScore": 23,
+      "classification": ["independent"],
+      "prerequisites": [],
+      "dependents": ["admin_dashboard"],
+      "confidence": "high",
+      "evidenceRefs": [
+        "architect_output/global_flow.json#routeTransitions[xroute.auth_accounts.admin_dashboard.loginSuccess]",
+        "contract_output/modules/auth_accounts/navigation_graph.json#edges[auth-e-01] (cross-module toScreenId)",
+        "architect_output/global_integrations.json#integrations[email_service].usedInModules"
+      ]
+    },
+    {
+      "moduleId": "calendar_scheduling",
+      "inDegree": 2,
+      "outDegree": 2,
+      "screens": 2,
+      "endpoints": 5,
+      "dbModels": 3,
+      "webhooks": 0,
+      "scheduledJobs": 0,
+      "complexityLevel": "unknown",
+      "complexityWeight": 0,
+      "sharedModelCount": 3,
+      "integrationCount": 0,
+      "coreScore": 14,
+      "priorityScore": 33,
+      "classification": ["core"],
+      "prerequisites": ["enrollment_trial", "program_pricing"],
+      "dependents": ["admin_dashboard", "enrollment_trial"],
+      "confidence": "high",
+      "evidenceRefs": [
+        "architect_output/global_flow.json#crossModuleEdges[xmod.calendar_scheduling.program_pricing] (data dep on program_pricing)",
+        "architect_output/global_flow.json#crossModuleEdges[xmod.calendar_scheduling.enrollment_trial] (data dep on enrollment_trial)",
+        "architect_output/global_flow.json#routeTransitions[xroute.calendar_scheduling.enrollment_trial] (route to enrollment_trial)",
+        "contract_output/modules/calendar_scheduling/navigation_graph.json#edges[cs-e-01] (cross-module toScreenId)"
+      ]
+    },
+    {
+      "moduleId": "communication",
+      "inDegree": 0,
+      "outDegree": 0,
+      "screens": 3,
+      "endpoints": 8,
+      "dbModels": 3,
+      "webhooks": 0,
+      "scheduledJobs": 3,
+      "complexityLevel": "unknown",
+      "complexityWeight": 0,
+      "sharedModelCount": 0,
+      "integrationCount": 1,
+      "coreScore": 2,
+      "priorityScore": 21,
+      "classification": ["independent", "leaf"],
+      "prerequisites": [],
+      "dependents": [],
+      "confidence": "low",
+      "evidenceRefs": [
+        "architect_output/global_integrations.json#integrations[email_service].usedInModules (email integration only)",
+        "architect_output/global_flow.json#handoffs[handoff.HO-03,handoff.HO-04] (handoff target, not modeled as build dependency)"
+      ]
+    },
+    {
+      "moduleId": "enrollment_trial",
+      "inDegree": 6,
+      "outDegree": 4,
+      "screens": 6,
+      "endpoints": 9,
+      "dbModels": 9,
+      "webhooks": 0,
+      "scheduledJobs": 0,
+      "complexityLevel": "unknown",
+      "complexityWeight": 0,
+      "sharedModelCount": 9,
+      "integrationCount": 1,
+      "coreScore": 36,
+      "priorityScore": 81,
+      "classification": ["core"],
+      "prerequisites": ["admin_dashboard", "calendar_scheduling", "lead_management", "payment_tracking", "program_pricing", "settings"],
+      "dependents": ["admin_dashboard", "calendar_scheduling", "payment_tracking", "program_pricing"],
+      "confidence": "high",
+      "evidenceRefs": [
+        "architect_output/global_flow.json#crossModuleEdges (5 data deps as sourceModule + 4 as targetModule = 9 total)",
+        "architect_output/global_flow.json#routeTransitions (3 route transitions involving enrollment_trial)",
+        "architect_output/global_flow.json#handoffs[handoff.HO-01,handoff.HO-02,handoff.HO-03] (3 handoffs)"
+      ]
+    },
+    {
+      "moduleId": "lead_management",
+      "inDegree": 3,
+      "outDegree": 2,
+      "screens": 2,
+      "endpoints": 8,
+      "dbModels": 3,
+      "webhooks": 0,
+      "scheduledJobs": 0,
+      "complexityLevel": "unknown",
+      "complexityWeight": 0,
+      "sharedModelCount": 4,
+      "integrationCount": 1,
+      "coreScore": 18,
+      "priorityScore": 43,
+      "classification": ["core"],
+      "prerequisites": ["admin_dashboard", "program_pricing", "settings"],
+      "dependents": ["admin_dashboard", "enrollment_trial"],
+      "confidence": "high",
+      "evidenceRefs": [
+        "architect_output/global_flow.json#crossModuleEdges[xmod.lead_management.program_pricing] (reads Program)",
+        "architect_output/global_flow.json#crossModuleEdges[xmod.lead_management.settings] (reads LocationSettings)",
+        "architect_output/global_flow.json#crossModuleEdges[xmod.enrollment_trial.lead_management] (enrollment_trial writes Lead/LeadActivity)",
+        "architect_output/global_flow.json#routeTransitions[xroute.admin_dashboard.lead_management]"
+      ]
+    },
+    {
+      "moduleId": "payment_tracking",
+      "inDegree": 4,
+      "outDegree": 2,
+      "screens": 3,
+      "endpoints": 4,
+      "dbModels": 4,
+      "webhooks": 0,
+      "scheduledJobs": 1,
+      "complexityLevel": "unknown",
+      "complexityWeight": 0,
+      "sharedModelCount": 4,
+      "integrationCount": 1,
+      "coreScore": 18,
+      "priorityScore": 41,
+      "classification": ["core"],
+      "prerequisites": ["admin_dashboard", "enrollment_trial", "program_pricing", "settings"],
+      "dependents": ["admin_dashboard", "enrollment_trial"],
+      "confidence": "high",
+      "evidenceRefs": [
+        "architect_output/global_flow.json#crossModuleEdges[xmod.payment_tracking.enrollment_trial] (reads Enrollment)",
+        "architect_output/global_flow.json#crossModuleEdges[xmod.payment_tracking.program_pricing] (reads Program)",
+        "architect_output/global_flow.json#crossModuleEdges[xmod.payment_tracking.settings] (reads LocationSettings)",
+        "architect_output/global_flow.json#routeTransitions[xroute.enrollment_trial.payment_tracking,xroute.admin_dashboard.payment_tracking]",
+        "contract_output/modules/admin_dashboard/navigation_graph.json#edges[ad-e-03,ad-e-06] (cross-module toScreenId)"
+      ]
+    },
+    {
+      "moduleId": "program_pricing",
+      "inDegree": 2,
+      "outDegree": 5,
+      "screens": 3,
+      "endpoints": 8,
+      "dbModels": 4,
+      "webhooks": 0,
+      "scheduledJobs": 0,
+      "complexityLevel": "unknown",
+      "complexityWeight": 0,
+      "sharedModelCount": 4,
+      "integrationCount": 0,
+      "coreScore": 28,
+      "priorityScore": 65,
+      "classification": ["core"],
+      "prerequisites": ["enrollment_trial", "settings"],
+      "dependents": ["admin_dashboard", "calendar_scheduling", "enrollment_trial", "lead_management", "payment_tracking"],
+      "confidence": "high",
+      "evidenceRefs": [
+        "architect_output/global_flow.json#crossModuleEdges (targeted by 5 modules as data dependency for Program/Coupon models)",
+        "architect_output/global_flow.json#crossModuleEdges[xmod.program_pricing.settings] (depends on settings for Zelle config)",
+        "architect_output/global_flow.json#crossModuleEdges[xmod.program_pricing.enrollment_trial] (reads Enrollment count)"
+      ]
+    },
+    {
+      "moduleId": "settings",
+      "inDegree": 0,
+      "outDegree": 4,
+      "screens": 2,
+      "endpoints": 2,
+      "dbModels": 1,
+      "webhooks": 0,
+      "scheduledJobs": 0,
+      "complexityLevel": "unknown",
+      "complexityWeight": 0,
+      "sharedModelCount": 1,
+      "integrationCount": 0,
+      "coreScore": 18,
+      "priorityScore": 40,
+      "classification": ["independent", "core"],
+      "prerequisites": [],
+      "dependents": ["enrollment_trial", "lead_management", "payment_tracking", "program_pricing"],
+      "confidence": "high",
+      "evidenceRefs": [
+        "architect_output/global_flow.json#crossModuleEdges (4 modules read LocationSettings: enrollment_trial, lead_management, payment_tracking, program_pricing)",
+        "architect_output/global_services_registry.json#services[authService].usedInModules (settings uses authService)"
+      ]
+    }
+  ],
+  "independentModules": ["auth_accounts", "communication", "settings"],
+  "coreModules": [
+    {
+      "moduleId": "enrollment_trial",
+      "coreScore": 36
+    },
+    {
+      "moduleId": "program_pricing",
+      "coreScore": 28
+    },
+    {
+      "moduleId": "admin_dashboard",
+      "coreScore": 24
+    },
+    {
+      "moduleId": "lead_management",
+      "coreScore": 18
+    },
+    {
+      "moduleId": "payment_tracking",
+      "coreScore": 18
+    },
+    {
+      "moduleId": "settings",
+      "coreScore": 18
+    },
+    {
+      "moduleId": "calendar_scheduling",
+      "coreScore": 14
+    }
+  ],
+  "leafModules": ["communication"],
+  "buildLayers": [
+    {
+      "layer": 0,
+      "modules": [
+        {
+          "moduleId": "settings",
+          "priorityScore": 40
+        },
+        {
+          "moduleId": "auth_accounts",
+          "priorityScore": 23
+        },
+        {
+          "moduleId": "communication",
+          "priorityScore": 21
+        }
+      ],
+      "rationale": "Independent modules with zero prerequisites. Settings is foundational — 4 modules depend on its LocationSettings model. Auth_accounts is the authentication gateway. Communication is a leaf module with no cross-module build dependencies."
+    },
+    {
+      "layer": 1,
+      "modules": [
+        {
+          "moduleId": "enrollment_trial",
+          "priorityScore": 81
+        }
+      ],
+      "rationale": "Cycle break required. enrollment_trial has the highest priorityScore (81) among all remaining modules. It participates in mutual data dependencies with program_pricing, calendar_scheduling, payment_tracking, lead_management, and admin_dashboard. Placed early because it is the central hub: 4 modules depend on its data (outDegree=4), it touches 9 shared models, and it has the most endpoints (9) and screens (6)."
+    },
+    {
+      "layer": 2,
+      "modules": [
+        {
+          "moduleId": "program_pricing",
+          "priorityScore": 65
+        }
+      ],
+      "rationale": "After enrollment_trial is placed, program_pricing has zero remaining unresolved prerequisites (settings resolved in Layer 0, enrollment_trial in Layer 1). Highest outDegree (5) — calendar_scheduling, lead_management, payment_tracking, admin_dashboard, and enrollment_trial all depend on its Program/Coupon models."
+    },
+    {
+      "layer": 3,
+      "modules": [
+        {
+          "moduleId": "calendar_scheduling",
+          "priorityScore": 33
+        }
+      ],
+      "rationale": "Both prerequisites resolved: program_pricing (Layer 2), enrollment_trial (Layer 1). Provides CalendarDate model needed by admin_dashboard and enrollment_trial."
+    },
+    {
+      "layer": 4,
+      "modules": [
+        {
+          "moduleId": "admin_dashboard",
+          "priorityScore": 47
+        }
+      ],
+      "rationale": "Cycle break required. admin_dashboard has mutual navigation dependencies with lead_management and payment_tracking (admin_dashboard links to them via route transitions, they provide data back). Placed here because it has the highest priorityScore (47) among remaining modules and resolves both cycles."
+    },
+    {
+      "layer": 5,
+      "modules": [
+        {
+          "moduleId": "lead_management",
+          "priorityScore": 43
+        },
+        {
+          "moduleId": "payment_tracking",
+          "priorityScore": 41
+        }
+      ],
+      "rationale": "All prerequisites resolved after admin_dashboard placement. Both become buildable simultaneously. lead_management depends on admin_dashboard (navigation), program_pricing, and settings. payment_tracking depends on admin_dashboard (navigation), enrollment_trial, program_pricing, and settings."
+    }
+  ],
+  "buildSequenceFlat": [
+    "settings",
+    "auth_accounts",
+    "communication",
+    "enrollment_trial",
+    "program_pricing",
+    "calendar_scheduling",
+    "admin_dashboard",
+    "lead_management",
+    "payment_tracking"
+  ],
+  "cycleBreaks": [
+    {
+      "cycleId": "cycle-01",
+      "resolvedModule": "enrollment_trial",
+      "resolvedAtLayer": 1,
+      "brokenEdges": [
+        {
+          "from": "program_pricing",
+          "to": "enrollment_trial",
+          "originalReasonType": "data_dependency",
+          "breakJustification": "enrollment_trial needs Program/Coupon data from program_pricing, but program_pricing only needs an enrollment count aggregate — a weaker read-only dependency that can use stub data or be implemented after enrollment_trial core is built"
+        },
+        {
+          "from": "calendar_scheduling",
+          "to": "enrollment_trial",
+          "originalReasonType": "data_dependency",
+          "breakJustification": "enrollment_trial needs CalendarDate for trial booking, but calendar_scheduling only needs Trial count for spotsRemaining — an aggregate query that can be deferred"
+        },
+        {
+          "from": "lead_management",
+          "to": "enrollment_trial",
+          "originalReasonType": "data_dependency",
+          "breakJustification": "enrollment_trial auto-creates Lead records, but this is a write-side effect that can be implemented as a hook after both modules exist"
+        },
+        {
+          "from": "payment_tracking",
+          "to": "enrollment_trial",
+          "originalReasonType": "data_dependency",
+          "breakJustification": "enrollment_trial auto-creates Payment records (HO-02), a write-side effect implementable as a post-enrollment hook"
+        },
+        {
+          "from": "admin_dashboard",
+          "to": "enrollment_trial",
+          "originalReasonType": "cross_module_navigation",
+          "breakJustification": "Navigation link from dashboard to enrollments — a UI routing concern, not a build-order blocker"
+        }
+      ]
+    },
+    {
+      "cycleId": "cycle-02",
+      "resolvedModule": "admin_dashboard",
+      "resolvedAtLayer": 4,
+      "brokenEdges": [
+        {
+          "from": "lead_management",
+          "to": "admin_dashboard",
+          "originalReasonType": "data_dependency",
+          "breakJustification": "admin_dashboard reads Lead data for widgets — a read-only aggregate that can use stubs until lead_management is built in the next layer"
+        },
+        {
+          "from": "payment_tracking",
+          "to": "admin_dashboard",
+          "originalReasonType": "data_dependency",
+          "breakJustification": "admin_dashboard reads Payment data for pending payments widget — a read-only aggregate that can use stubs until payment_tracking is built in the next layer"
+        }
+      ]
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "ASM-01",
+      "field": "complexityLevel",
+      "value": "unknown (weight=0) for all modules",
+      "reason": "global_flow.json does not contain a summary.modulesByComplexity field. All modules defaulted to 'unknown' with weight 0."
+    },
+    {
+      "id": "ASM-02",
+      "field": "sharedModelCount",
+      "value": "Counted as unique model names appearing in crossModuleEdges per module",
+      "reason": "global_flow.json does not contain a crossModuleEdges.sharedModels[] array. Count derived from models[] arrays within crossModuleEdges entries where the module appears as sourceModule or targetModule."
+    },
+    {
+      "id": "ASM-03",
+      "field": "integrationCount",
+      "value": "Derived from global_integrations.json usedInModules",
+      "reason": "global_flow.json does not contain a crossModuleEdges.externalIntegrations[] field. Integration count sourced from global_integrations.json: only email_service integration exists, used by auth_accounts, lead_management, enrollment_trial, payment_tracking, communication."
+    },
+    {
+      "id": "ASM-04",
+      "field": "webhooks",
+      "value": "0 for all modules",
+      "reason": "global_integrations.json explicitly states webhooks.enabled=false for the email integration. No webhook endpoints found in any module."
+    },
+    {
+      "id": "ASM-05",
+      "field": "scheduledJobs",
+      "value": "Derived from global_services_registry.json registeredJobs",
+      "reason": "global_flow.json modules[] does not contain a scheduledJobs field. Counts sourced from jobQueueService.registeredJobs: auth_accounts=1 (session_cleanup, deferred), payment_tracking=1 (payment_overdue_check), communication=3 (trial_approaching_reminder, class_start_approaching_reminder, email_send_worker)."
+    },
+    {
+      "id": "ASM-06",
+      "field": "communication dependencies",
+      "value": "inDegree=0, outDegree=0",
+      "reason": "communication module is referenced in handoffs HO-03 and HO-04 as a target, but no direct data_dependency or cross_module_navigation edges exist in global_flow.json crossModuleEdges or routeTransitions. It operates as an event-driven service triggered by other modules, not a build-order dependency."
+    },
+    {
+      "id": "ASM-07",
+      "field": "dependencyGraph signals",
+      "value": "crossModuleEdges mapped to data_dependency, routeTransitions mapped to cross_module_navigation",
+      "reason": "global_flow.json uses field names 'crossModuleEdges' (with type: data_dependency) and 'routeTransitions' instead of the expected 'crossModuleEdges.screenTransitions'. Mapping applied: crossModuleEdges → data_dependency signal, routeTransitions → cross_module_navigation signal."
+    }
+  ],
+  "summary": {
+    "totalLayers": 6,
+    "totalCycleBreaks": 2,
+    "brokenEdgeCount": 7,
+    "independentCount": 3,
+    "coreCount": 7,
+    "leafCount": 1,
+    "recommendedParallelGroups": [
+      {
+        "group": 1,
+        "modules": ["settings", "auth_accounts", "communication"],
+        "rationale": "Zero interdependencies — all three can be built in parallel"
+      },
+      {
+        "group": 2,
+        "modules": ["enrollment_trial"],
+        "rationale": "Central hub module; depends on settings (Layer 0); builds the core data models used by most other modules"
+      },
+      {
+        "group": 3,
+        "modules": ["program_pricing"],
+        "rationale": "Depends on settings + enrollment_trial; provides Program/Coupon models to 5 downstream modules"
+      },
+      {
+        "group": 4,
+        "modules": ["calendar_scheduling"],
+        "rationale": "Depends on program_pricing + enrollment_trial; provides CalendarDate management"
+      },
+      {
+        "group": 5,
+        "modules": ["admin_dashboard"],
+        "rationale": "Read-only aggregation dashboard; depends on data from all business modules"
+      },
+      {
+        "group": 6,
+        "modules": ["lead_management", "payment_tracking"],
+        "rationale": "Both resolved simultaneously after admin_dashboard; can be built in parallel"
+      }
+    ]
+  }
+}

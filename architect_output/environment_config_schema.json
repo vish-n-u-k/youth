@@ -1,0 +1,354 @@
+{
+  "schema": {
+    "application": {
+      "NODE_ENV": {
+        "type": "enum",
+        "values": ["development", "staging", "production"],
+        "required": true,
+        "description": "Node.js environment",
+        "default": "development",
+        "sensitive": false,
+        "variesByEnvironment": true,
+        "confidence": "medium",
+        "evidenceRefs": [
+          "Standard Node.js convention — not explicitly referenced in contracts"
+        ]
+      },
+      "PORT": {
+        "type": "number",
+        "required": true,
+        "description": "Server port",
+        "default": 3000,
+        "sensitive": false,
+        "variesByEnvironment": false,
+        "confidence": "medium",
+        "evidenceRefs": [
+          "Standard Node.js convention — no servers array defined in any OpenAPI spec"
+        ]
+      },
+      "APP_URL": {
+        "type": "string",
+        "required": true,
+        "description": "Full backend application URL. Used for constructing absolute URLs in outbound emails (password reset links, trial confirmation links, enrollment confirmation links)",
+        "exampleDev": "http://localhost:3000",
+        "exampleStaging": "https://api.staging.example.com",
+        "exampleProduction": "https://api.example.com",
+        "sensitive": false,
+        "variesByEnvironment": true,
+        "confidence": "medium",
+        "evidenceRefs": [
+          "Inferred from email link generation requirements across 5 modules",
+          "openapi://auth_accounts#/paths/~1api~1auth~1forgot-password (password reset email with link)",
+          "openapi://enrollment_trial#/paths/~1api~1public~1trials POST (confirmationEmailSent with booking details)",
+          "openapi://enrollment_trial#/paths/~1api~1public~1enrollments POST (confirmationEmailSent with enrollment details)"
+        ]
+      }
+    },
+    "database": {
+      "DATABASE_URL": {
+        "type": "string",
+        "required": true,
+        "description": "PostgreSQL connection string for Prisma ORM",
+        "format": "postgresql://user:password@host:port/database?schema=public",
+        "exampleDev": "postgresql://postgres:postgres@localhost:5432/app_dev?schema=public",
+        "exampleStaging": "postgresql://user:pass@staging-db.example.com:5432/app_staging?schema=public",
+        "exampleProduction": "postgresql://user:pass@prod-db.example.com:5432/app_prod?schema=public",
+        "sensitive": true,
+        "variesByEnvironment": true,
+        "confidence": "high",
+        "evidenceRefs": [
+          "prisma_contract://auth_accounts, settings, lead_management, program_pricing, calendar_scheduling, enrollment_trial, payment_tracking, communication, admin_dashboard — all 9 modules define Prisma models requiring a PostgreSQL datasource",
+          "Standard Prisma datasource configuration pattern"
+        ]
+      }
+    },
+    "authentication": {
+      "SESSION_SECRET": {
+        "type": "string",
+        "required": true,
+        "description": "Secret key for signing session cookies. Must be a cryptographically random string",
+        "minLength": 32,
+        "sensitive": true,
+        "variesByEnvironment": true,
+        "confidence": "high",
+        "evidenceRefs": [
+          "global_security_policies://authentication/strategy (session_based)",
+          "global_security_policies://authentication/mechanism (cookieAuth)",
+          "global_security_policies://authentication/sessionConfig (httpOnly: true, secure: true, sameSite: lax, maxAge: 7d)",
+          "openapi://auth_accounts#/components/securitySchemes/cookieAuth (cookie-based session across all 9 modules)"
+        ]
+      }
+    },
+    "integrations": {
+      "EMAIL_PROVIDER": {
+        "type": "enum",
+        "values": ["sendgrid", "ses", "postmark", "resend", "mailgun"],
+        "required": true,
+        "description": "Transactional email service provider. Used to select the correct adapter at runtime. Implement behind an adapter interface so the provider can be swapped later",
+        "default": null,
+        "sensitive": false,
+        "variesByEnvironment": false,
+        "confidence": "high",
+        "evidenceRefs": [
+          "global_integrations://email_service/config/required (EMAIL_PROVIDER)",
+          "global_integrations://email_service/providerCandidates ([SendGrid, AWS SES, Postmark, Resend, Mailgun])",
+          "global_integrations://email_service/implementationGuidance/abstractionLayer (adapter pattern)"
+        ]
+      },
+      "EMAIL_API_KEY": {
+        "type": "string",
+        "required": true,
+        "description": "Provider-specific API key for the email service. For AWS SES, use AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY instead (see notes)",
+        "sensitive": true,
+        "variesByEnvironment": true,
+        "confidence": "high",
+        "notes": "If EMAIL_PROVIDER is 'ses', this variable may be unused. Configure AWS credentials via AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY + AWS_REGION environment variables or IAM role instead.",
+        "evidenceRefs": [
+          "global_integrations://email_service/config/required (EMAIL_API_KEY)",
+          "global_integrations://email_service/config/notes/EMAIL_API_KEY ('For AWS SES, use AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY instead')"
+        ]
+      },
+      "EMAIL_FROM_ADDRESS": {
+        "type": "string",
+        "required": true,
+        "description": "Verified sender email address for all outbound transactional emails. Must be verified with the chosen provider",
+        "format": "email",
+        "exampleDev": "noreply@localhost",
+        "exampleStaging": "noreply@staging.example.com",
+        "exampleProduction": "noreply@example.com",
+        "sensitive": false,
+        "variesByEnvironment": true,
+        "confidence": "high",
+        "evidenceRefs": [
+          "global_integrations://email_service/config/required (EMAIL_FROM_ADDRESS)",
+          "global_integrations://email_service/config/notes/EMAIL_FROM_ADDRESS ('Verified sender email address')"
+        ]
+      },
+      "EMAIL_FROM_NAME": {
+        "type": "string",
+        "required": true,
+        "description": "Display name for the email sender (e.g. the business name). Shown in recipient's inbox as the 'From' name",
+        "exampleDev": "MyApp Dev",
+        "exampleProduction": "My Business Name",
+        "sensitive": false,
+        "variesByEnvironment": true,
+        "confidence": "high",
+        "evidenceRefs": [
+          "global_integrations://email_service/config/required (EMAIL_FROM_NAME)",
+          "global_integrations://email_service/config/notes/EMAIL_FROM_NAME ('Display name for the sender, e.g. the business name from LocationSettings')"
+        ]
+      },
+      "EMAIL_REPLY_TO_ADDRESS": {
+        "type": "string",
+        "required": false,
+        "description": "Reply-to email address for outbound emails. If not set, replies go to EMAIL_FROM_ADDRESS",
+        "format": "email",
+        "sensitive": false,
+        "variesByEnvironment": true,
+        "confidence": "high",
+        "evidenceRefs": [
+          "global_integrations://email_service/config/optional (EMAIL_REPLY_TO_ADDRESS)"
+        ]
+      },
+      "EMAIL_API_ENDPOINT": {
+        "type": "string",
+        "required": false,
+        "description": "Custom API endpoint for the email provider. Only needed if using a non-standard or regional endpoint (e.g. AWS SES regional endpoint)",
+        "format": "url",
+        "sensitive": false,
+        "variesByEnvironment": true,
+        "confidence": "high",
+        "evidenceRefs": [
+          "global_integrations://email_service/config/optional (EMAIL_API_ENDPOINT)"
+        ]
+      },
+      "EMAIL_RATE_LIMIT_PER_SECOND": {
+        "type": "number",
+        "required": false,
+        "description": "Application-level email send rate limit per second. Provider-dependent. Most providers allow 100+ emails/second on paid plans. MVP volume is low",
+        "default": null,
+        "sensitive": false,
+        "variesByEnvironment": false,
+        "confidence": "high",
+        "evidenceRefs": [
+          "global_integrations://email_service/config/optional (EMAIL_RATE_LIMIT_PER_SECOND)",
+          "global_integrations://email_service/rateLimit/note ('MVP volume is low, single-tenant admin app')"
+        ]
+      }
+    },
+    "security": {
+      "FRONTEND_URL": {
+        "type": "string",
+        "required": true,
+        "description": "Frontend application URL. Used as the allowed CORS origin for cross-origin cookie-based authentication. Separate from APP_URL because the frontend SPA and backend API may be on different domains/ports",
+        "exampleDev": "http://localhost:5173",
+        "exampleStaging": "https://staging.example.com",
+        "exampleProduction": "https://app.example.com",
+        "sensitive": false,
+        "variesByEnvironment": true,
+        "confidence": "high",
+        "evidenceRefs": [
+          "global_security_policies://cors/allowedOrigins (['${FRONTEND_URL}'] — explicitly referenced)",
+          "global_security_policies://cors/credentials (true — required for cookie-based auth cross-origin)",
+          "global_security_policies://cors/appliesTo ('all 53 endpoints')"
+        ]
+      }
+    }
+  },
+  "validation": {
+    "requiredInProduction": [
+      "NODE_ENV",
+      "PORT",
+      "APP_URL",
+      "DATABASE_URL",
+      "SESSION_SECRET",
+      "FRONTEND_URL",
+      "EMAIL_PROVIDER",
+      "EMAIL_API_KEY",
+      "EMAIL_FROM_ADDRESS",
+      "EMAIL_FROM_NAME"
+    ],
+    "sensitiveVars": [
+      "DATABASE_URL",
+      "SESSION_SECRET",
+      "EMAIL_API_KEY"
+    ]
+  },
+  "environmentDefaults": {
+    "development": {
+      "NODE_ENV": "development",
+      "PORT": 3000,
+      "APP_URL": "http://localhost:3000",
+      "FRONTEND_URL": "http://localhost:5173",
+      "DATABASE_URL": "postgresql://postgres:postgres@localhost:5432/app_dev?schema=public"
+    },
+    "staging": {
+      "NODE_ENV": "staging",
+      "PORT": 3000,
+      "APP_URL": "https://api.staging.example.com",
+      "FRONTEND_URL": "https://staging.example.com",
+      "DATABASE_URL": "postgresql://user:pass@staging-db.example.com:5432/app_staging?schema=public"
+    },
+    "production": {
+      "NODE_ENV": "production",
+      "PORT": 3000,
+      "APP_URL": "https://api.example.com",
+      "FRONTEND_URL": "https://app.example.com",
+      "DATABASE_URL": "postgresql://user:pass@prod-db.example.com:5432/app_prod?schema=public"
+    }
+  },
+  "exampleEnvFiles": {
+    "development": ".env.example (generated)",
+    "production": ".env.production.example (generated)"
+  },
+  "unknowns": [
+    {
+      "id": "UNKNOWN-01",
+      "description": "Email provider not yet selected",
+      "recommendation": "Choose based on deployment environment. If deploying on AWS, SES is cheapest. For simplicity and good DX, Resend or Postmark. SendGrid is most commonly documented. Implement behind an adapter interface so the provider can be swapped later.",
+      "severity": "medium",
+      "mustResolveBeforeImplementation": true,
+      "confidence": "high",
+      "evidenceRefs": [
+        "global_integrations://unresolvedIntegrations/UNRESOLVED-INT-01"
+      ]
+    },
+    {
+      "id": "UNKNOWN-02",
+      "description": "AWS SES credentials pattern differs from other providers",
+      "recommendation": "If EMAIL_PROVIDER is 'ses', EMAIL_API_KEY is unused. Instead, configure AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_REGION as environment variables, or use IAM roles. The email adapter should handle this provider-specific credential pattern internally.",
+      "severity": "low",
+      "mustResolveBeforeImplementation": false,
+      "confidence": "high",
+      "evidenceRefs": [
+        "global_integrations://email_service/config/notes/EMAIL_API_KEY"
+      ]
+    },
+    {
+      "id": "UNKNOWN-03",
+      "description": "CORS additional origins beyond FRONTEND_URL not defined",
+      "recommendation": "Default to FRONTEND_URL only. If additional origins are needed (e.g. admin on a different subdomain), add a CORS_ORIGINS env var accepting comma-separated URLs. Not needed for MVP single-tenant setup.",
+      "severity": "low",
+      "mustResolveBeforeImplementation": false,
+      "confidence": "low",
+      "evidenceRefs": [
+        "global_security_policies://cors/allowedOrigins",
+        "global_security_policies://cors/confidenceNote (medium confidence — inferred from middleware registry)"
+      ]
+    }
+  ],
+  "notRequired": [
+    {
+      "category": "OAuth",
+      "reason": "No OAuth providers — admin-only app uses email/password auth with server-side sessions",
+      "evidenceRefs": [
+        "global_integrations://nonIntegrations/OAuth ('not_present')",
+        "global_security_policies://authentication/oauth/providers (empty array)"
+      ]
+    },
+    {
+      "category": "Payment Processors",
+      "reason": "All payments are manual/offline via Zelle. Admin manually records payment amounts. Zelle config (recipient name, contact info, instructions) is stored in DB via LocationSettings, not env vars",
+      "evidenceRefs": [
+        "global_integrations://nonIntegrations/PaymentProcessors ('not_present')",
+        "prisma_contract://settings/LocationSettings (zelleRecipientName, zelleContactInfo, zelleInstructions fields)"
+      ]
+    },
+    {
+      "category": "Cloud Storage",
+      "reason": "No file upload endpoints exist in any of the 9 modules",
+      "evidenceRefs": [
+        "global_integrations://nonIntegrations/CloudStorage ('not_present')"
+      ]
+    },
+    {
+      "category": "Monitoring / Analytics",
+      "reason": "No monitoring or analytics integrations referenced in contracts. Implementation-level concern that may be added during development",
+      "evidenceRefs": [
+        "global_integrations://nonIntegrations/Monitoring ('not_in_contracts')"
+      ]
+    },
+    {
+      "category": "JWT / Token Secrets",
+      "reason": "No JWT used. Authentication is session-based with httpOnly cookies. Token field removed from login response",
+      "evidenceRefs": [
+        "global_security_policies://authentication/tokenInResponseBody (false)",
+        "global_security_policies://authentication/tokenNote ('BE uses httpOnly session cookie instead')"
+      ]
+    }
+  ],
+  "metadata": {
+    "totalEnvVars": 14,
+    "requiredVars": 10,
+    "optionalVars": 4,
+    "sensitiveVars": 3,
+    "categories": {
+      "application": 3,
+      "database": 1,
+      "authentication": 1,
+      "integrations": 7,
+      "security": 1
+    },
+    "extractionTimestamp": "2026-03-06T00:00:00Z",
+    "sourceArtifacts": [
+      "architect_output/global_integrations.json",
+      "architect_output/global_security_policies.json",
+      "contract_output/modules/*/prisma_contract.json (9 modules)",
+      "contract_output/modules/*/openapi.json (9 modules)"
+    ],
+    "decisionsApplied": [
+      {
+        "decision": "APP_URL and FRONTEND_URL kept as separate variables",
+        "rationale": "CORS config explicitly references ${FRONTEND_URL} for the frontend SPA origin. APP_URL is the backend URL used for email link construction. These are different hosts/ports in typical deployments (SPA on :5173, API on :3000)."
+      },
+      {
+        "decision": "AWS SES credentials not added as top-level env vars",
+        "rationale": "Kept simple with EMAIL_API_KEY as the primary credential. SES exception documented in EMAIL_API_KEY notes and UNKNOWN-02. Adapter implementation handles provider-specific credential patterns."
+      },
+      {
+        "decision": "No GitHub OAuth/App variables included",
+        "rationale": "Example schema in prompt included GitHub vars, but this project has no OAuth or GitHub integration. Admin-only app with email/password auth confirmed by both global_integrations.json and global_security_policies.json."
+      }
+    ]
+  }
+}

@@ -1,0 +1,826 @@
+{
+  "moduleId": "auth_accounts",
+  "generatedAt": "2026-03-06",
+  "reconcileVersion": "v1.0.0",
+  "nodes": [
+    {
+      "id": "auth_accounts.screen.admin_login",
+      "type": "screen",
+      "route": "/admin/login",
+      "components": ["LoginForm", "ForgotPasswordLink"]
+    },
+    {
+      "id": "auth_accounts.screen.password_reset_request",
+      "type": "screen",
+      "route": "/admin/forgot-password",
+      "components": ["ForgotPasswordForm", "BackToLoginLink"]
+    },
+    {
+      "id": "auth_accounts.screen.set_new_password",
+      "type": "screen",
+      "route": "/admin/reset-password/{token}",
+      "components": ["ResetPasswordForm"]
+    },
+    {
+      "id": "auth_accounts.screen.parent_login_stub",
+      "type": "screen",
+      "route": "/login",
+      "components": ["Phase2StubMessage"]
+    },
+    {
+      "id": "auth_accounts.endpoint.adminLogin",
+      "type": "endpoint",
+      "method": "POST",
+      "path": "/api/auth/login",
+      "auth": {
+        "type": "none",
+        "source": "openapi",
+        "note": "Public endpoint — no auth required"
+      },
+      "permissionMatrix": {
+        "roles": [],
+        "permissions": [],
+        "source": "openapi",
+        "precedence": "openapi"
+      }
+    },
+    {
+      "id": "auth_accounts.endpoint.adminLogout",
+      "type": "endpoint",
+      "method": "POST",
+      "path": "/api/auth/logout",
+      "auth": {
+        "type": "cookieAuth",
+        "source": "openapi",
+        "note": "Requires valid admin session"
+      },
+      "permissionMatrix": {
+        "roles": ["admin"],
+        "permissions": [],
+        "source": "openapi",
+        "precedence": "openapi"
+      }
+    },
+    {
+      "id": "auth_accounts.endpoint.getSession",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "auth": {
+        "type": "cookieAuth",
+        "source": "openapi",
+        "note": "Session validation on app load"
+      },
+      "permissionMatrix": {
+        "roles": ["admin"],
+        "permissions": [],
+        "source": "openapi",
+        "precedence": "openapi"
+      }
+    },
+    {
+      "id": "auth_accounts.endpoint.requestPasswordReset",
+      "type": "endpoint",
+      "method": "POST",
+      "path": "/api/auth/forgot-password",
+      "auth": {
+        "type": "none",
+        "source": "openapi",
+        "note": "Public endpoint"
+      },
+      "permissionMatrix": {
+        "roles": [],
+        "permissions": [],
+        "source": "openapi",
+        "precedence": "openapi"
+      }
+    },
+    {
+      "id": "auth_accounts.endpoint.setNewPassword",
+      "type": "endpoint",
+      "method": "POST",
+      "path": "/api/auth/reset-password",
+      "auth": {
+        "type": "none",
+        "source": "openapi",
+        "note": "Token-based auth (not session-based)"
+      },
+      "permissionMatrix": {
+        "roles": [],
+        "permissions": [],
+        "source": "openapi",
+        "precedence": "openapi"
+      }
+    },
+    {
+      "id": "auth_accounts.mw.adminLogin.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "auth_accounts.mw.adminLogin.rate_limit",
+      "type": "middleware",
+      "middleware": "rate_limit",
+      "order": 2,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "auth_accounts.mw.adminLogin.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 3,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "auth_accounts.mw.adminLogin.audit_log",
+      "type": "middleware",
+      "middleware": "audit_log",
+      "order": 4,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "auth_accounts.mw.adminLogout.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "auth_accounts.mw.adminLogout.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "auth_accounts.mw.adminLogout.audit_log",
+      "type": "middleware",
+      "middleware": "audit_log",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "auth_accounts.mw.getSession.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "auth_accounts.mw.getSession.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "auth_accounts.mw.requestPasswordReset.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "auth_accounts.mw.requestPasswordReset.rate_limit",
+      "type": "middleware",
+      "middleware": "rate_limit",
+      "order": 2,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "auth_accounts.mw.requestPasswordReset.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 3,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "auth_accounts.mw.requestPasswordReset.business_rule_guard",
+      "type": "middleware",
+      "middleware": "business_rule_guard",
+      "order": 4,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "auth_accounts.mw.setNewPassword.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "auth_accounts.mw.setNewPassword.rate_limit",
+      "type": "middleware",
+      "middleware": "rate_limit",
+      "order": 2,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "auth_accounts.mw.setNewPassword.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 3,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "auth_accounts.mw.setNewPassword.business_rule_guard",
+      "type": "middleware",
+      "middleware": "business_rule_guard",
+      "order": 4,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "auth_accounts.mw.setNewPassword.audit_log",
+      "type": "middleware",
+      "middleware": "audit_log",
+      "order": 5,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "auth_accounts.db.adminLogin.Admin.READ",
+      "type": "db_operation",
+      "model": "Admin",
+      "operation": "READ",
+      "description": "Find admin by email for credential verification"
+    },
+    {
+      "id": "auth_accounts.db.adminLogin.Session.CREATE",
+      "type": "db_operation",
+      "model": "Session",
+      "operation": "CREATE",
+      "description": "Create new server-side session record on successful login"
+    },
+    {
+      "id": "auth_accounts.db.adminLogout.Session.DELETE",
+      "type": "db_operation",
+      "model": "Session",
+      "operation": "DELETE",
+      "description": "Delete/invalidate the current session record"
+    },
+    {
+      "id": "auth_accounts.db.getSession.Session.READ",
+      "type": "db_operation",
+      "model": "Session",
+      "operation": "READ",
+      "description": "Validate current session exists and is not expired"
+    },
+    {
+      "id": "auth_accounts.db.getSession.Admin.READ",
+      "type": "db_operation",
+      "model": "Admin",
+      "operation": "READ",
+      "description": "Fetch admin profile data for session response"
+    },
+    {
+      "id": "auth_accounts.db.requestPasswordReset.Admin.READ",
+      "type": "db_operation",
+      "model": "Admin",
+      "operation": "READ",
+      "description": "Check if email exists (result not exposed to client per AA-A-03)"
+    },
+    {
+      "id": "auth_accounts.db.requestPasswordReset.PasswordResetToken.CREATE",
+      "type": "db_operation",
+      "model": "PasswordResetToken",
+      "operation": "CREATE",
+      "description": "Generate and store password reset token (24h expiry per AA-A-02)"
+    },
+    {
+      "id": "auth_accounts.db.setNewPassword.PasswordResetToken.READ",
+      "type": "db_operation",
+      "model": "PasswordResetToken",
+      "operation": "READ",
+      "description": "Validate token exists, not expired, not used"
+    },
+    {
+      "id": "auth_accounts.db.setNewPassword.Admin.UPDATE",
+      "type": "db_operation",
+      "model": "Admin",
+      "operation": "UPDATE",
+      "description": "Update admin passwordHash with new password"
+    },
+    {
+      "id": "auth_accounts.db.setNewPassword.PasswordResetToken.UPDATE",
+      "type": "db_operation",
+      "model": "PasswordResetToken",
+      "operation": "UPDATE",
+      "description": "Mark token as used (single-use enforcement)"
+    },
+    {
+      "id": "auth_accounts.db.setNewPassword.Session.DELETE",
+      "type": "db_operation",
+      "model": "Session",
+      "operation": "DELETE",
+      "description": "Invalidate all existing sessions for the admin (security best practice)"
+    },
+    {
+      "id": "auth_accounts.effect.adminLogin.audit_login_attempt",
+      "type": "side_effect",
+      "effectType": "app_event",
+      "name": "audit_login_attempt",
+      "description": "Audit log records both successful and failed login attempts"
+    },
+    {
+      "id": "auth_accounts.effect.adminLogout.audit_logout",
+      "type": "side_effect",
+      "effectType": "app_event",
+      "name": "audit_logout",
+      "description": "Audit log records logout event"
+    },
+    {
+      "id": "auth_accounts.effect.requestPasswordReset.password_reset_email",
+      "type": "side_effect",
+      "effectType": "email",
+      "name": "password_reset_email",
+      "description": "Sends password reset link via email (only if admin exists)"
+    },
+    {
+      "id": "auth_accounts.effect.setNewPassword.audit_password_reset",
+      "type": "side_effect",
+      "effectType": "app_event",
+      "name": "audit_password_reset",
+      "description": "Audit log records password change event"
+    },
+    {
+      "id": "auth_accounts.unmapped.adminLogout",
+      "type": "unmapped_action",
+      "operationId": "adminLogout",
+      "method": "POST",
+      "path": "/api/auth/logout",
+      "reason": "BE-addition: No FE screen maps to this — triggered from global navbar/header component",
+      "suggestedComponent": "AppHeader/NavBar",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/auth/logout.post"]
+    },
+    {
+      "id": "auth_accounts.unmapped.getSession",
+      "type": "unmapped_action",
+      "operationId": "getSession",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "reason": "BE-addition: Session validation on app load — called from global auth guard/provider",
+      "suggestedComponent": "AuthProvider/RouteGuard",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/auth/me.get"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "auth_accounts.edge.submitLogin.adminLogin",
+      "type": "screen_action_to_endpoint",
+      "from": "auth_accounts.screen.admin_login",
+      "to": "auth_accounts.endpoint.adminLogin",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/auth/login.post", "fe_details://admin_login.endpointProposals[0]"]
+    },
+    {
+      "id": "auth_accounts.edge.submitResetRequest.requestPasswordReset",
+      "type": "screen_action_to_endpoint",
+      "from": "auth_accounts.screen.password_reset_request",
+      "to": "auth_accounts.endpoint.requestPasswordReset",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/auth/forgot-password.post", "fe_details://password_reset_request.endpointProposals[0]"]
+    },
+    {
+      "id": "auth_accounts.edge.submitNewPassword.setNewPassword",
+      "type": "screen_action_to_endpoint",
+      "from": "auth_accounts.screen.set_new_password",
+      "to": "auth_accounts.endpoint.setNewPassword",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/auth/reset-password.post", "fe_details://set_new_password.endpointProposals[0]"]
+    },
+    {
+      "id": "auth_accounts.edge.adminLogin.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "auth_accounts.endpoint.adminLogin",
+      "to": "auth_accounts.mw.adminLogin.request_id"
+    },
+    {
+      "id": "auth_accounts.edge.adminLogin.mw.rate_limit",
+      "type": "endpoint_to_middleware",
+      "from": "auth_accounts.endpoint.adminLogin",
+      "to": "auth_accounts.mw.adminLogin.rate_limit"
+    },
+    {
+      "id": "auth_accounts.edge.adminLogin.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "auth_accounts.endpoint.adminLogin",
+      "to": "auth_accounts.mw.adminLogin.input_validation"
+    },
+    {
+      "id": "auth_accounts.edge.adminLogin.mw.audit_log",
+      "type": "endpoint_to_middleware",
+      "from": "auth_accounts.endpoint.adminLogin",
+      "to": "auth_accounts.mw.adminLogin.audit_log"
+    },
+    {
+      "id": "auth_accounts.edge.adminLogout.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "auth_accounts.endpoint.adminLogout",
+      "to": "auth_accounts.mw.adminLogout.request_id"
+    },
+    {
+      "id": "auth_accounts.edge.adminLogout.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "auth_accounts.endpoint.adminLogout",
+      "to": "auth_accounts.mw.adminLogout.auth_session"
+    },
+    {
+      "id": "auth_accounts.edge.adminLogout.mw.audit_log",
+      "type": "endpoint_to_middleware",
+      "from": "auth_accounts.endpoint.adminLogout",
+      "to": "auth_accounts.mw.adminLogout.audit_log"
+    },
+    {
+      "id": "auth_accounts.edge.getSession.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "auth_accounts.endpoint.getSession",
+      "to": "auth_accounts.mw.getSession.request_id"
+    },
+    {
+      "id": "auth_accounts.edge.getSession.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "auth_accounts.endpoint.getSession",
+      "to": "auth_accounts.mw.getSession.auth_session"
+    },
+    {
+      "id": "auth_accounts.edge.requestPasswordReset.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "auth_accounts.endpoint.requestPasswordReset",
+      "to": "auth_accounts.mw.requestPasswordReset.request_id"
+    },
+    {
+      "id": "auth_accounts.edge.requestPasswordReset.mw.rate_limit",
+      "type": "endpoint_to_middleware",
+      "from": "auth_accounts.endpoint.requestPasswordReset",
+      "to": "auth_accounts.mw.requestPasswordReset.rate_limit"
+    },
+    {
+      "id": "auth_accounts.edge.requestPasswordReset.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "auth_accounts.endpoint.requestPasswordReset",
+      "to": "auth_accounts.mw.requestPasswordReset.input_validation"
+    },
+    {
+      "id": "auth_accounts.edge.requestPasswordReset.mw.business_rule_guard",
+      "type": "endpoint_to_middleware",
+      "from": "auth_accounts.endpoint.requestPasswordReset",
+      "to": "auth_accounts.mw.requestPasswordReset.business_rule_guard"
+    },
+    {
+      "id": "auth_accounts.edge.setNewPassword.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "auth_accounts.endpoint.setNewPassword",
+      "to": "auth_accounts.mw.setNewPassword.request_id"
+    },
+    {
+      "id": "auth_accounts.edge.setNewPassword.mw.rate_limit",
+      "type": "endpoint_to_middleware",
+      "from": "auth_accounts.endpoint.setNewPassword",
+      "to": "auth_accounts.mw.setNewPassword.rate_limit"
+    },
+    {
+      "id": "auth_accounts.edge.setNewPassword.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "auth_accounts.endpoint.setNewPassword",
+      "to": "auth_accounts.mw.setNewPassword.input_validation"
+    },
+    {
+      "id": "auth_accounts.edge.setNewPassword.mw.business_rule_guard",
+      "type": "endpoint_to_middleware",
+      "from": "auth_accounts.endpoint.setNewPassword",
+      "to": "auth_accounts.mw.setNewPassword.business_rule_guard"
+    },
+    {
+      "id": "auth_accounts.edge.setNewPassword.mw.audit_log",
+      "type": "endpoint_to_middleware",
+      "from": "auth_accounts.endpoint.setNewPassword",
+      "to": "auth_accounts.mw.setNewPassword.audit_log"
+    },
+    {
+      "id": "auth_accounts.edge.adminLogin.perm",
+      "type": "endpoint_to_permission",
+      "from": "auth_accounts.endpoint.adminLogin",
+      "permissionMatrix": {
+        "roles": [],
+        "permissions": [],
+        "source": "openapi",
+        "precedence": "openapi"
+      }
+    },
+    {
+      "id": "auth_accounts.edge.adminLogout.perm",
+      "type": "endpoint_to_permission",
+      "from": "auth_accounts.endpoint.adminLogout",
+      "permissionMatrix": {
+        "roles": ["admin"],
+        "permissions": [],
+        "source": "openapi",
+        "precedence": "openapi"
+      }
+    },
+    {
+      "id": "auth_accounts.edge.getSession.perm",
+      "type": "endpoint_to_permission",
+      "from": "auth_accounts.endpoint.getSession",
+      "permissionMatrix": {
+        "roles": ["admin"],
+        "permissions": [],
+        "source": "openapi",
+        "precedence": "openapi"
+      }
+    },
+    {
+      "id": "auth_accounts.edge.requestPasswordReset.perm",
+      "type": "endpoint_to_permission",
+      "from": "auth_accounts.endpoint.requestPasswordReset",
+      "permissionMatrix": {
+        "roles": [],
+        "permissions": [],
+        "source": "openapi",
+        "precedence": "openapi"
+      }
+    },
+    {
+      "id": "auth_accounts.edge.setNewPassword.perm",
+      "type": "endpoint_to_permission",
+      "from": "auth_accounts.endpoint.setNewPassword",
+      "permissionMatrix": {
+        "roles": [],
+        "permissions": [],
+        "source": "openapi",
+        "precedence": "openapi"
+      }
+    },
+    {
+      "id": "auth_accounts.edge.adminLogin.db.Admin.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "auth_accounts.endpoint.adminLogin",
+      "to": "auth_accounts.db.adminLogin.Admin.READ"
+    },
+    {
+      "id": "auth_accounts.edge.adminLogin.db.Session.CREATE",
+      "type": "endpoint_to_db_operation",
+      "from": "auth_accounts.endpoint.adminLogin",
+      "to": "auth_accounts.db.adminLogin.Session.CREATE"
+    },
+    {
+      "id": "auth_accounts.edge.adminLogout.db.Session.DELETE",
+      "type": "endpoint_to_db_operation",
+      "from": "auth_accounts.endpoint.adminLogout",
+      "to": "auth_accounts.db.adminLogout.Session.DELETE"
+    },
+    {
+      "id": "auth_accounts.edge.getSession.db.Session.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "auth_accounts.endpoint.getSession",
+      "to": "auth_accounts.db.getSession.Session.READ"
+    },
+    {
+      "id": "auth_accounts.edge.getSession.db.Admin.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "auth_accounts.endpoint.getSession",
+      "to": "auth_accounts.db.getSession.Admin.READ"
+    },
+    {
+      "id": "auth_accounts.edge.requestPasswordReset.db.Admin.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "auth_accounts.endpoint.requestPasswordReset",
+      "to": "auth_accounts.db.requestPasswordReset.Admin.READ"
+    },
+    {
+      "id": "auth_accounts.edge.requestPasswordReset.db.PasswordResetToken.CREATE",
+      "type": "endpoint_to_db_operation",
+      "from": "auth_accounts.endpoint.requestPasswordReset",
+      "to": "auth_accounts.db.requestPasswordReset.PasswordResetToken.CREATE"
+    },
+    {
+      "id": "auth_accounts.edge.setNewPassword.db.PasswordResetToken.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "auth_accounts.endpoint.setNewPassword",
+      "to": "auth_accounts.db.setNewPassword.PasswordResetToken.READ"
+    },
+    {
+      "id": "auth_accounts.edge.setNewPassword.db.Admin.UPDATE",
+      "type": "endpoint_to_db_operation",
+      "from": "auth_accounts.endpoint.setNewPassword",
+      "to": "auth_accounts.db.setNewPassword.Admin.UPDATE"
+    },
+    {
+      "id": "auth_accounts.edge.setNewPassword.db.PasswordResetToken.UPDATE",
+      "type": "endpoint_to_db_operation",
+      "from": "auth_accounts.endpoint.setNewPassword",
+      "to": "auth_accounts.db.setNewPassword.PasswordResetToken.UPDATE"
+    },
+    {
+      "id": "auth_accounts.edge.setNewPassword.db.Session.DELETE",
+      "type": "endpoint_to_db_operation",
+      "from": "auth_accounts.endpoint.setNewPassword",
+      "to": "auth_accounts.db.setNewPassword.Session.DELETE"
+    },
+    {
+      "id": "auth_accounts.edge.adminLogin.effect.audit_login_attempt",
+      "type": "db_to_side_effect",
+      "from": "auth_accounts.db.adminLogin.Session.CREATE",
+      "to": "auth_accounts.effect.adminLogin.audit_login_attempt"
+    },
+    {
+      "id": "auth_accounts.edge.adminLogout.effect.audit_logout",
+      "type": "db_to_side_effect",
+      "from": "auth_accounts.db.adminLogout.Session.DELETE",
+      "to": "auth_accounts.effect.adminLogout.audit_logout"
+    },
+    {
+      "id": "auth_accounts.edge.requestPasswordReset.effect.password_reset_email",
+      "type": "db_to_side_effect",
+      "from": "auth_accounts.db.requestPasswordReset.PasswordResetToken.CREATE",
+      "to": "auth_accounts.effect.requestPasswordReset.password_reset_email"
+    },
+    {
+      "id": "auth_accounts.edge.setNewPassword.effect.audit_password_reset",
+      "type": "db_to_side_effect",
+      "from": "auth_accounts.db.setNewPassword.Admin.UPDATE",
+      "to": "auth_accounts.effect.setNewPassword.audit_password_reset"
+    }
+  ],
+  "guards": [
+    {
+      "route": "/admin/login",
+      "authRequired": false,
+      "allowedRoles": ["admin"],
+      "redirectIfAuthenticated": "/admin/dashboard",
+      "confidence": "high",
+      "evidenceRefs": ["fe_details://admin_login"]
+    },
+    {
+      "route": "/admin/forgot-password",
+      "authRequired": false,
+      "allowedRoles": ["admin"],
+      "confidence": "high",
+      "evidenceRefs": ["fe_details://password_reset_request"]
+    },
+    {
+      "route": "/admin/reset-password/{token}",
+      "authRequired": false,
+      "allowedRoles": ["admin"],
+      "confidence": "high",
+      "evidenceRefs": ["fe_details://set_new_password"]
+    },
+    {
+      "route": "/login",
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "confidence": "high",
+      "evidenceRefs": ["fe_details://parent_login_stub"]
+    }
+  ],
+  "crossModuleDependencies": [],
+  "issues": {
+    "unresolvedLinks": [],
+    "gaps": [
+      {
+        "id": "AA-GAP-01",
+        "source": "be_policy_flow",
+        "description": "No explicit rate-limit config in OpenAPI for public auth endpoints — values must be decided. Defaults applied: 5 req/15min for login/reset, 3 req/15min for forgot-password.",
+        "severity": "medium"
+      },
+      {
+        "id": "AA-GAP-02",
+        "source": "be_policy_flow",
+        "description": "adminLogout has no x-required-roles — role 'admin' inferred from cookieAuth + rbac section, not explicitly from OpenAPI security extensions.",
+        "severity": "low"
+      },
+      {
+        "id": "AA-DB-U-01",
+        "source": "db_flow",
+        "description": "Session cleanup strategy (expired sessions) — cron job vs lazy deletion on read. Recommend scheduled cleanup job.",
+        "severity": "low",
+        "decision": "deferred_to_implementation"
+      }
+    ],
+    "inferredItems": [
+      {
+        "nodeId": "auth_accounts.mw.adminLogin.request_id",
+        "type": "middleware",
+        "source": "be_policy_flow",
+        "confidence": "high"
+      },
+      {
+        "nodeId": "auth_accounts.mw.adminLogin.rate_limit",
+        "type": "middleware",
+        "source": "be_policy_flow",
+        "confidence": "high"
+      },
+      {
+        "nodeId": "auth_accounts.mw.adminLogin.audit_log",
+        "type": "middleware",
+        "source": "be_policy_flow",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "auth_accounts.mw.adminLogout.request_id",
+        "type": "middleware",
+        "source": "be_policy_flow",
+        "confidence": "high"
+      },
+      {
+        "nodeId": "auth_accounts.mw.adminLogout.audit_log",
+        "type": "middleware",
+        "source": "be_policy_flow",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "auth_accounts.mw.getSession.request_id",
+        "type": "middleware",
+        "source": "be_policy_flow",
+        "confidence": "high"
+      },
+      {
+        "nodeId": "auth_accounts.mw.requestPasswordReset.request_id",
+        "type": "middleware",
+        "source": "be_policy_flow",
+        "confidence": "high"
+      },
+      {
+        "nodeId": "auth_accounts.mw.requestPasswordReset.rate_limit",
+        "type": "middleware",
+        "source": "be_policy_flow",
+        "confidence": "high"
+      },
+      {
+        "nodeId": "auth_accounts.mw.requestPasswordReset.business_rule_guard",
+        "type": "middleware",
+        "source": "be_policy_flow",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "auth_accounts.mw.setNewPassword.request_id",
+        "type": "middleware",
+        "source": "be_policy_flow",
+        "confidence": "high"
+      },
+      {
+        "nodeId": "auth_accounts.mw.setNewPassword.rate_limit",
+        "type": "middleware",
+        "source": "be_policy_flow",
+        "confidence": "high"
+      },
+      {
+        "nodeId": "auth_accounts.mw.setNewPassword.business_rule_guard",
+        "type": "middleware",
+        "source": "be_policy_flow",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "auth_accounts.mw.setNewPassword.audit_log",
+        "type": "middleware",
+        "source": "be_policy_flow",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "auth_accounts.effect.adminLogin.audit_login_attempt",
+        "type": "side_effect",
+        "source": "db_flow",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "auth_accounts.effect.adminLogout.audit_logout",
+        "type": "side_effect",
+        "source": "db_flow",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "auth_accounts.effect.setNewPassword.audit_password_reset",
+        "type": "side_effect",
+        "source": "db_flow",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "auth_accounts.db.setNewPassword.Session.DELETE",
+        "type": "db_operation",
+        "source": "db_flow",
+        "confidence": "medium"
+      }
+    ]
+  }
+}

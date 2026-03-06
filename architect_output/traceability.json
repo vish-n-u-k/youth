@@ -1,0 +1,3085 @@
+{
+  "generatedAt": "2026-03-06",
+  "reconcileVersion": "v1.0.0",
+  "traces": [
+    {
+      "traceId": "auth_accounts.trace.submitLogin",
+      "moduleId": "auth_accounts",
+      "screenId": "auth_accounts.screen.admin_login",
+      "actionId": "submitLogin",
+      "route": "/admin/login",
+      "endpoint": {
+        "operationId": "adminLogin",
+        "method": "POST",
+        "path": "/api/auth/login"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "rate_limit",
+          "inferred": true
+        },
+        {
+          "order": 3,
+          "middleware": "input_validation",
+          "inferred": false
+        },
+        {
+          "order": 4,
+          "middleware": "audit_log",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "none",
+        "roles": [],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Admin",
+          "operation": "READ",
+          "description": "Find admin by email for credential verification"
+        },
+        {
+          "model": "Session",
+          "operation": "CREATE",
+          "description": "Create new server-side session record on successful login"
+        }
+      ],
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_login_attempt",
+          "description": "Audit log records both successful and failed login attempts"
+        }
+      ],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/auth/login.post",
+        "fe_details://admin_login.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "auth_accounts.trace.submitResetRequest",
+      "moduleId": "auth_accounts",
+      "screenId": "auth_accounts.screen.password_reset_request",
+      "actionId": "submitResetRequest",
+      "route": "/admin/forgot-password",
+      "endpoint": {
+        "operationId": "requestPasswordReset",
+        "method": "POST",
+        "path": "/api/auth/forgot-password"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "rate_limit",
+          "inferred": true
+        },
+        {
+          "order": 3,
+          "middleware": "input_validation",
+          "inferred": false
+        },
+        {
+          "order": 4,
+          "middleware": "business_rule_guard",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "none",
+        "roles": [],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Admin",
+          "operation": "READ",
+          "description": "Check if email exists (result not exposed to client per AA-A-03)"
+        },
+        {
+          "model": "PasswordResetToken",
+          "operation": "CREATE",
+          "description": "Generate and store password reset token (24h expiry per AA-A-02)"
+        }
+      ],
+      "sideEffects": [
+        {
+          "type": "email",
+          "name": "password_reset_email",
+          "description": "Sends password reset link via email (only if admin exists)"
+        }
+      ],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/auth/forgot-password.post",
+        "fe_details://password_reset_request.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "auth_accounts.trace.submitNewPassword",
+      "moduleId": "auth_accounts",
+      "screenId": "auth_accounts.screen.set_new_password",
+      "actionId": "submitNewPassword",
+      "route": "/admin/reset-password/{token}",
+      "endpoint": {
+        "operationId": "setNewPassword",
+        "method": "POST",
+        "path": "/api/auth/reset-password"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "rate_limit",
+          "inferred": true
+        },
+        {
+          "order": 3,
+          "middleware": "input_validation",
+          "inferred": false
+        },
+        {
+          "order": 4,
+          "middleware": "business_rule_guard",
+          "inferred": true
+        },
+        {
+          "order": 5,
+          "middleware": "audit_log",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "none",
+        "roles": [],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "PasswordResetToken",
+          "operation": "READ",
+          "description": "Validate token exists, not expired, not used"
+        },
+        {
+          "model": "Admin",
+          "operation": "UPDATE",
+          "description": "Update admin passwordHash with new password"
+        },
+        {
+          "model": "PasswordResetToken",
+          "operation": "UPDATE",
+          "description": "Mark token as used (single-use enforcement)"
+        },
+        {
+          "model": "Session",
+          "operation": "DELETE",
+          "description": "Invalidate all existing sessions for the admin (security best practice)"
+        }
+      ],
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_password_reset",
+          "description": "Audit log records password change event"
+        }
+      ],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/auth/reset-password.post",
+        "fe_details://set_new_password.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "admin_dashboard.trace.loadMetrics",
+      "moduleId": "admin_dashboard",
+      "screenId": "admin_dashboard.screen.dashboard_overview",
+      "actionId": "loadMetrics",
+      "route": "/admin/dashboard",
+      "endpoint": {
+        "operationId": "getDashboardMetrics",
+        "method": "GET",
+        "path": "/api/dashboard/metrics"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Lead",
+          "operation": "READ",
+          "description": "Aggregate lead counts by source and status for metrics cards"
+        },
+        {
+          "model": "Trial",
+          "operation": "READ",
+          "description": "Count trials by status for conversion rate computation"
+        },
+        {
+          "model": "Enrollment",
+          "operation": "READ",
+          "description": "Count enrollments for conversion rate and active enrollment metrics"
+        },
+        {
+          "model": "Payment",
+          "operation": "READ",
+          "description": "Summarize payment statuses and amounts for revenue metrics"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/dashboard/metrics.get",
+        "fe_details://dashboard_overview.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "admin_dashboard.trace.loadRecentLeads",
+      "moduleId": "admin_dashboard",
+      "screenId": "admin_dashboard.screen.dashboard_overview",
+      "actionId": "loadRecentLeads",
+      "route": "/admin/dashboard",
+      "endpoint": {
+        "operationId": "getDashboardRecentLeads",
+        "method": "GET",
+        "path": "/api/dashboard/recent-leads"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Lead",
+          "operation": "READ",
+          "description": "Fetch most recent leads ordered by createdAt DESC, limited count"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/dashboard/recent-leads.get",
+        "fe_details://dashboard_overview.endpointProposals[1]"
+      ]
+    },
+    {
+      "traceId": "admin_dashboard.trace.loadUpcomingTrials",
+      "moduleId": "admin_dashboard",
+      "screenId": "admin_dashboard.screen.dashboard_overview",
+      "actionId": "loadUpcomingTrials",
+      "route": "/admin/dashboard",
+      "endpoint": {
+        "operationId": "getDashboardUpcomingTrials",
+        "method": "GET",
+        "path": "/api/dashboard/upcoming-trials"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Trial",
+          "operation": "READ",
+          "description": "Fetch upcoming trials with status SCHEDULED, date >= now"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/dashboard/upcoming-trials.get",
+        "fe_details://dashboard_overview.endpointProposals[2]"
+      ]
+    },
+    {
+      "traceId": "admin_dashboard.trace.loadPendingPayments",
+      "moduleId": "admin_dashboard",
+      "screenId": "admin_dashboard.screen.dashboard_overview",
+      "actionId": "loadPendingPayments",
+      "route": "/admin/dashboard",
+      "endpoint": {
+        "operationId": "getDashboardPendingPayments",
+        "method": "GET",
+        "path": "/api/dashboard/pending-payments"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Payment",
+          "operation": "READ",
+          "description": "Fetch payments with status PENDING or PARTIAL, joined with enrollment for parent/program info"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/dashboard/pending-payments.get",
+        "fe_details://dashboard_overview.endpointProposals[3]"
+      ]
+    },
+    {
+      "traceId": "settings.trace.loadSettings",
+      "moduleId": "settings",
+      "screenId": "settings.screen.general_settings",
+      "actionId": "loadSettings",
+      "route": "/admin/settings",
+      "endpoint": {
+        "operationId": "getSettings",
+        "method": "GET",
+        "path": "/api/settings"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "LocationSettings",
+          "operation": "READ",
+          "description": "Fetch the single LocationSettings record (single-location MVP per ST-A-01)"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/settings.get",
+        "fe_details://general_settings.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "settings.trace.saveSettings",
+      "moduleId": "settings",
+      "screenId": "settings.screen.general_settings",
+      "actionId": "saveSettings",
+      "route": "/admin/settings",
+      "endpoint": {
+        "operationId": "updateSettings",
+        "method": "PUT",
+        "path": "/api/settings"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        },
+        {
+          "order": 5,
+          "middleware": "business_rule_guard",
+          "inferred": true
+        },
+        {
+          "order": 6,
+          "middleware": "audit_log",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "LocationSettings",
+          "operation": "UPDATE",
+          "description": "Update location settings (business info, Zelle config, notification preferences). ST-A-02: Zelle fields validated — required before any program can be ACTIVE."
+        }
+      ],
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_settings_update",
+          "description": "Audit log records settings change (affects global business behavior)"
+        }
+      ],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/settings.put",
+        "fe_details://general_settings.endpointProposals[1]"
+      ]
+    },
+    {
+      "traceId": "lead_management.trace.loadLeads",
+      "moduleId": "lead_management",
+      "screenId": "lead_management.screen.lead_list",
+      "actionId": "loadLeads",
+      "route": "/admin/leads",
+      "endpoint": {
+        "operationId": "getLeads",
+        "method": "GET",
+        "path": "/api/leads"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Lead",
+          "operation": "READ",
+          "description": "Paginated list of leads with filters (status, source, programId, search) and sorting"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/leads.get",
+        "fe_details://lead_list.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "lead_management.trace.updateLeadStatus",
+      "moduleId": "lead_management",
+      "screenId": "lead_management.screen.lead_list",
+      "actionId": "updateLeadStatus",
+      "route": "/admin/leads",
+      "endpoint": {
+        "operationId": "updateLeadStatus",
+        "method": "PATCH",
+        "path": "/api/leads/{leadId}/status"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        },
+        {
+          "order": 5,
+          "middleware": "business_rule_guard",
+          "inferred": true
+        },
+        {
+          "order": 6,
+          "middleware": "audit_log",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Lead",
+          "operation": "READ",
+          "description": "Read current lead status for transition validation"
+        },
+        {
+          "model": "Lead",
+          "operation": "UPDATE",
+          "description": "Update lead status (with business rule validation for valid transitions per GP-04)"
+        },
+        {
+          "model": "LeadActivity",
+          "operation": "CREATE",
+          "description": "Create STATUS_CHANGE activity record to track the transition"
+        }
+      ],
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_status_change",
+          "description": "Audit log records status transition"
+        }
+      ],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/leads/{leadId}/status.patch",
+        "fe_details://lead_list.endpointProposals[1]"
+      ]
+    },
+    {
+      "traceId": "lead_management.trace.loadLead",
+      "moduleId": "lead_management",
+      "screenId": "lead_management.screen.lead_detail",
+      "actionId": "loadLead",
+      "route": "/admin/leads/{leadId}",
+      "endpoint": {
+        "operationId": "getLead",
+        "method": "GET",
+        "path": "/api/leads/{leadId}"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Lead",
+          "operation": "READ",
+          "description": "Fetch single lead with related program, location info"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/leads/{leadId}.get",
+        "fe_details://lead_detail.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "lead_management.trace.updateLead",
+      "moduleId": "lead_management",
+      "screenId": "lead_management.screen.lead_detail",
+      "actionId": "updateLead",
+      "route": "/admin/leads/{leadId}",
+      "endpoint": {
+        "operationId": "updateLead",
+        "method": "PUT",
+        "path": "/api/leads/{leadId}"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        },
+        {
+          "order": 5,
+          "middleware": "audit_log",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Lead",
+          "operation": "UPDATE",
+          "description": "Update lead details (parentName, email, phone, childName, childAge, source, interestedProgramId)"
+        }
+      ],
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_lead_update",
+          "description": "Audit log records lead data change"
+        }
+      ],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/leads/{leadId}.put",
+        "fe_details://lead_detail.endpointProposals[1]"
+      ]
+    },
+    {
+      "traceId": "lead_management.trace.loadNotes",
+      "moduleId": "lead_management",
+      "screenId": "lead_management.screen.lead_detail",
+      "actionId": "loadNotes",
+      "route": "/admin/leads/{leadId}",
+      "endpoint": {
+        "operationId": "getLeadNotes",
+        "method": "GET",
+        "path": "/api/leads/{leadId}/notes"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "LeadNote",
+          "operation": "READ",
+          "description": "Fetch all notes for a lead, ordered by createdAt DESC"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/leads/{leadId}/notes.get",
+        "fe_details://lead_detail.endpointProposals[2]"
+      ]
+    },
+    {
+      "traceId": "lead_management.trace.addNote",
+      "moduleId": "lead_management",
+      "screenId": "lead_management.screen.lead_detail",
+      "actionId": "addNote",
+      "route": "/admin/leads/{leadId}",
+      "endpoint": {
+        "operationId": "addLeadNote",
+        "method": "POST",
+        "path": "/api/leads/{leadId}/notes"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "LeadNote",
+          "operation": "CREATE",
+          "description": "Create new note for the lead (append-only)"
+        },
+        {
+          "model": "LeadActivity",
+          "operation": "CREATE",
+          "description": "Create NOTE_ADDED activity record"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/leads/{leadId}/notes.post",
+        "fe_details://lead_detail.endpointProposals[3]"
+      ]
+    },
+    {
+      "traceId": "lead_management.trace.loadActivity",
+      "moduleId": "lead_management",
+      "screenId": "lead_management.screen.lead_detail",
+      "actionId": "loadActivity",
+      "route": "/admin/leads/{leadId}",
+      "endpoint": {
+        "operationId": "getLeadActivity",
+        "method": "GET",
+        "path": "/api/leads/{leadId}/activity"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "LeadActivity",
+          "operation": "READ",
+          "description": "Fetch all activity records for a lead, ordered by createdAt DESC"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/leads/{leadId}/activity.get",
+        "fe_details://lead_detail.endpointProposals[4]"
+      ]
+    },
+    {
+      "traceId": "lead_management.trace.sendTrialBookingLink",
+      "moduleId": "lead_management",
+      "screenId": "lead_management.screen.lead_detail",
+      "actionId": "sendTrialBookingLink",
+      "route": "/admin/leads/{leadId}",
+      "endpoint": {
+        "operationId": "sendTrialBookingLink",
+        "method": "POST",
+        "path": "/api/leads/{leadId}/send-trial-link"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        },
+        {
+          "order": 5,
+          "middleware": "audit_log",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Lead",
+          "operation": "READ",
+          "description": "Fetch lead details (email, name) for composing email"
+        },
+        {
+          "model": "LeadActivity",
+          "operation": "CREATE",
+          "description": "Create EMAIL_SENT activity record"
+        }
+      ],
+      "sideEffects": [
+        {
+          "type": "email",
+          "name": "trial_booking_link_email",
+          "description": "Sends trial booking link email to lead (HO-01: lead_management -> enrollment_trial)"
+        }
+      ],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/leads/{leadId}/send-trial-link.post",
+        "fe_details://lead_detail.endpointProposals[5]"
+      ]
+    },
+    {
+      "traceId": "calendar_scheduling.trace.loadCalendarDates",
+      "moduleId": "calendar_scheduling",
+      "screenId": "calendar_scheduling.screen.admin_calendar",
+      "actionId": "loadCalendarDates",
+      "route": "/admin/calendar",
+      "endpoint": {
+        "operationId": "getCalendarDates",
+        "method": "GET",
+        "path": "/api/calendar"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "CalendarDate",
+          "operation": "READ",
+          "description": "Fetch calendar dates filtered by programId, month, year. Includes computed spotsRemaining."
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/calendar.get",
+        "fe_details://admin_calendar.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "calendar_scheduling.trace.addCalendarDate",
+      "moduleId": "calendar_scheduling",
+      "screenId": "calendar_scheduling.screen.admin_calendar",
+      "actionId": "addCalendarDate",
+      "route": "/admin/calendar",
+      "endpoint": {
+        "operationId": "addCalendarDate",
+        "method": "POST",
+        "path": "/api/calendar"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        },
+        {
+          "order": 5,
+          "middleware": "business_rule_guard",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Program",
+          "operation": "READ",
+          "description": "Validate programId exists"
+        },
+        {
+          "model": "CalendarDate",
+          "operation": "CREATE",
+          "description": "Create new calendar date (unique constraint on programId+date enforced at DB level)"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/calendar.post",
+        "fe_details://admin_calendar.endpointProposals[1]"
+      ]
+    },
+    {
+      "traceId": "calendar_scheduling.trace.updateCalendarDate",
+      "moduleId": "calendar_scheduling",
+      "screenId": "calendar_scheduling.screen.admin_calendar",
+      "actionId": "updateCalendarDate",
+      "route": "/admin/calendar",
+      "endpoint": {
+        "operationId": "updateCalendarDate",
+        "method": "PUT",
+        "path": "/api/calendar/{dateId}"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "CalendarDate",
+          "operation": "UPDATE",
+          "description": "Update calendar date fields (date, trialEligible, capacity, notes)"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/calendar/{dateId}.put",
+        "fe_details://admin_calendar.endpointProposals[2]"
+      ]
+    },
+    {
+      "traceId": "calendar_scheduling.trace.deleteCalendarDate",
+      "moduleId": "calendar_scheduling",
+      "screenId": "calendar_scheduling.screen.admin_calendar",
+      "actionId": "deleteCalendarDate",
+      "route": "/admin/calendar",
+      "endpoint": {
+        "operationId": "deleteCalendarDate",
+        "method": "DELETE",
+        "path": "/api/calendar/{dateId}"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "business_rule_guard",
+          "inferred": true
+        },
+        {
+          "order": 5,
+          "middleware": "audit_log",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Trial",
+          "operation": "READ",
+          "description": "Check for existing trial bookings on this date (FK constraint guard)"
+        },
+        {
+          "model": "CalendarDate",
+          "operation": "DELETE",
+          "description": "Hard delete calendar date (only if no active trial bookings)"
+        }
+      ],
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_calendar_date_deleted",
+          "description": "Audit log records calendar date deletion"
+        }
+      ],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/calendar/{dateId}.delete",
+        "fe_details://admin_calendar.endpointProposals[3]"
+      ]
+    },
+    {
+      "traceId": "calendar_scheduling.trace.loadAvailableTrialDates",
+      "moduleId": "calendar_scheduling",
+      "screenId": "calendar_scheduling.screen.parent_calendar",
+      "actionId": "loadAvailableTrialDates",
+      "route": "/programs/{programId}/trial-dates",
+      "endpoint": {
+        "operationId": "getAvailableTrialDates",
+        "method": "GET",
+        "path": "/api/programs/{programId}/trial-dates"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "rate_limit",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "none",
+        "roles": [],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "CalendarDate",
+          "operation": "READ",
+          "description": "Fetch future trial-eligible dates with available spots for public booking form"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/programs/{programId}/trial-dates.get",
+        "fe_details://parent_calendar.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "program_pricing.trace.loadPrograms",
+      "moduleId": "program_pricing",
+      "screenId": "program_pricing.screen.program_list",
+      "actionId": "loadPrograms",
+      "route": "/admin/programs",
+      "endpoint": {
+        "operationId": "getPrograms",
+        "method": "GET",
+        "path": "/api/programs"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Program",
+          "operation": "READ",
+          "description": "Paginated list of programs with status filter, includes computed enrollmentCount"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/programs.get",
+        "fe_details://program_list.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "program_pricing.trace.loadProgram",
+      "moduleId": "program_pricing",
+      "screenId": "program_pricing.screen.program_setup",
+      "actionId": "loadProgram",
+      "route": "/admin/programs/{programId}",
+      "endpoint": {
+        "operationId": "getProgram",
+        "method": "GET",
+        "path": "/api/programs/{programId}"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Program",
+          "operation": "READ",
+          "description": "Fetch single program with computed fields"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/programs/{programId}.get",
+        "fe_details://program_setup.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "program_pricing.trace.createProgram",
+      "moduleId": "program_pricing",
+      "screenId": "program_pricing.screen.program_setup",
+      "actionId": "createProgram",
+      "route": "/admin/programs/{programId}",
+      "endpoint": {
+        "operationId": "createProgram",
+        "method": "POST",
+        "path": "/api/programs"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        },
+        {
+          "order": 5,
+          "middleware": "audit_log",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "LocationSettings",
+          "operation": "READ",
+          "description": "Validate locationId exists"
+        },
+        {
+          "model": "Program",
+          "operation": "CREATE",
+          "description": "Create new program (default status DRAFT)"
+        }
+      ],
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_program_created",
+          "description": "Audit log records program creation"
+        }
+      ],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/programs.post",
+        "fe_details://program_setup.endpointProposals[1]"
+      ]
+    },
+    {
+      "traceId": "program_pricing.trace.updateProgram",
+      "moduleId": "program_pricing",
+      "screenId": "program_pricing.screen.program_setup",
+      "actionId": "updateProgram",
+      "route": "/admin/programs/{programId}",
+      "endpoint": {
+        "operationId": "updateProgram",
+        "method": "PUT",
+        "path": "/api/programs/{programId}"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        },
+        {
+          "order": 5,
+          "middleware": "business_rule_guard",
+          "inferred": true
+        },
+        {
+          "order": 6,
+          "middleware": "audit_log",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Program",
+          "operation": "READ",
+          "description": "Read current program state for transition validation"
+        },
+        {
+          "model": "LocationSettings",
+          "operation": "READ",
+          "description": "If transitioning to ACTIVE, validate Zelle config is complete (zelleRecipientName, zelleContactInfo required)"
+        },
+        {
+          "model": "Enrollment",
+          "operation": "READ",
+          "description": "Check enrollment count vs capacity if capacity is being reduced"
+        },
+        {
+          "model": "Program",
+          "operation": "UPDATE",
+          "description": "Update program fields"
+        }
+      ],
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_program_updated",
+          "description": "Audit log records program update (especially status transitions)"
+        }
+      ],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/programs/{programId}.put",
+        "fe_details://program_setup.endpointProposals[2]"
+      ]
+    },
+    {
+      "traceId": "program_pricing.trace.loadCoupons",
+      "moduleId": "program_pricing",
+      "screenId": "program_pricing.screen.coupon_management",
+      "actionId": "loadCoupons",
+      "route": "/admin/programs/coupons",
+      "endpoint": {
+        "operationId": "getCoupons",
+        "method": "GET",
+        "path": "/api/coupons"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Coupon",
+          "operation": "READ",
+          "description": "List all coupons"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/coupons.get",
+        "fe_details://coupon_management.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "program_pricing.trace.createCoupon",
+      "moduleId": "program_pricing",
+      "screenId": "program_pricing.screen.coupon_management",
+      "actionId": "createCoupon",
+      "route": "/admin/programs/coupons",
+      "endpoint": {
+        "operationId": "createCoupon",
+        "method": "POST",
+        "path": "/api/coupons"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        },
+        {
+          "order": 5,
+          "middleware": "business_rule_guard",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Coupon",
+          "operation": "CREATE",
+          "description": "Create new coupon (code uniqueness enforced at DB level)"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/coupons.post",
+        "fe_details://coupon_management.endpointProposals[1]"
+      ]
+    },
+    {
+      "traceId": "program_pricing.trace.updateCoupon",
+      "moduleId": "program_pricing",
+      "screenId": "program_pricing.screen.coupon_management",
+      "actionId": "updateCoupon",
+      "route": "/admin/programs/coupons",
+      "endpoint": {
+        "operationId": "updateCoupon",
+        "method": "PUT",
+        "path": "/api/coupons/{couponId}"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        },
+        {
+          "order": 5,
+          "middleware": "business_rule_guard",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Coupon",
+          "operation": "UPDATE",
+          "description": "Update coupon fields (code uniqueness re-validated at DB level)"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/coupons/{couponId}.put",
+        "fe_details://coupon_management.endpointProposals[2]"
+      ]
+    },
+    {
+      "traceId": "program_pricing.trace.deleteCoupon",
+      "moduleId": "program_pricing",
+      "screenId": "program_pricing.screen.coupon_management",
+      "actionId": "deleteCoupon",
+      "route": "/admin/programs/coupons",
+      "endpoint": {
+        "operationId": "deleteCoupon",
+        "method": "DELETE",
+        "path": "/api/coupons/{couponId}"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "audit_log",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Coupon",
+          "operation": "DELETE",
+          "description": "Hard delete coupon record"
+        }
+      ],
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_coupon_deleted",
+          "description": "Audit log records coupon deletion"
+        }
+      ],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/coupons/{couponId}.delete",
+        "fe_details://coupon_management.endpointProposals[3]"
+      ]
+    },
+    {
+      "traceId": "payment_tracking.trace.loadPayments",
+      "moduleId": "payment_tracking",
+      "screenId": "payment_tracking.screen.payment_dashboard",
+      "actionId": "loadPayments",
+      "route": "/admin/payments",
+      "endpoint": {
+        "operationId": "getPayments",
+        "method": "GET",
+        "path": "/api/payments"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Payment",
+          "operation": "READ",
+          "description": "Paginated list of payments with filters (status, search), includes computed remainingBalance"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/payments.get",
+        "fe_details://payment_dashboard.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "payment_tracking.trace.loadPayment",
+      "moduleId": "payment_tracking",
+      "screenId": "payment_tracking.screen.payment_detail",
+      "actionId": "loadPayment",
+      "route": "/admin/payments/{paymentId}",
+      "endpoint": {
+        "operationId": "getPayment",
+        "method": "GET",
+        "path": "/api/payments/{paymentId}"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Payment",
+          "operation": "READ",
+          "description": "Fetch single payment with full enrollment and program details"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/payments/{paymentId}.get",
+        "fe_details://payment_detail.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "payment_tracking.trace.updatePayment",
+      "moduleId": "payment_tracking",
+      "screenId": "payment_tracking.screen.payment_detail",
+      "actionId": "updatePayment",
+      "route": "/admin/payments/{paymentId}",
+      "endpoint": {
+        "operationId": "updatePayment",
+        "method": "PUT",
+        "path": "/api/payments/{paymentId}"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        },
+        {
+          "order": 5,
+          "middleware": "business_rule_guard",
+          "inferred": true
+        },
+        {
+          "order": 6,
+          "middleware": "audit_log",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Payment",
+          "operation": "READ",
+          "description": "Read current payment state for validation (amountReceived <= amountDue, valid status transition)"
+        },
+        {
+          "model": "Payment",
+          "operation": "UPDATE",
+          "description": "Update payment status, amountReceived, paymentMethod, notes. Status auto-computed: PAID if amountReceived >= amountDue, PARTIAL if partial, WAIVED if admin sets."
+        }
+      ],
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_payment_update",
+          "description": "Audit log records payment status change (financially sensitive)"
+        }
+      ],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/payments/{paymentId}.put",
+        "fe_details://payment_detail.endpointProposals[1]"
+      ]
+    },
+    {
+      "traceId": "payment_tracking.trace.loadZelleInstructions",
+      "moduleId": "payment_tracking",
+      "screenId": "payment_tracking.screen.zelle_instructions",
+      "actionId": "loadZelleInstructions",
+      "route": "/enrollment/{enrollmentId}/pay",
+      "endpoint": {
+        "operationId": "getZelleInstructions",
+        "method": "GET",
+        "path": "/api/public/enrollments/{enrollmentId}/payment-instructions"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "rate_limit",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "none",
+        "roles": [],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Enrollment",
+          "operation": "READ",
+          "description": "Fetch enrollment to get programId for location lookup"
+        },
+        {
+          "model": "Program",
+          "operation": "READ",
+          "description": "Fetch program to get locationId"
+        },
+        {
+          "model": "LocationSettings",
+          "operation": "READ",
+          "description": "Fetch Zelle payment config (zelleRecipientName, zelleContactInfo, zelleInstructions)"
+        },
+        {
+          "model": "Payment",
+          "operation": "READ",
+          "description": "Fetch payment record for amount due display"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/public/enrollments/{enrollmentId}/payment-instructions.get",
+        "fe_details://zelle_instructions.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "enrollment_trial.trace.loadEnrollments",
+      "moduleId": "enrollment_trial",
+      "screenId": "enrollment_trial.screen.admin_enrollment_list",
+      "actionId": "loadEnrollments",
+      "route": "/admin/enrollments",
+      "endpoint": {
+        "operationId": "getEnrollments",
+        "method": "GET",
+        "path": "/api/enrollments"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Enrollment",
+          "operation": "READ",
+          "description": "Paginated list of enrollments with filters (status, programId, paymentStatus, search)"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/enrollments.get",
+        "fe_details://admin_enrollment_list.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "enrollment_trial.trace.loadEnrollment",
+      "moduleId": "enrollment_trial",
+      "screenId": "enrollment_trial.screen.admin_enrollment_detail",
+      "actionId": "loadEnrollment",
+      "route": "/admin/enrollments/{enrollmentId}",
+      "endpoint": {
+        "operationId": "getEnrollment",
+        "method": "GET",
+        "path": "/api/enrollments/{enrollmentId}"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Enrollment",
+          "operation": "READ",
+          "description": "Fetch single enrollment with full relations"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/enrollments/{enrollmentId}.get",
+        "fe_details://admin_enrollment_detail.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "enrollment_trial.trace.updateEnrollmentStatus",
+      "moduleId": "enrollment_trial",
+      "screenId": "enrollment_trial.screen.admin_enrollment_detail",
+      "actionId": "updateEnrollmentStatus",
+      "route": "/admin/enrollments/{enrollmentId}",
+      "endpoint": {
+        "operationId": "updateEnrollmentStatus",
+        "method": "PATCH",
+        "path": "/api/enrollments/{enrollmentId}/status"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        },
+        {
+          "order": 5,
+          "middleware": "business_rule_guard",
+          "inferred": true
+        },
+        {
+          "order": 6,
+          "middleware": "audit_log",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Enrollment",
+          "operation": "READ",
+          "description": "Read current enrollment status for transition validation"
+        },
+        {
+          "model": "Enrollment",
+          "operation": "UPDATE",
+          "description": "Update enrollment status (ACTIVE->CANCELLED requires cancellationReason; ACTIVE->COMPLETED)"
+        }
+      ],
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_enrollment_status_change",
+          "description": "Audit log records enrollment status transition"
+        }
+      ],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/enrollments/{enrollmentId}/status.patch",
+        "fe_details://admin_enrollment_detail.endpointProposals[1]"
+      ]
+    },
+    {
+      "traceId": "enrollment_trial.trace.loadPublicPrograms",
+      "moduleId": "enrollment_trial",
+      "screenId": "enrollment_trial.screen.program_discovery",
+      "actionId": "loadPublicPrograms",
+      "route": "/programs",
+      "endpoint": {
+        "operationId": "getPublicPrograms",
+        "method": "GET",
+        "path": "/api/public/programs"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "rate_limit",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "none",
+        "roles": [],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Program",
+          "operation": "READ",
+          "description": "Fetch all ACTIVE programs for public listing (GP-06: only ACTIVE status)"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/public/programs.get",
+        "fe_details://program_discovery.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "enrollment_trial.trace.loadPublicProgram",
+      "moduleId": "enrollment_trial",
+      "screenId": "enrollment_trial.screen.trial_booking_form",
+      "actionId": "loadPublicProgram",
+      "route": "/programs/{programId}/book-trial",
+      "endpoint": {
+        "operationId": "getPublicProgram",
+        "method": "GET",
+        "path": "/api/public/programs/{programId}"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "rate_limit",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "none",
+        "roles": [],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Program",
+          "operation": "READ",
+          "description": "Fetch single program detail for public view (must be ACTIVE)"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/public/programs/{programId}.get",
+        "fe_details://trial_booking_form.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "enrollment_trial.trace.submitTrialBooking",
+      "moduleId": "enrollment_trial",
+      "screenId": "enrollment_trial.screen.trial_booking_form",
+      "actionId": "submitTrialBooking",
+      "route": "/programs/{programId}/book-trial",
+      "endpoint": {
+        "operationId": "bookTrial",
+        "method": "POST",
+        "path": "/api/public/trials"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "rate_limit",
+          "inferred": true
+        },
+        {
+          "order": 3,
+          "middleware": "input_validation",
+          "inferred": false
+        },
+        {
+          "order": 4,
+          "middleware": "business_rule_guard",
+          "inferred": true
+        },
+        {
+          "order": 5,
+          "middleware": "audit_log",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "none",
+        "roles": [],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "CalendarDate",
+          "operation": "READ",
+          "description": "Validate trialDateId exists, is trialEligible, has capacity (spots remaining check)"
+        },
+        {
+          "model": "Program",
+          "operation": "READ",
+          "description": "Validate program is ACTIVE and exists"
+        },
+        {
+          "model": "Trial",
+          "operation": "READ",
+          "description": "Check for duplicate trial booking (GP-01: one per child per program)"
+        },
+        {
+          "model": "Lead",
+          "operation": "READ",
+          "description": "Check if lead exists by parentEmail (GP-02: auto-create/link)"
+        },
+        {
+          "model": "Lead",
+          "operation": "CREATE",
+          "description": "Auto-create lead if not exists (GP-02), with status TRIAL_SCHEDULED"
+        },
+        {
+          "model": "Lead",
+          "operation": "UPDATE",
+          "description": "Auto-advance existing lead status to TRIAL_SCHEDULED if applicable (GP-04)"
+        },
+        {
+          "model": "Trial",
+          "operation": "CREATE",
+          "description": "Create trial booking record"
+        },
+        {
+          "model": "LeadActivity",
+          "operation": "CREATE",
+          "description": "Create activity records (LEAD_CREATED if new lead, STATUS_CHANGE for auto-advance)"
+        }
+      ],
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "lead_created_notification",
+          "description": "If new lead created, triggers LEAD_CREATED automation (if enabled)"
+        },
+        {
+          "type": "email",
+          "name": "trial_booked_email",
+          "description": "Fires trial confirmation email to parent (HO-03: enrollment_trial -> communication)"
+        }
+      ],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/public/trials.post",
+        "fe_details://trial_booking_form.endpointProposals[1]"
+      ]
+    },
+    {
+      "traceId": "enrollment_trial.trace.getPriceBreakdown",
+      "moduleId": "enrollment_trial",
+      "screenId": "enrollment_trial.screen.enrollment_form",
+      "actionId": "getPriceBreakdown",
+      "route": "/programs/{programId}/enroll",
+      "endpoint": {
+        "operationId": "getPriceBreakdown",
+        "method": "POST",
+        "path": "/api/public/programs/{programId}/price"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "rate_limit",
+          "inferred": true
+        },
+        {
+          "order": 3,
+          "middleware": "input_validation",
+          "inferred": false
+        }
+      ],
+      "permissionCheck": {
+        "authType": "none",
+        "roles": [],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Program",
+          "operation": "READ",
+          "description": "Fetch program pricing fields (baseFee, feeType, registrationFee, registrationFeeRequired, totalSessions)"
+        },
+        {
+          "model": "Coupon",
+          "operation": "READ",
+          "description": "Validate coupon code if provided (exists, not expired, usage not exceeded)"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/public/programs/{programId}/price.post",
+        "fe_details://enrollment_form.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "enrollment_trial.trace.submitEnrollment",
+      "moduleId": "enrollment_trial",
+      "screenId": "enrollment_trial.screen.enrollment_form",
+      "actionId": "submitEnrollment",
+      "route": "/programs/{programId}/enroll",
+      "endpoint": {
+        "operationId": "submitEnrollment",
+        "method": "POST",
+        "path": "/api/public/enrollments"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "rate_limit",
+          "inferred": true
+        },
+        {
+          "order": 3,
+          "middleware": "input_validation",
+          "inferred": false
+        },
+        {
+          "order": 4,
+          "middleware": "business_rule_guard",
+          "inferred": true
+        },
+        {
+          "order": 5,
+          "middleware": "audit_log",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "none",
+        "roles": [],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Program",
+          "operation": "READ",
+          "description": "Validate program is ACTIVE, has capacity, fetch pricing"
+        },
+        {
+          "model": "Enrollment",
+          "operation": "READ",
+          "description": "Check for duplicate enrollment (GP-01: one per child per program)"
+        },
+        {
+          "model": "Coupon",
+          "operation": "READ",
+          "description": "Validate coupon if provided (exists, not expired, within usage limit)"
+        },
+        {
+          "model": "Coupon",
+          "operation": "UPDATE",
+          "description": "Increment usageCount on coupon redemption"
+        },
+        {
+          "model": "Lead",
+          "operation": "READ",
+          "description": "Check if lead exists by parentEmail (GP-02)"
+        },
+        {
+          "model": "Lead",
+          "operation": "CREATE",
+          "description": "Auto-create lead if not exists (GP-02), with status ENROLLED"
+        },
+        {
+          "model": "Lead",
+          "operation": "UPDATE",
+          "description": "Auto-advance existing lead status to ENROLLED (GP-04)"
+        },
+        {
+          "model": "Enrollment",
+          "operation": "CREATE",
+          "description": "Create enrollment record with price breakdown snapshot"
+        },
+        {
+          "model": "Payment",
+          "operation": "CREATE",
+          "description": "Auto-create Payment record for the enrollment (HO-02: enrollment_trial -> payment_tracking)"
+        },
+        {
+          "model": "LeadActivity",
+          "operation": "CREATE",
+          "description": "Create activity records (ENROLLMENT_EVENT, STATUS_CHANGE, optionally LEAD_CREATED)"
+        }
+      ],
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "lead_created_notification",
+          "description": "If new lead created, triggers LEAD_CREATED automation"
+        },
+        {
+          "type": "email",
+          "name": "enrollment_confirmation_email",
+          "description": "Fires enrollment confirmation email to parent (HO-03)"
+        }
+      ],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/public/enrollments.post",
+        "fe_details://enrollment_form.endpointProposals[1]"
+      ]
+    },
+    {
+      "traceId": "enrollment_trial.trace.loadConfirmation",
+      "moduleId": "enrollment_trial",
+      "screenId": "enrollment_trial.screen.enrollment_confirmation",
+      "actionId": "loadConfirmation",
+      "route": "/enrollment/{enrollmentId}/confirmation",
+      "endpoint": {
+        "operationId": "getEnrollmentConfirmation",
+        "method": "GET",
+        "path": "/api/public/enrollments/{enrollmentId}/confirmation"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "rate_limit",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "none",
+        "roles": [],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Enrollment",
+          "operation": "READ",
+          "description": "Fetch enrollment details for confirmation page"
+        },
+        {
+          "model": "LocationSettings",
+          "operation": "READ",
+          "description": "Fetch location/Zelle info for payment instructions reference"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/public/enrollments/{enrollmentId}/confirmation.get",
+        "fe_details://enrollment_confirmation.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "communication.trace.loadTemplates",
+      "moduleId": "communication",
+      "screenId": "communication.screen.template_manager",
+      "actionId": "loadTemplates",
+      "route": "/admin/communications/templates",
+      "endpoint": {
+        "operationId": "getTemplates",
+        "method": "GET",
+        "path": "/api/communications/templates"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Template",
+          "operation": "READ",
+          "description": "List all email templates"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/communications/templates.get",
+        "fe_details://template_manager.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "communication.trace.loadTemplate",
+      "moduleId": "communication",
+      "screenId": "communication.screen.template_manager",
+      "actionId": "loadTemplate",
+      "route": "/admin/communications/templates",
+      "endpoint": {
+        "operationId": "getTemplate",
+        "method": "GET",
+        "path": "/api/communications/templates/{templateId}"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Template",
+          "operation": "READ",
+          "description": "Fetch single template with body content"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/communications/templates/{templateId}.get",
+        "fe_details://template_manager.endpointProposals[1]"
+      ]
+    },
+    {
+      "traceId": "communication.trace.createTemplate",
+      "moduleId": "communication",
+      "screenId": "communication.screen.template_manager",
+      "actionId": "createTemplate",
+      "route": "/admin/communications/templates",
+      "endpoint": {
+        "operationId": "createTemplate",
+        "method": "POST",
+        "path": "/api/communications/templates"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        },
+        {
+          "order": 5,
+          "middleware": "business_rule_guard",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Template",
+          "operation": "CREATE",
+          "description": "Create new custom email template (GP-03: validate template variables like {{parentName}}, {{programName}})"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/communications/templates.post",
+        "fe_details://template_manager.endpointProposals[2]"
+      ]
+    },
+    {
+      "traceId": "communication.trace.updateTemplate",
+      "moduleId": "communication",
+      "screenId": "communication.screen.template_manager",
+      "actionId": "updateTemplate",
+      "route": "/admin/communications/templates",
+      "endpoint": {
+        "operationId": "updateTemplate",
+        "method": "PUT",
+        "path": "/api/communications/templates/{templateId}"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        },
+        {
+          "order": 5,
+          "middleware": "business_rule_guard",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Template",
+          "operation": "READ",
+          "description": "Read existing template (verify it exists; default templates are editable but not deletable)"
+        },
+        {
+          "model": "Template",
+          "operation": "UPDATE",
+          "description": "Update template fields (GP-03: validate template variables). Default templates can be edited."
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/communications/templates/{templateId}.put",
+        "fe_details://template_manager.endpointProposals[3]"
+      ]
+    },
+    {
+      "traceId": "communication.trace.loadAutomations",
+      "moduleId": "communication",
+      "screenId": "communication.screen.automation_rules",
+      "actionId": "loadAutomations",
+      "route": "/admin/communications/automations",
+      "endpoint": {
+        "operationId": "getAutomations",
+        "method": "GET",
+        "path": "/api/communications/automations"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Automation",
+          "operation": "READ",
+          "description": "List all 6 pre-seeded automation rules with linked template info"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/communications/automations.get",
+        "fe_details://automation_rules.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "communication.trace.updateAutomation",
+      "moduleId": "communication",
+      "screenId": "communication.screen.automation_rules",
+      "actionId": "updateAutomation",
+      "route": "/admin/communications/automations",
+      "endpoint": {
+        "operationId": "updateAutomation",
+        "method": "PUT",
+        "path": "/api/communications/automations/{automationId}"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        },
+        {
+          "order": 5,
+          "middleware": "audit_log",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "Template",
+          "operation": "READ",
+          "description": "Validate templateId exists"
+        },
+        {
+          "model": "Automation",
+          "operation": "UPDATE",
+          "description": "Update automation config (templateId, delayMinutes, enabled toggle). No CREATE/DELETE — only 6 pre-seeded."
+        }
+      ],
+      "sideEffects": [
+        {
+          "type": "app_event",
+          "name": "audit_automation_toggle",
+          "description": "Audit log records automation enable/disable (affects email delivery behavior)"
+        }
+      ],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/communications/automations/{automationId}.put",
+        "fe_details://automation_rules.endpointProposals[1]"
+      ]
+    },
+    {
+      "traceId": "communication.trace.loadLog",
+      "moduleId": "communication",
+      "screenId": "communication.screen.communications_log",
+      "actionId": "loadLog",
+      "route": "/admin/communications/log",
+      "endpoint": {
+        "operationId": "getCommunicationsLog",
+        "method": "GET",
+        "path": "/api/communications/log"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "input_validation",
+          "inferred": false
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "CommunicationLog",
+          "operation": "READ",
+          "description": "Paginated list of communication log entries with filters (deliveryStatus, triggerEvent, search)"
+        }
+      ],
+      "sideEffects": [],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/communications/log.get",
+        "fe_details://communications_log.endpointProposals[0]"
+      ]
+    },
+    {
+      "traceId": "communication.trace.retryEmail",
+      "moduleId": "communication",
+      "screenId": "communication.screen.communications_log",
+      "actionId": "retryEmail",
+      "route": "/admin/communications/log",
+      "endpoint": {
+        "operationId": "retryEmail",
+        "method": "POST",
+        "path": "/api/communications/log/{logId}/retry"
+      },
+      "middlewareChain": [
+        {
+          "order": 1,
+          "middleware": "request_id",
+          "inferred": true
+        },
+        {
+          "order": 2,
+          "middleware": "auth_session",
+          "inferred": false
+        },
+        {
+          "order": 3,
+          "middleware": "role_permission_check",
+          "inferred": true
+        },
+        {
+          "order": 4,
+          "middleware": "business_rule_guard",
+          "inferred": true
+        },
+        {
+          "order": 5,
+          "middleware": "audit_log",
+          "inferred": true
+        }
+      ],
+      "permissionCheck": {
+        "authType": "cookieAuth",
+        "roles": [
+          "admin"
+        ],
+        "permissions": []
+      },
+      "dbOperations": [
+        {
+          "model": "CommunicationLog",
+          "operation": "READ",
+          "description": "Fetch log entry to validate status is FAILED (only FAILED emails can be retried)"
+        },
+        {
+          "model": "CommunicationLog",
+          "operation": "UPDATE",
+          "description": "Update delivery status to PENDING (will be re-sent by email worker), clear failureReason"
+        }
+      ],
+      "sideEffects": [
+        {
+          "type": "email",
+          "name": "retry_email_send",
+          "description": "Re-queues the email for sending via email worker/service"
+        }
+      ],
+      "confidence": "high",
+      "evidenceRefs": [
+        "openapi:///api/communications/log/{logId}/retry.post",
+        "fe_details://communications_log.endpointProposals[1]"
+      ]
+    }
+  ],
+  "unmappedEndpoints": [
+    {
+      "moduleId": "auth_accounts",
+      "operationId": "adminLogout",
+      "method": "POST",
+      "path": "/api/auth/logout",
+      "reason": "BE-addition: No FE screen maps to this — triggered from global navbar/header component",
+      "suggestedComponent": "AppHeader/NavBar"
+    },
+    {
+      "moduleId": "auth_accounts",
+      "operationId": "getSession",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "reason": "BE-addition: Session validation on app load — called from global auth guard/provider",
+      "suggestedComponent": "AuthProvider/RouteGuard"
+    }
+  ],
+  "coverageStats": {
+    "totalTraces": 51,
+    "totalEndpoints": 53,
+    "mappedEndpoints": 51,
+    "unmappedEndpoints": 2,
+    "coveragePercent": 96.23
+  }
+}

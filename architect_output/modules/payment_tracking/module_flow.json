@@ -1,0 +1,591 @@
+{
+  "moduleId": "payment_tracking",
+  "generatedAt": "2026-03-06",
+  "reconcileVersion": "v1.0.0",
+  "nodes": [
+    {
+      "id": "payment_tracking.screen.payment_dashboard",
+      "type": "screen",
+      "route": "/admin/payments",
+      "components": ["PaymentFilters", "PaymentTable", "Pagination"]
+    },
+    {
+      "id": "payment_tracking.screen.payment_detail",
+      "type": "screen",
+      "route": "/admin/payments/{paymentId}",
+      "components": ["PaymentInfoPanel", "PaymentUpdateForm"]
+    },
+    {
+      "id": "payment_tracking.screen.zelle_instructions",
+      "type": "screen",
+      "route": "/enrollment/{enrollmentId}/pay",
+      "components": ["ZelleInstructionsCard", "PaymentAmountSummary"]
+    },
+    {
+      "id": "payment_tracking.endpoint.getPayments",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/payments",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "payment_tracking.endpoint.getPayment",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/payments/{paymentId}",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "payment_tracking.endpoint.updatePayment",
+      "type": "endpoint",
+      "method": "PUT",
+      "path": "/api/payments/{paymentId}",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "payment_tracking.endpoint.getZelleInstructions",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/public/enrollments/{enrollmentId}/payment-instructions",
+      "auth": { "type": "none", "source": "openapi", "note": "Public endpoint — accessed via enrollment confirmation flow" },
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" }
+    },
+    {
+      "id": "payment_tracking.mw.getPayments.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "payment_tracking.mw.getPayments.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "payment_tracking.mw.getPayments.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "payment_tracking.mw.getPayments.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "payment_tracking.mw.getPayment.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "payment_tracking.mw.getPayment.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "payment_tracking.mw.getPayment.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "payment_tracking.mw.updatePayment.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "payment_tracking.mw.updatePayment.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "payment_tracking.mw.updatePayment.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "payment_tracking.mw.updatePayment.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "payment_tracking.mw.updatePayment.business_rule_guard",
+      "type": "middleware",
+      "middleware": "business_rule_guard",
+      "order": 5,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "payment_tracking.mw.updatePayment.audit_log",
+      "type": "middleware",
+      "middleware": "audit_log",
+      "order": 6,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "payment_tracking.mw.getZelleInstructions.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "payment_tracking.mw.getZelleInstructions.rate_limit",
+      "type": "middleware",
+      "middleware": "rate_limit",
+      "order": 2,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "payment_tracking.db.getPayments.Payment.READ",
+      "type": "db_operation",
+      "model": "Payment",
+      "operation": "READ",
+      "description": "Paginated list of payments with filters (status, search), includes computed remainingBalance"
+    },
+    {
+      "id": "payment_tracking.db.getPayment.Payment.READ",
+      "type": "db_operation",
+      "model": "Payment",
+      "operation": "READ",
+      "description": "Fetch single payment with full enrollment and program details"
+    },
+    {
+      "id": "payment_tracking.db.updatePayment.Payment.READ",
+      "type": "db_operation",
+      "model": "Payment",
+      "operation": "READ",
+      "description": "Read current payment state for validation (amountReceived <= amountDue, valid status transition)"
+    },
+    {
+      "id": "payment_tracking.db.updatePayment.Payment.UPDATE",
+      "type": "db_operation",
+      "model": "Payment",
+      "operation": "UPDATE",
+      "description": "Update payment status, amountReceived, paymentMethod, notes. Status auto-computed: PAID if amountReceived >= amountDue, PARTIAL if partial, WAIVED if admin sets."
+    },
+    {
+      "id": "payment_tracking.db.getZelleInstructions.Enrollment.READ",
+      "type": "db_operation",
+      "model": "Enrollment",
+      "operation": "READ",
+      "description": "Fetch enrollment to get programId for location lookup"
+    },
+    {
+      "id": "payment_tracking.db.getZelleInstructions.Program.READ",
+      "type": "db_operation",
+      "model": "Program",
+      "operation": "READ",
+      "description": "Fetch program to get locationId"
+    },
+    {
+      "id": "payment_tracking.db.getZelleInstructions.LocationSettings.READ",
+      "type": "db_operation",
+      "model": "LocationSettings",
+      "operation": "READ",
+      "description": "Fetch Zelle payment config (zelleRecipientName, zelleContactInfo, zelleInstructions)"
+    },
+    {
+      "id": "payment_tracking.db.getZelleInstructions.Payment.READ",
+      "type": "db_operation",
+      "model": "Payment",
+      "operation": "READ",
+      "description": "Fetch payment record for amount due display"
+    },
+    {
+      "id": "payment_tracking.effect.updatePayment.audit_payment_update",
+      "type": "side_effect",
+      "effectType": "app_event",
+      "name": "audit_payment_update",
+      "description": "Audit log records payment status change (financially sensitive)"
+    }
+  ],
+  "edges": [
+    {
+      "id": "payment_tracking.edge.loadPayments.getPayments",
+      "type": "screen_action_to_endpoint",
+      "from": "payment_tracking.screen.payment_dashboard",
+      "to": "payment_tracking.endpoint.getPayments",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/payments.get", "fe_details://payment_dashboard.endpointProposals[0]"]
+    },
+    {
+      "id": "payment_tracking.edge.loadPayment.getPayment",
+      "type": "screen_action_to_endpoint",
+      "from": "payment_tracking.screen.payment_detail",
+      "to": "payment_tracking.endpoint.getPayment",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/payments/{paymentId}.get", "fe_details://payment_detail.endpointProposals[0]"]
+    },
+    {
+      "id": "payment_tracking.edge.updatePayment.updatePayment",
+      "type": "screen_action_to_endpoint",
+      "from": "payment_tracking.screen.payment_detail",
+      "to": "payment_tracking.endpoint.updatePayment",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/payments/{paymentId}.put", "fe_details://payment_detail.endpointProposals[1]"]
+    },
+    {
+      "id": "payment_tracking.edge.loadZelleInstructions.getZelleInstructions",
+      "type": "screen_action_to_endpoint",
+      "from": "payment_tracking.screen.zelle_instructions",
+      "to": "payment_tracking.endpoint.getZelleInstructions",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/public/enrollments/{enrollmentId}/payment-instructions.get", "fe_details://zelle_instructions.endpointProposals[0]"]
+    },
+    {
+      "id": "payment_tracking.edge.getPayments.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "payment_tracking.endpoint.getPayments",
+      "to": "payment_tracking.mw.getPayments.request_id"
+    },
+    {
+      "id": "payment_tracking.edge.getPayments.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "payment_tracking.endpoint.getPayments",
+      "to": "payment_tracking.mw.getPayments.auth_session"
+    },
+    {
+      "id": "payment_tracking.edge.getPayments.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "payment_tracking.endpoint.getPayments",
+      "to": "payment_tracking.mw.getPayments.role_permission_check"
+    },
+    {
+      "id": "payment_tracking.edge.getPayments.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "payment_tracking.endpoint.getPayments",
+      "to": "payment_tracking.mw.getPayments.input_validation"
+    },
+    {
+      "id": "payment_tracking.edge.getPayments.perm",
+      "type": "endpoint_to_permission",
+      "from": "payment_tracking.endpoint.getPayments",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "payment_tracking.edge.getPayment.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "payment_tracking.endpoint.getPayment",
+      "to": "payment_tracking.mw.getPayment.request_id"
+    },
+    {
+      "id": "payment_tracking.edge.getPayment.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "payment_tracking.endpoint.getPayment",
+      "to": "payment_tracking.mw.getPayment.auth_session"
+    },
+    {
+      "id": "payment_tracking.edge.getPayment.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "payment_tracking.endpoint.getPayment",
+      "to": "payment_tracking.mw.getPayment.role_permission_check"
+    },
+    {
+      "id": "payment_tracking.edge.getPayment.perm",
+      "type": "endpoint_to_permission",
+      "from": "payment_tracking.endpoint.getPayment",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "payment_tracking.edge.updatePayment.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "payment_tracking.endpoint.updatePayment",
+      "to": "payment_tracking.mw.updatePayment.request_id"
+    },
+    {
+      "id": "payment_tracking.edge.updatePayment.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "payment_tracking.endpoint.updatePayment",
+      "to": "payment_tracking.mw.updatePayment.auth_session"
+    },
+    {
+      "id": "payment_tracking.edge.updatePayment.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "payment_tracking.endpoint.updatePayment",
+      "to": "payment_tracking.mw.updatePayment.role_permission_check"
+    },
+    {
+      "id": "payment_tracking.edge.updatePayment.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "payment_tracking.endpoint.updatePayment",
+      "to": "payment_tracking.mw.updatePayment.input_validation"
+    },
+    {
+      "id": "payment_tracking.edge.updatePayment.mw.business_rule_guard",
+      "type": "endpoint_to_middleware",
+      "from": "payment_tracking.endpoint.updatePayment",
+      "to": "payment_tracking.mw.updatePayment.business_rule_guard"
+    },
+    {
+      "id": "payment_tracking.edge.updatePayment.mw.audit_log",
+      "type": "endpoint_to_middleware",
+      "from": "payment_tracking.endpoint.updatePayment",
+      "to": "payment_tracking.mw.updatePayment.audit_log"
+    },
+    {
+      "id": "payment_tracking.edge.updatePayment.perm",
+      "type": "endpoint_to_permission",
+      "from": "payment_tracking.endpoint.updatePayment",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "payment_tracking.edge.getZelleInstructions.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "payment_tracking.endpoint.getZelleInstructions",
+      "to": "payment_tracking.mw.getZelleInstructions.request_id"
+    },
+    {
+      "id": "payment_tracking.edge.getZelleInstructions.mw.rate_limit",
+      "type": "endpoint_to_middleware",
+      "from": "payment_tracking.endpoint.getZelleInstructions",
+      "to": "payment_tracking.mw.getZelleInstructions.rate_limit"
+    },
+    {
+      "id": "payment_tracking.edge.getZelleInstructions.perm",
+      "type": "endpoint_to_permission",
+      "from": "payment_tracking.endpoint.getZelleInstructions",
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" }
+    },
+    {
+      "id": "payment_tracking.edge.getPayments.db.Payment.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "payment_tracking.endpoint.getPayments",
+      "to": "payment_tracking.db.getPayments.Payment.READ"
+    },
+    {
+      "id": "payment_tracking.edge.getPayment.db.Payment.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "payment_tracking.endpoint.getPayment",
+      "to": "payment_tracking.db.getPayment.Payment.READ"
+    },
+    {
+      "id": "payment_tracking.edge.updatePayment.db.Payment.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "payment_tracking.endpoint.updatePayment",
+      "to": "payment_tracking.db.updatePayment.Payment.READ"
+    },
+    {
+      "id": "payment_tracking.edge.updatePayment.db.Payment.UPDATE",
+      "type": "endpoint_to_db_operation",
+      "from": "payment_tracking.endpoint.updatePayment",
+      "to": "payment_tracking.db.updatePayment.Payment.UPDATE"
+    },
+    {
+      "id": "payment_tracking.edge.getZelleInstructions.db.Enrollment.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "payment_tracking.endpoint.getZelleInstructions",
+      "to": "payment_tracking.db.getZelleInstructions.Enrollment.READ"
+    },
+    {
+      "id": "payment_tracking.edge.getZelleInstructions.db.Program.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "payment_tracking.endpoint.getZelleInstructions",
+      "to": "payment_tracking.db.getZelleInstructions.Program.READ"
+    },
+    {
+      "id": "payment_tracking.edge.getZelleInstructions.db.LocationSettings.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "payment_tracking.endpoint.getZelleInstructions",
+      "to": "payment_tracking.db.getZelleInstructions.LocationSettings.READ"
+    },
+    {
+      "id": "payment_tracking.edge.getZelleInstructions.db.Payment.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "payment_tracking.endpoint.getZelleInstructions",
+      "to": "payment_tracking.db.getZelleInstructions.Payment.READ"
+    },
+    {
+      "id": "payment_tracking.edge.updatePayment.effect.audit_payment_update",
+      "type": "db_to_side_effect",
+      "from": "payment_tracking.db.updatePayment.Payment.UPDATE",
+      "to": "payment_tracking.effect.updatePayment.audit_payment_update"
+    }
+  ],
+  "guards": [
+    {
+      "route": "/admin/payments",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "redirectIfUnauthenticated": "/admin/login",
+      "confidence": "high",
+      "evidenceRefs": ["fe_details://payment_dashboard"]
+    },
+    {
+      "route": "/admin/payments/{paymentId}",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "redirectIfUnauthenticated": "/admin/login",
+      "confidence": "high",
+      "evidenceRefs": ["fe_details://payment_detail"]
+    },
+    {
+      "route": "/enrollment/{enrollmentId}/pay",
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "confidence": "high",
+      "evidenceRefs": ["fe_details://zelle_instructions"]
+    }
+  ],
+  "crossModuleDependencies": [
+    {
+      "targetModule": "enrollment_trial",
+      "models": ["Enrollment"],
+      "accessType": "READ",
+      "reason": "Payment references enrollment for parent/program context",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.Payment.relations.enrollment"]
+    },
+    {
+      "targetModule": "program_pricing",
+      "models": ["Program"],
+      "accessType": "READ",
+      "reason": "Program name for payment display; locationId for Zelle instructions",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.Enrollment.relations.program"]
+    },
+    {
+      "targetModule": "settings",
+      "models": ["LocationSettings"],
+      "accessType": "READ",
+      "reason": "Zelle payment config for public payment instructions",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.LocationSettings"]
+    }
+  ],
+  "issues": {
+    "unresolvedLinks": [],
+    "gaps": [
+      {
+        "id": "PT-GAP-01",
+        "source": "be_policy_flow",
+        "description": "Zelle instructions accessible by anyone with enrollmentId (unguessable CUID). No additional auth — relies on ID obscurity. Acceptable for MVP.",
+        "severity": "low"
+      },
+      {
+        "id": "PT-GAP-02",
+        "source": "be_policy_flow",
+        "description": "Admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles.",
+        "severity": "low"
+      },
+      {
+        "id": "PT-GAP-03",
+        "source": "be_policy_flow",
+        "description": "Payment overdue threshold is admin-configurable (PT-A-01) but storage location (LocationSettings vs app config) not specified.",
+        "severity": "medium"
+      },
+      {
+        "id": "PT-DB-U-01",
+        "source": "db_flow",
+        "description": "Payment overdue threshold storage location not specified — LocationSettings vs app env config. Recommend LocationSettings for admin configurability.",
+        "severity": "low",
+        "decision": "deferred_to_implementation"
+      }
+    ],
+    "inferredItems": [
+      {
+        "nodeId": "payment_tracking.mw.getPayments.request_id",
+        "type": "middleware",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "payment_tracking.mw.getPayments.role_permission_check",
+        "type": "middleware",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "payment_tracking.mw.getPayment.request_id",
+        "type": "middleware",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "payment_tracking.mw.getPayment.role_permission_check",
+        "type": "middleware",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "payment_tracking.mw.updatePayment.request_id",
+        "type": "middleware",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "payment_tracking.mw.updatePayment.role_permission_check",
+        "type": "middleware",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "payment_tracking.mw.updatePayment.business_rule_guard",
+        "type": "middleware",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "payment_tracking.mw.updatePayment.audit_log",
+        "type": "middleware",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "payment_tracking.mw.getZelleInstructions.request_id",
+        "type": "middleware",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "payment_tracking.mw.getZelleInstructions.rate_limit",
+        "type": "middleware",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "payment_tracking.effect.updatePayment.audit_payment_update",
+        "type": "side_effect",
+        "confidence": "high",
+        "source": "db_flow"
+      }
+    ]
+  }
+}

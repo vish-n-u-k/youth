@@ -1,0 +1,1036 @@
+{
+  "moduleId": "lead_management",
+  "generatedAt": "2026-03-06",
+  "reconcileVersion": "v1.0.0",
+  "nodes": [
+    {
+      "id": "lead_management.screen.lead_list",
+      "type": "screen",
+      "route": "/admin/leads",
+      "components": ["LeadFilters", "LeadTable", "StatusDropdown", "Pagination"]
+    },
+    {
+      "id": "lead_management.screen.lead_detail",
+      "type": "screen",
+      "route": "/admin/leads/{leadId}",
+      "components": ["LeadInfoPanel", "LeadEditForm", "NotesSection", "ActivityTimeline", "SendTrialLinkButton"]
+    },
+    {
+      "id": "lead_management.endpoint.getLeads",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/leads",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "lead_management.endpoint.getLead",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/leads/{leadId}",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "lead_management.endpoint.updateLead",
+      "type": "endpoint",
+      "method": "PUT",
+      "path": "/api/leads/{leadId}",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "lead_management.endpoint.updateLeadStatus",
+      "type": "endpoint",
+      "method": "PATCH",
+      "path": "/api/leads/{leadId}/status",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "lead_management.endpoint.getLeadNotes",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/leads/{leadId}/notes",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "lead_management.endpoint.addLeadNote",
+      "type": "endpoint",
+      "method": "POST",
+      "path": "/api/leads/{leadId}/notes",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "lead_management.endpoint.getLeadActivity",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/leads/{leadId}/activity",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "lead_management.endpoint.sendTrialBookingLink",
+      "type": "endpoint",
+      "method": "POST",
+      "path": "/api/leads/{leadId}/send-trial-link",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "lead_management.mw.getLeads.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.getLeads.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.getLeads.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "lead_management.mw.getLeads.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.getLead.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.getLead.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.getLead.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "lead_management.mw.updateLead.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.updateLead.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.updateLead.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "lead_management.mw.updateLead.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.updateLead.audit_log",
+      "type": "middleware",
+      "middleware": "audit_log",
+      "order": 5,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "lead_management.mw.updateLeadStatus.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.updateLeadStatus.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.updateLeadStatus.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "lead_management.mw.updateLeadStatus.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.updateLeadStatus.business_rule_guard",
+      "type": "middleware",
+      "middleware": "business_rule_guard",
+      "order": 5,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "lead_management.mw.updateLeadStatus.audit_log",
+      "type": "middleware",
+      "middleware": "audit_log",
+      "order": 6,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "lead_management.mw.getLeadNotes.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.getLeadNotes.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.getLeadNotes.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "lead_management.mw.addLeadNote.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.addLeadNote.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.addLeadNote.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "lead_management.mw.addLeadNote.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.getLeadActivity.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.getLeadActivity.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.getLeadActivity.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "lead_management.mw.sendTrialBookingLink.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.sendTrialBookingLink.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.sendTrialBookingLink.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "lead_management.mw.sendTrialBookingLink.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "lead_management.mw.sendTrialBookingLink.audit_log",
+      "type": "middleware",
+      "middleware": "audit_log",
+      "order": 5,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "lead_management.db.getLeads.Lead.READ",
+      "type": "db_operation",
+      "model": "Lead",
+      "operation": "READ",
+      "description": "Paginated list of leads with filters (status, source, programId, search) and sorting"
+    },
+    {
+      "id": "lead_management.db.getLead.Lead.READ",
+      "type": "db_operation",
+      "model": "Lead",
+      "operation": "READ",
+      "description": "Fetch single lead with related program, location info"
+    },
+    {
+      "id": "lead_management.db.updateLead.Lead.UPDATE",
+      "type": "db_operation",
+      "model": "Lead",
+      "operation": "UPDATE",
+      "description": "Update lead details (parentName, email, phone, childName, childAge, source, interestedProgramId)"
+    },
+    {
+      "id": "lead_management.db.updateLeadStatus.Lead.READ",
+      "type": "db_operation",
+      "model": "Lead",
+      "operation": "READ",
+      "description": "Read current lead status for transition validation"
+    },
+    {
+      "id": "lead_management.db.updateLeadStatus.Lead.UPDATE",
+      "type": "db_operation",
+      "model": "Lead",
+      "operation": "UPDATE",
+      "description": "Update lead status (with business rule validation for valid transitions per GP-04)"
+    },
+    {
+      "id": "lead_management.db.updateLeadStatus.LeadActivity.CREATE",
+      "type": "db_operation",
+      "model": "LeadActivity",
+      "operation": "CREATE",
+      "description": "Create STATUS_CHANGE activity record to track the transition"
+    },
+    {
+      "id": "lead_management.db.getLeadNotes.LeadNote.READ",
+      "type": "db_operation",
+      "model": "LeadNote",
+      "operation": "READ",
+      "description": "Fetch all notes for a lead, ordered by createdAt DESC"
+    },
+    {
+      "id": "lead_management.db.addLeadNote.LeadNote.CREATE",
+      "type": "db_operation",
+      "model": "LeadNote",
+      "operation": "CREATE",
+      "description": "Create new note for the lead (append-only)"
+    },
+    {
+      "id": "lead_management.db.addLeadNote.LeadActivity.CREATE",
+      "type": "db_operation",
+      "model": "LeadActivity",
+      "operation": "CREATE",
+      "description": "Create NOTE_ADDED activity record"
+    },
+    {
+      "id": "lead_management.db.getLeadActivity.LeadActivity.READ",
+      "type": "db_operation",
+      "model": "LeadActivity",
+      "operation": "READ",
+      "description": "Fetch all activity records for a lead, ordered by createdAt DESC"
+    },
+    {
+      "id": "lead_management.db.sendTrialBookingLink.Lead.READ",
+      "type": "db_operation",
+      "model": "Lead",
+      "operation": "READ",
+      "description": "Fetch lead details (email, name) for composing email"
+    },
+    {
+      "id": "lead_management.db.sendTrialBookingLink.LeadActivity.CREATE",
+      "type": "db_operation",
+      "model": "LeadActivity",
+      "operation": "CREATE",
+      "description": "Create EMAIL_SENT activity record"
+    },
+    {
+      "id": "lead_management.effect.updateLead.audit_lead_update",
+      "type": "side_effect",
+      "effectType": "app_event",
+      "name": "audit_lead_update",
+      "description": "Audit log records lead data change"
+    },
+    {
+      "id": "lead_management.effect.updateLeadStatus.audit_status_change",
+      "type": "side_effect",
+      "effectType": "app_event",
+      "name": "audit_status_change",
+      "description": "Audit log records status transition"
+    },
+    {
+      "id": "lead_management.effect.sendTrialBookingLink.trial_booking_link_email",
+      "type": "side_effect",
+      "effectType": "email",
+      "name": "trial_booking_link_email",
+      "description": "Sends trial booking link email to lead (HO-01: lead_management -> enrollment_trial)"
+    }
+  ],
+  "edges": [
+    {
+      "id": "lead_management.edge.loadLeads.getLeads",
+      "type": "screen_action_to_endpoint",
+      "from": "lead_management.screen.lead_list",
+      "to": "lead_management.endpoint.getLeads",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/leads.get", "fe_details://lead_list.endpointProposals[0]"]
+    },
+    {
+      "id": "lead_management.edge.updateLeadStatus.updateLeadStatus",
+      "type": "screen_action_to_endpoint",
+      "from": "lead_management.screen.lead_list",
+      "to": "lead_management.endpoint.updateLeadStatus",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/leads/{leadId}/status.patch", "fe_details://lead_list.endpointProposals[1]"]
+    },
+    {
+      "id": "lead_management.edge.loadLead.getLead",
+      "type": "screen_action_to_endpoint",
+      "from": "lead_management.screen.lead_detail",
+      "to": "lead_management.endpoint.getLead",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/leads/{leadId}.get", "fe_details://lead_detail.endpointProposals[0]"]
+    },
+    {
+      "id": "lead_management.edge.updateLead.updateLead",
+      "type": "screen_action_to_endpoint",
+      "from": "lead_management.screen.lead_detail",
+      "to": "lead_management.endpoint.updateLead",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/leads/{leadId}.put", "fe_details://lead_detail.endpointProposals[1]"]
+    },
+    {
+      "id": "lead_management.edge.loadNotes.getLeadNotes",
+      "type": "screen_action_to_endpoint",
+      "from": "lead_management.screen.lead_detail",
+      "to": "lead_management.endpoint.getLeadNotes",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/leads/{leadId}/notes.get", "fe_details://lead_detail.endpointProposals[2]"]
+    },
+    {
+      "id": "lead_management.edge.addNote.addLeadNote",
+      "type": "screen_action_to_endpoint",
+      "from": "lead_management.screen.lead_detail",
+      "to": "lead_management.endpoint.addLeadNote",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/leads/{leadId}/notes.post", "fe_details://lead_detail.endpointProposals[3]"]
+    },
+    {
+      "id": "lead_management.edge.loadActivity.getLeadActivity",
+      "type": "screen_action_to_endpoint",
+      "from": "lead_management.screen.lead_detail",
+      "to": "lead_management.endpoint.getLeadActivity",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/leads/{leadId}/activity.get", "fe_details://lead_detail.endpointProposals[4]"]
+    },
+    {
+      "id": "lead_management.edge.sendTrialBookingLink.sendTrialBookingLink",
+      "type": "screen_action_to_endpoint",
+      "from": "lead_management.screen.lead_detail",
+      "to": "lead_management.endpoint.sendTrialBookingLink",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/leads/{leadId}/send-trial-link.post", "fe_details://lead_detail.endpointProposals[5]"]
+    },
+    {
+      "id": "lead_management.edge.getLeads.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.getLeads",
+      "to": "lead_management.mw.getLeads.request_id"
+    },
+    {
+      "id": "lead_management.edge.getLeads.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.getLeads",
+      "to": "lead_management.mw.getLeads.auth_session"
+    },
+    {
+      "id": "lead_management.edge.getLeads.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.getLeads",
+      "to": "lead_management.mw.getLeads.role_permission_check"
+    },
+    {
+      "id": "lead_management.edge.getLeads.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.getLeads",
+      "to": "lead_management.mw.getLeads.input_validation"
+    },
+    {
+      "id": "lead_management.edge.getLeads.perm",
+      "type": "endpoint_to_permission",
+      "from": "lead_management.endpoint.getLeads",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "lead_management.edge.getLead.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.getLead",
+      "to": "lead_management.mw.getLead.request_id"
+    },
+    {
+      "id": "lead_management.edge.getLead.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.getLead",
+      "to": "lead_management.mw.getLead.auth_session"
+    },
+    {
+      "id": "lead_management.edge.getLead.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.getLead",
+      "to": "lead_management.mw.getLead.role_permission_check"
+    },
+    {
+      "id": "lead_management.edge.getLead.perm",
+      "type": "endpoint_to_permission",
+      "from": "lead_management.endpoint.getLead",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "lead_management.edge.updateLead.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.updateLead",
+      "to": "lead_management.mw.updateLead.request_id"
+    },
+    {
+      "id": "lead_management.edge.updateLead.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.updateLead",
+      "to": "lead_management.mw.updateLead.auth_session"
+    },
+    {
+      "id": "lead_management.edge.updateLead.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.updateLead",
+      "to": "lead_management.mw.updateLead.role_permission_check"
+    },
+    {
+      "id": "lead_management.edge.updateLead.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.updateLead",
+      "to": "lead_management.mw.updateLead.input_validation"
+    },
+    {
+      "id": "lead_management.edge.updateLead.mw.audit_log",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.updateLead",
+      "to": "lead_management.mw.updateLead.audit_log"
+    },
+    {
+      "id": "lead_management.edge.updateLead.perm",
+      "type": "endpoint_to_permission",
+      "from": "lead_management.endpoint.updateLead",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "lead_management.edge.updateLeadStatus.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.updateLeadStatus",
+      "to": "lead_management.mw.updateLeadStatus.request_id"
+    },
+    {
+      "id": "lead_management.edge.updateLeadStatus.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.updateLeadStatus",
+      "to": "lead_management.mw.updateLeadStatus.auth_session"
+    },
+    {
+      "id": "lead_management.edge.updateLeadStatus.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.updateLeadStatus",
+      "to": "lead_management.mw.updateLeadStatus.role_permission_check"
+    },
+    {
+      "id": "lead_management.edge.updateLeadStatus.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.updateLeadStatus",
+      "to": "lead_management.mw.updateLeadStatus.input_validation"
+    },
+    {
+      "id": "lead_management.edge.updateLeadStatus.mw.business_rule_guard",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.updateLeadStatus",
+      "to": "lead_management.mw.updateLeadStatus.business_rule_guard"
+    },
+    {
+      "id": "lead_management.edge.updateLeadStatus.mw.audit_log",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.updateLeadStatus",
+      "to": "lead_management.mw.updateLeadStatus.audit_log"
+    },
+    {
+      "id": "lead_management.edge.updateLeadStatus.perm",
+      "type": "endpoint_to_permission",
+      "from": "lead_management.endpoint.updateLeadStatus",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "lead_management.edge.getLeadNotes.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.getLeadNotes",
+      "to": "lead_management.mw.getLeadNotes.request_id"
+    },
+    {
+      "id": "lead_management.edge.getLeadNotes.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.getLeadNotes",
+      "to": "lead_management.mw.getLeadNotes.auth_session"
+    },
+    {
+      "id": "lead_management.edge.getLeadNotes.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.getLeadNotes",
+      "to": "lead_management.mw.getLeadNotes.role_permission_check"
+    },
+    {
+      "id": "lead_management.edge.getLeadNotes.perm",
+      "type": "endpoint_to_permission",
+      "from": "lead_management.endpoint.getLeadNotes",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "lead_management.edge.addLeadNote.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.addLeadNote",
+      "to": "lead_management.mw.addLeadNote.request_id"
+    },
+    {
+      "id": "lead_management.edge.addLeadNote.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.addLeadNote",
+      "to": "lead_management.mw.addLeadNote.auth_session"
+    },
+    {
+      "id": "lead_management.edge.addLeadNote.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.addLeadNote",
+      "to": "lead_management.mw.addLeadNote.role_permission_check"
+    },
+    {
+      "id": "lead_management.edge.addLeadNote.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.addLeadNote",
+      "to": "lead_management.mw.addLeadNote.input_validation"
+    },
+    {
+      "id": "lead_management.edge.addLeadNote.perm",
+      "type": "endpoint_to_permission",
+      "from": "lead_management.endpoint.addLeadNote",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "lead_management.edge.getLeadActivity.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.getLeadActivity",
+      "to": "lead_management.mw.getLeadActivity.request_id"
+    },
+    {
+      "id": "lead_management.edge.getLeadActivity.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.getLeadActivity",
+      "to": "lead_management.mw.getLeadActivity.auth_session"
+    },
+    {
+      "id": "lead_management.edge.getLeadActivity.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.getLeadActivity",
+      "to": "lead_management.mw.getLeadActivity.role_permission_check"
+    },
+    {
+      "id": "lead_management.edge.getLeadActivity.perm",
+      "type": "endpoint_to_permission",
+      "from": "lead_management.endpoint.getLeadActivity",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "lead_management.edge.sendTrialBookingLink.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.sendTrialBookingLink",
+      "to": "lead_management.mw.sendTrialBookingLink.request_id"
+    },
+    {
+      "id": "lead_management.edge.sendTrialBookingLink.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.sendTrialBookingLink",
+      "to": "lead_management.mw.sendTrialBookingLink.auth_session"
+    },
+    {
+      "id": "lead_management.edge.sendTrialBookingLink.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.sendTrialBookingLink",
+      "to": "lead_management.mw.sendTrialBookingLink.role_permission_check"
+    },
+    {
+      "id": "lead_management.edge.sendTrialBookingLink.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.sendTrialBookingLink",
+      "to": "lead_management.mw.sendTrialBookingLink.input_validation"
+    },
+    {
+      "id": "lead_management.edge.sendTrialBookingLink.mw.audit_log",
+      "type": "endpoint_to_middleware",
+      "from": "lead_management.endpoint.sendTrialBookingLink",
+      "to": "lead_management.mw.sendTrialBookingLink.audit_log"
+    },
+    {
+      "id": "lead_management.edge.sendTrialBookingLink.perm",
+      "type": "endpoint_to_permission",
+      "from": "lead_management.endpoint.sendTrialBookingLink",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "lead_management.edge.getLeads.db.Lead.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "lead_management.endpoint.getLeads",
+      "to": "lead_management.db.getLeads.Lead.READ"
+    },
+    {
+      "id": "lead_management.edge.getLead.db.Lead.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "lead_management.endpoint.getLead",
+      "to": "lead_management.db.getLead.Lead.READ"
+    },
+    {
+      "id": "lead_management.edge.updateLead.db.Lead.UPDATE",
+      "type": "endpoint_to_db_operation",
+      "from": "lead_management.endpoint.updateLead",
+      "to": "lead_management.db.updateLead.Lead.UPDATE"
+    },
+    {
+      "id": "lead_management.edge.updateLeadStatus.db.Lead.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "lead_management.endpoint.updateLeadStatus",
+      "to": "lead_management.db.updateLeadStatus.Lead.READ"
+    },
+    {
+      "id": "lead_management.edge.updateLeadStatus.db.Lead.UPDATE",
+      "type": "endpoint_to_db_operation",
+      "from": "lead_management.endpoint.updateLeadStatus",
+      "to": "lead_management.db.updateLeadStatus.Lead.UPDATE"
+    },
+    {
+      "id": "lead_management.edge.updateLeadStatus.db.LeadActivity.CREATE",
+      "type": "endpoint_to_db_operation",
+      "from": "lead_management.endpoint.updateLeadStatus",
+      "to": "lead_management.db.updateLeadStatus.LeadActivity.CREATE"
+    },
+    {
+      "id": "lead_management.edge.getLeadNotes.db.LeadNote.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "lead_management.endpoint.getLeadNotes",
+      "to": "lead_management.db.getLeadNotes.LeadNote.READ"
+    },
+    {
+      "id": "lead_management.edge.addLeadNote.db.LeadNote.CREATE",
+      "type": "endpoint_to_db_operation",
+      "from": "lead_management.endpoint.addLeadNote",
+      "to": "lead_management.db.addLeadNote.LeadNote.CREATE"
+    },
+    {
+      "id": "lead_management.edge.addLeadNote.db.LeadActivity.CREATE",
+      "type": "endpoint_to_db_operation",
+      "from": "lead_management.endpoint.addLeadNote",
+      "to": "lead_management.db.addLeadNote.LeadActivity.CREATE"
+    },
+    {
+      "id": "lead_management.edge.getLeadActivity.db.LeadActivity.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "lead_management.endpoint.getLeadActivity",
+      "to": "lead_management.db.getLeadActivity.LeadActivity.READ"
+    },
+    {
+      "id": "lead_management.edge.sendTrialBookingLink.db.Lead.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "lead_management.endpoint.sendTrialBookingLink",
+      "to": "lead_management.db.sendTrialBookingLink.Lead.READ"
+    },
+    {
+      "id": "lead_management.edge.sendTrialBookingLink.db.LeadActivity.CREATE",
+      "type": "endpoint_to_db_operation",
+      "from": "lead_management.endpoint.sendTrialBookingLink",
+      "to": "lead_management.db.sendTrialBookingLink.LeadActivity.CREATE"
+    },
+    {
+      "id": "lead_management.edge.updateLead.effect.audit_lead_update",
+      "type": "db_to_side_effect",
+      "from": "lead_management.db.updateLead.Lead.UPDATE",
+      "to": "lead_management.effect.updateLead.audit_lead_update"
+    },
+    {
+      "id": "lead_management.edge.updateLeadStatus.effect.audit_status_change",
+      "type": "db_to_side_effect",
+      "from": "lead_management.db.updateLeadStatus.Lead.UPDATE",
+      "to": "lead_management.effect.updateLeadStatus.audit_status_change"
+    },
+    {
+      "id": "lead_management.edge.sendTrialBookingLink.effect.trial_booking_link_email",
+      "type": "db_to_side_effect",
+      "from": "lead_management.db.sendTrialBookingLink.Lead.READ",
+      "to": "lead_management.effect.sendTrialBookingLink.trial_booking_link_email"
+    }
+  ],
+  "guards": [
+    {
+      "route": "/admin/leads",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "redirectIfUnauthenticated": "/admin/login",
+      "confidence": "high",
+      "evidenceRefs": ["fe_details://lead_list"]
+    },
+    {
+      "route": "/admin/leads/{leadId}",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "redirectIfUnauthenticated": "/admin/login",
+      "confidence": "high",
+      "evidenceRefs": ["fe_details://lead_detail"]
+    }
+  ],
+  "crossModuleDependencies": [
+    {
+      "targetModule": "program_pricing",
+      "models": ["Program"],
+      "accessType": "READ",
+      "reason": "Join for interestedProgram name on lead detail/list",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.Lead.relations.interestedProgram"]
+    },
+    {
+      "targetModule": "settings",
+      "models": ["LocationSettings"],
+      "accessType": "READ",
+      "reason": "Join for location name on lead detail",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.Lead.relations.location"]
+    }
+  ],
+  "issues": {
+    "unresolvedLinks": [],
+    "gaps": [
+      {
+        "id": "LM-GAP-01",
+        "source": "be_policy_flow",
+        "description": "All admin roles inferred from FE allowedRoles — OpenAPI lacks x-required-roles on all endpoints.",
+        "severity": "low"
+      },
+      {
+        "id": "LM-GAP-02",
+        "source": "be_policy_flow",
+        "description": "No explicit lead status transition validation rules in OpenAPI. Business rule guard on updateLeadStatus inferred from GP-04 policy ref.",
+        "severity": "medium"
+      },
+      {
+        "id": "LM-DB-U-01",
+        "source": "db_flow",
+        "description": "Facebook/Google lead ingestion method (webhook vs polling) deferred to implementation (LM-A-02, LM-A-03). Will create leads + LEAD_CREATED activity records.",
+        "confidence": "low",
+        "decision": "deferred_to_implementation"
+      }
+    ],
+    "inferredItems": [
+      {
+        "nodeId": "lead_management.mw.getLeads.request_id",
+        "type": "middleware",
+        "confidence": "high"
+      },
+      {
+        "nodeId": "lead_management.mw.getLeads.role_permission_check",
+        "type": "middleware",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "lead_management.mw.getLead.request_id",
+        "type": "middleware",
+        "confidence": "high"
+      },
+      {
+        "nodeId": "lead_management.mw.getLead.role_permission_check",
+        "type": "middleware",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "lead_management.mw.updateLead.request_id",
+        "type": "middleware",
+        "confidence": "high"
+      },
+      {
+        "nodeId": "lead_management.mw.updateLead.role_permission_check",
+        "type": "middleware",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "lead_management.mw.updateLead.audit_log",
+        "type": "middleware",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "lead_management.mw.updateLeadStatus.request_id",
+        "type": "middleware",
+        "confidence": "high"
+      },
+      {
+        "nodeId": "lead_management.mw.updateLeadStatus.role_permission_check",
+        "type": "middleware",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "lead_management.mw.updateLeadStatus.business_rule_guard",
+        "type": "middleware",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "lead_management.mw.updateLeadStatus.audit_log",
+        "type": "middleware",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "lead_management.mw.getLeadNotes.request_id",
+        "type": "middleware",
+        "confidence": "high"
+      },
+      {
+        "nodeId": "lead_management.mw.getLeadNotes.role_permission_check",
+        "type": "middleware",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "lead_management.mw.addLeadNote.request_id",
+        "type": "middleware",
+        "confidence": "high"
+      },
+      {
+        "nodeId": "lead_management.mw.addLeadNote.role_permission_check",
+        "type": "middleware",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "lead_management.mw.getLeadActivity.request_id",
+        "type": "middleware",
+        "confidence": "high"
+      },
+      {
+        "nodeId": "lead_management.mw.getLeadActivity.role_permission_check",
+        "type": "middleware",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "lead_management.mw.sendTrialBookingLink.request_id",
+        "type": "middleware",
+        "confidence": "high"
+      },
+      {
+        "nodeId": "lead_management.mw.sendTrialBookingLink.role_permission_check",
+        "type": "middleware",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "lead_management.mw.sendTrialBookingLink.audit_log",
+        "type": "middleware",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "lead_management.effect.updateLead.audit_lead_update",
+        "type": "side_effect",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "lead_management.effect.updateLeadStatus.audit_status_change",
+        "type": "side_effect",
+        "confidence": "medium"
+      },
+      {
+        "nodeId": "lead_management.db.addLeadNote.LeadActivity.CREATE",
+        "type": "db_operation",
+        "confidence": "high"
+      },
+      {
+        "nodeId": "lead_management.db.sendTrialBookingLink.LeadActivity.CREATE",
+        "type": "db_operation",
+        "confidence": "high"
+      }
+    ]
+  }
+}

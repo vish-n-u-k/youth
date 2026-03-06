@@ -1,0 +1,497 @@
+{
+  "moduleId": "admin_dashboard",
+  "generatedAt": "2026-03-06",
+  "reconcileVersion": "v1.0.0",
+  "nodes": [
+    {
+      "id": "admin_dashboard.screen.dashboard_overview",
+      "type": "screen",
+      "route": "/admin/dashboard",
+      "components": ["MetricsCards", "RecentLeadsWidget", "UpcomingTrialsWidget", "PendingPaymentsWidget"]
+    },
+    {
+      "id": "admin_dashboard.endpoint.getDashboardMetrics",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/dashboard/metrics",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "admin_dashboard.endpoint.getDashboardRecentLeads",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/dashboard/recent-leads",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "admin_dashboard.endpoint.getDashboardUpcomingTrials",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/dashboard/upcoming-trials",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "admin_dashboard.endpoint.getDashboardPendingPayments",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/dashboard/pending-payments",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "admin_dashboard.mw.getDashboardMetrics.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "admin_dashboard.mw.getDashboardMetrics.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "admin_dashboard.mw.getDashboardMetrics.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "admin_dashboard.mw.getDashboardRecentLeads.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "admin_dashboard.mw.getDashboardRecentLeads.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "admin_dashboard.mw.getDashboardRecentLeads.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "admin_dashboard.mw.getDashboardUpcomingTrials.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "admin_dashboard.mw.getDashboardUpcomingTrials.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "admin_dashboard.mw.getDashboardUpcomingTrials.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "admin_dashboard.mw.getDashboardPendingPayments.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "admin_dashboard.mw.getDashboardPendingPayments.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "admin_dashboard.mw.getDashboardPendingPayments.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "admin_dashboard.db.getDashboardMetrics.Lead.READ",
+      "type": "db_operation",
+      "model": "Lead",
+      "operation": "READ",
+      "description": "Aggregate lead counts by source and status for metrics cards"
+    },
+    {
+      "id": "admin_dashboard.db.getDashboardMetrics.Trial.READ",
+      "type": "db_operation",
+      "model": "Trial",
+      "operation": "READ",
+      "description": "Count trials by status for conversion rate computation"
+    },
+    {
+      "id": "admin_dashboard.db.getDashboardMetrics.Enrollment.READ",
+      "type": "db_operation",
+      "model": "Enrollment",
+      "operation": "READ",
+      "description": "Count enrollments for conversion rate and active enrollment metrics"
+    },
+    {
+      "id": "admin_dashboard.db.getDashboardMetrics.Payment.READ",
+      "type": "db_operation",
+      "model": "Payment",
+      "operation": "READ",
+      "description": "Summarize payment statuses and amounts for revenue metrics"
+    },
+    {
+      "id": "admin_dashboard.db.getDashboardRecentLeads.Lead.READ",
+      "type": "db_operation",
+      "model": "Lead",
+      "operation": "READ",
+      "description": "Fetch most recent leads ordered by createdAt DESC, limited count"
+    },
+    {
+      "id": "admin_dashboard.db.getDashboardUpcomingTrials.Trial.READ",
+      "type": "db_operation",
+      "model": "Trial",
+      "operation": "READ",
+      "description": "Fetch upcoming trials with status SCHEDULED, date >= now"
+    },
+    {
+      "id": "admin_dashboard.db.getDashboardPendingPayments.Payment.READ",
+      "type": "db_operation",
+      "model": "Payment",
+      "operation": "READ",
+      "description": "Fetch payments with status PENDING or PARTIAL, joined with enrollment for parent/program info"
+    }
+  ],
+  "edges": [
+    {
+      "id": "admin_dashboard.edge.loadMetrics.getDashboardMetrics",
+      "type": "screen_action_to_endpoint",
+      "from": "admin_dashboard.screen.dashboard_overview",
+      "to": "admin_dashboard.endpoint.getDashboardMetrics",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/dashboard/metrics.get", "fe_details://dashboard_overview.endpointProposals[0]"]
+    },
+    {
+      "id": "admin_dashboard.edge.loadRecentLeads.getDashboardRecentLeads",
+      "type": "screen_action_to_endpoint",
+      "from": "admin_dashboard.screen.dashboard_overview",
+      "to": "admin_dashboard.endpoint.getDashboardRecentLeads",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/dashboard/recent-leads.get", "fe_details://dashboard_overview.endpointProposals[1]"]
+    },
+    {
+      "id": "admin_dashboard.edge.loadUpcomingTrials.getDashboardUpcomingTrials",
+      "type": "screen_action_to_endpoint",
+      "from": "admin_dashboard.screen.dashboard_overview",
+      "to": "admin_dashboard.endpoint.getDashboardUpcomingTrials",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/dashboard/upcoming-trials.get", "fe_details://dashboard_overview.endpointProposals[2]"]
+    },
+    {
+      "id": "admin_dashboard.edge.loadPendingPayments.getDashboardPendingPayments",
+      "type": "screen_action_to_endpoint",
+      "from": "admin_dashboard.screen.dashboard_overview",
+      "to": "admin_dashboard.endpoint.getDashboardPendingPayments",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/dashboard/pending-payments.get", "fe_details://dashboard_overview.endpointProposals[3]"]
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardMetrics.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "admin_dashboard.endpoint.getDashboardMetrics",
+      "to": "admin_dashboard.mw.getDashboardMetrics.request_id"
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardMetrics.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "admin_dashboard.endpoint.getDashboardMetrics",
+      "to": "admin_dashboard.mw.getDashboardMetrics.auth_session"
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardMetrics.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "admin_dashboard.endpoint.getDashboardMetrics",
+      "to": "admin_dashboard.mw.getDashboardMetrics.role_permission_check"
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardMetrics.perm",
+      "type": "endpoint_to_permission",
+      "from": "admin_dashboard.endpoint.getDashboardMetrics",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardRecentLeads.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "admin_dashboard.endpoint.getDashboardRecentLeads",
+      "to": "admin_dashboard.mw.getDashboardRecentLeads.request_id"
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardRecentLeads.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "admin_dashboard.endpoint.getDashboardRecentLeads",
+      "to": "admin_dashboard.mw.getDashboardRecentLeads.auth_session"
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardRecentLeads.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "admin_dashboard.endpoint.getDashboardRecentLeads",
+      "to": "admin_dashboard.mw.getDashboardRecentLeads.role_permission_check"
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardRecentLeads.perm",
+      "type": "endpoint_to_permission",
+      "from": "admin_dashboard.endpoint.getDashboardRecentLeads",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardUpcomingTrials.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "admin_dashboard.endpoint.getDashboardUpcomingTrials",
+      "to": "admin_dashboard.mw.getDashboardUpcomingTrials.request_id"
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardUpcomingTrials.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "admin_dashboard.endpoint.getDashboardUpcomingTrials",
+      "to": "admin_dashboard.mw.getDashboardUpcomingTrials.auth_session"
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardUpcomingTrials.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "admin_dashboard.endpoint.getDashboardUpcomingTrials",
+      "to": "admin_dashboard.mw.getDashboardUpcomingTrials.role_permission_check"
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardUpcomingTrials.perm",
+      "type": "endpoint_to_permission",
+      "from": "admin_dashboard.endpoint.getDashboardUpcomingTrials",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardPendingPayments.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "admin_dashboard.endpoint.getDashboardPendingPayments",
+      "to": "admin_dashboard.mw.getDashboardPendingPayments.request_id"
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardPendingPayments.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "admin_dashboard.endpoint.getDashboardPendingPayments",
+      "to": "admin_dashboard.mw.getDashboardPendingPayments.auth_session"
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardPendingPayments.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "admin_dashboard.endpoint.getDashboardPendingPayments",
+      "to": "admin_dashboard.mw.getDashboardPendingPayments.role_permission_check"
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardPendingPayments.perm",
+      "type": "endpoint_to_permission",
+      "from": "admin_dashboard.endpoint.getDashboardPendingPayments",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardMetrics.db.Lead.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "admin_dashboard.endpoint.getDashboardMetrics",
+      "to": "admin_dashboard.db.getDashboardMetrics.Lead.READ"
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardMetrics.db.Trial.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "admin_dashboard.endpoint.getDashboardMetrics",
+      "to": "admin_dashboard.db.getDashboardMetrics.Trial.READ"
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardMetrics.db.Enrollment.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "admin_dashboard.endpoint.getDashboardMetrics",
+      "to": "admin_dashboard.db.getDashboardMetrics.Enrollment.READ"
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardMetrics.db.Payment.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "admin_dashboard.endpoint.getDashboardMetrics",
+      "to": "admin_dashboard.db.getDashboardMetrics.Payment.READ"
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardRecentLeads.db.Lead.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "admin_dashboard.endpoint.getDashboardRecentLeads",
+      "to": "admin_dashboard.db.getDashboardRecentLeads.Lead.READ"
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardUpcomingTrials.db.Trial.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "admin_dashboard.endpoint.getDashboardUpcomingTrials",
+      "to": "admin_dashboard.db.getDashboardUpcomingTrials.Trial.READ"
+    },
+    {
+      "id": "admin_dashboard.edge.getDashboardPendingPayments.db.Payment.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "admin_dashboard.endpoint.getDashboardPendingPayments",
+      "to": "admin_dashboard.db.getDashboardPendingPayments.Payment.READ"
+    }
+  ],
+  "guards": [
+    {
+      "route": "/admin/dashboard",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "redirectIfUnauthenticated": "/admin/login",
+      "confidence": "high",
+      "evidenceRefs": ["fe_details://dashboard_overview"]
+    }
+  ],
+  "crossModuleDependencies": [
+    {
+      "targetModule": "lead_management",
+      "models": ["Lead"],
+      "accessType": "READ",
+      "reason": "Aggregate lead source counts; fetch recent leads",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://dbNotes.queryDependencies"]
+    },
+    {
+      "targetModule": "enrollment_trial",
+      "models": ["Trial", "Enrollment"],
+      "accessType": "READ",
+      "reason": "Conversion rate metrics; upcoming trial list",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://dbNotes.queryDependencies"]
+    },
+    {
+      "targetModule": "payment_tracking",
+      "models": ["Payment"],
+      "accessType": "READ",
+      "reason": "Payment status summary; pending payment list",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://dbNotes.queryDependencies"]
+    },
+    {
+      "targetModule": "program_pricing",
+      "models": ["Program"],
+      "accessType": "READ",
+      "reason": "Program name joins for trial/payment displays",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://dbNotes.queryDependencies"]
+    },
+    {
+      "targetModule": "calendar_scheduling",
+      "models": ["CalendarDate"],
+      "accessType": "READ",
+      "reason": "Trial date info for upcoming trials display",
+      "confidence": "high",
+      "inferred": true,
+      "sourceRefs": ["prisma_contract://models.Trial.relations.trialDate"]
+    }
+  ],
+  "issues": {
+    "unresolvedLinks": [],
+    "gaps": [
+      {
+        "id": "AD-GAP-01",
+        "source": "be_policy_flow",
+        "description": "Role 'admin' inferred from FE allowedRoles, not from explicit x-required-roles in OpenAPI. Applies to all 4 endpoints.",
+        "severity": "low"
+      },
+      {
+        "id": "AD-GAP-02",
+        "source": "be_policy_flow",
+        "description": "No query parameters defined — if date-range filtering is added later, input_validation middleware will be needed.",
+        "severity": "low"
+      }
+    ],
+    "inferredItems": [
+      {
+        "nodeId": "admin_dashboard.mw.getDashboardMetrics.request_id",
+        "type": "middleware",
+        "middleware": "request_id",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "admin_dashboard.mw.getDashboardMetrics.role_permission_check",
+        "type": "middleware",
+        "middleware": "role_permission_check",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "admin_dashboard.mw.getDashboardRecentLeads.request_id",
+        "type": "middleware",
+        "middleware": "request_id",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "admin_dashboard.mw.getDashboardRecentLeads.role_permission_check",
+        "type": "middleware",
+        "middleware": "role_permission_check",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "admin_dashboard.mw.getDashboardUpcomingTrials.request_id",
+        "type": "middleware",
+        "middleware": "request_id",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "admin_dashboard.mw.getDashboardUpcomingTrials.role_permission_check",
+        "type": "middleware",
+        "middleware": "role_permission_check",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "admin_dashboard.mw.getDashboardPendingPayments.request_id",
+        "type": "middleware",
+        "middleware": "request_id",
+        "confidence": "high",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "admin_dashboard.mw.getDashboardPendingPayments.role_permission_check",
+        "type": "middleware",
+        "middleware": "role_permission_check",
+        "confidence": "medium",
+        "source": "be_policy_flow"
+      },
+      {
+        "nodeId": "admin_dashboard.crossModuleDep.calendar_scheduling",
+        "type": "crossModuleDependency",
+        "targetModule": "calendar_scheduling",
+        "confidence": "high",
+        "source": "db_flow"
+      }
+    ]
+  }
+}

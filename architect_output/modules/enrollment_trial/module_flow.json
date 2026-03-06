@@ -1,0 +1,1237 @@
+{
+  "moduleId": "enrollment_trial",
+  "generatedAt": "2026-03-06",
+  "reconcileVersion": "v1.0.0",
+  "nodes": [
+    {
+      "id": "enrollment_trial.screen.admin_enrollment_list",
+      "type": "screen",
+      "route": "/admin/enrollments",
+      "components": ["EnrollmentFilters", "EnrollmentTable", "Pagination"]
+    },
+    {
+      "id": "enrollment_trial.screen.admin_enrollment_detail",
+      "type": "screen",
+      "route": "/admin/enrollments/{enrollmentId}",
+      "components": ["EnrollmentInfoPanel", "StatusActions", "PaymentSummary"]
+    },
+    {
+      "id": "enrollment_trial.screen.program_discovery",
+      "type": "screen",
+      "route": "/programs",
+      "components": ["PublicProgramGrid", "ProgramCard"]
+    },
+    {
+      "id": "enrollment_trial.screen.trial_booking_form",
+      "type": "screen",
+      "route": "/programs/{programId}/book-trial",
+      "components": ["TrialBookingForm", "TrialDatePicker", "ProgramSummary"]
+    },
+    {
+      "id": "enrollment_trial.screen.enrollment_form",
+      "type": "screen",
+      "route": "/programs/{programId}/enroll",
+      "components": ["EnrollmentForm", "CouponInput", "PriceBreakdownPanel"]
+    },
+    {
+      "id": "enrollment_trial.screen.enrollment_confirmation",
+      "type": "screen",
+      "route": "/enrollment/{enrollmentId}/confirmation",
+      "components": ["ConfirmationCard", "PaymentCTA"]
+    },
+    {
+      "id": "enrollment_trial.endpoint.getEnrollments",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/enrollments",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "enrollment_trial.endpoint.getEnrollment",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/enrollments/{enrollmentId}",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "enrollment_trial.endpoint.updateEnrollmentStatus",
+      "type": "endpoint",
+      "method": "PATCH",
+      "path": "/api/enrollments/{enrollmentId}/status",
+      "auth": { "type": "cookieAuth", "source": "openapi" },
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "enrollment_trial.endpoint.getPublicPrograms",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/public/programs",
+      "auth": { "type": "none", "source": "openapi", "note": "Public endpoint — GP-06: only ACTIVE programs returned" },
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" }
+    },
+    {
+      "id": "enrollment_trial.endpoint.getPublicProgram",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/public/programs/{programId}",
+      "auth": { "type": "none", "source": "openapi", "note": "Public endpoint" },
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" }
+    },
+    {
+      "id": "enrollment_trial.endpoint.getPriceBreakdown",
+      "type": "endpoint",
+      "method": "POST",
+      "path": "/api/public/programs/{programId}/price",
+      "auth": { "type": "none", "source": "openapi", "note": "Public endpoint" },
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" }
+    },
+    {
+      "id": "enrollment_trial.endpoint.bookTrial",
+      "type": "endpoint",
+      "method": "POST",
+      "path": "/api/public/trials",
+      "auth": { "type": "none", "source": "openapi", "note": "Public endpoint" },
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" }
+    },
+    {
+      "id": "enrollment_trial.endpoint.submitEnrollment",
+      "type": "endpoint",
+      "method": "POST",
+      "path": "/api/public/enrollments",
+      "auth": { "type": "none", "source": "openapi", "note": "Public endpoint — instant enrollment (ET-A-02)" },
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" }
+    },
+    {
+      "id": "enrollment_trial.endpoint.getEnrollmentConfirmation",
+      "type": "endpoint",
+      "method": "GET",
+      "path": "/api/public/enrollments/{enrollmentId}/confirmation",
+      "auth": { "type": "none", "source": "openapi", "note": "Public endpoint — accessed via enrollment confirmation link" },
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" }
+    },
+    {
+      "id": "enrollment_trial.mw.getEnrollments.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.getEnrollments.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.getEnrollments.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "enrollment_trial.mw.getEnrollments.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.getEnrollment.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.getEnrollment.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.getEnrollment.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "enrollment_trial.mw.updateEnrollmentStatus.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.updateEnrollmentStatus.auth_session",
+      "type": "middleware",
+      "middleware": "auth_session",
+      "order": 2,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.updateEnrollmentStatus.role_permission_check",
+      "type": "middleware",
+      "middleware": "role_permission_check",
+      "order": 3,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "enrollment_trial.mw.updateEnrollmentStatus.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 4,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.updateEnrollmentStatus.business_rule_guard",
+      "type": "middleware",
+      "middleware": "business_rule_guard",
+      "order": 5,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "enrollment_trial.mw.updateEnrollmentStatus.audit_log",
+      "type": "middleware",
+      "middleware": "audit_log",
+      "order": 6,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "enrollment_trial.mw.getPublicPrograms.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.getPublicPrograms.rate_limit",
+      "type": "middleware",
+      "middleware": "rate_limit",
+      "order": 2,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "enrollment_trial.mw.getPublicProgram.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.getPublicProgram.rate_limit",
+      "type": "middleware",
+      "middleware": "rate_limit",
+      "order": 2,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "enrollment_trial.mw.getPriceBreakdown.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.getPriceBreakdown.rate_limit",
+      "type": "middleware",
+      "middleware": "rate_limit",
+      "order": 2,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "enrollment_trial.mw.getPriceBreakdown.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 3,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.bookTrial.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.bookTrial.rate_limit",
+      "type": "middleware",
+      "middleware": "rate_limit",
+      "order": 2,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.bookTrial.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 3,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.bookTrial.business_rule_guard",
+      "type": "middleware",
+      "middleware": "business_rule_guard",
+      "order": 4,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.bookTrial.audit_log",
+      "type": "middleware",
+      "middleware": "audit_log",
+      "order": 5,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "enrollment_trial.mw.submitEnrollment.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.submitEnrollment.rate_limit",
+      "type": "middleware",
+      "middleware": "rate_limit",
+      "order": 2,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.submitEnrollment.input_validation",
+      "type": "middleware",
+      "middleware": "input_validation",
+      "order": 3,
+      "inferred": false,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.submitEnrollment.business_rule_guard",
+      "type": "middleware",
+      "middleware": "business_rule_guard",
+      "order": 4,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.submitEnrollment.audit_log",
+      "type": "middleware",
+      "middleware": "audit_log",
+      "order": 5,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.getEnrollmentConfirmation.request_id",
+      "type": "middleware",
+      "middleware": "request_id",
+      "order": 1,
+      "inferred": true,
+      "confidence": "high"
+    },
+    {
+      "id": "enrollment_trial.mw.getEnrollmentConfirmation.rate_limit",
+      "type": "middleware",
+      "middleware": "rate_limit",
+      "order": 2,
+      "inferred": true,
+      "confidence": "medium"
+    },
+    {
+      "id": "enrollment_trial.db.getEnrollments.Enrollment.READ",
+      "type": "db_operation",
+      "model": "Enrollment",
+      "operation": "READ",
+      "description": "Paginated list of enrollments with filters (status, programId, paymentStatus, search)"
+    },
+    {
+      "id": "enrollment_trial.db.getEnrollment.Enrollment.READ",
+      "type": "db_operation",
+      "model": "Enrollment",
+      "operation": "READ",
+      "description": "Fetch single enrollment with full relations"
+    },
+    {
+      "id": "enrollment_trial.db.updateEnrollmentStatus.Enrollment.READ",
+      "type": "db_operation",
+      "model": "Enrollment",
+      "operation": "READ",
+      "description": "Read current enrollment status for transition validation"
+    },
+    {
+      "id": "enrollment_trial.db.updateEnrollmentStatus.Enrollment.UPDATE",
+      "type": "db_operation",
+      "model": "Enrollment",
+      "operation": "UPDATE",
+      "description": "Update enrollment status (ACTIVE->CANCELLED requires cancellationReason; ACTIVE->COMPLETED)"
+    },
+    {
+      "id": "enrollment_trial.db.getPublicPrograms.Program.READ",
+      "type": "db_operation",
+      "model": "Program",
+      "operation": "READ",
+      "description": "Fetch all ACTIVE programs for public listing (GP-06: only ACTIVE status)"
+    },
+    {
+      "id": "enrollment_trial.db.getPublicProgram.Program.READ",
+      "type": "db_operation",
+      "model": "Program",
+      "operation": "READ",
+      "description": "Fetch single program detail for public view (must be ACTIVE)"
+    },
+    {
+      "id": "enrollment_trial.db.getPriceBreakdown.Program.READ",
+      "type": "db_operation",
+      "model": "Program",
+      "operation": "READ",
+      "description": "Fetch program pricing fields (baseFee, feeType, registrationFee, registrationFeeRequired, totalSessions)"
+    },
+    {
+      "id": "enrollment_trial.db.getPriceBreakdown.Coupon.READ",
+      "type": "db_operation",
+      "model": "Coupon",
+      "operation": "READ",
+      "description": "Validate coupon code if provided (exists, not expired, usage not exceeded)"
+    },
+    {
+      "id": "enrollment_trial.db.bookTrial.CalendarDate.READ",
+      "type": "db_operation",
+      "model": "CalendarDate",
+      "operation": "READ",
+      "description": "Validate trialDateId exists, is trialEligible, has capacity (spots remaining check)"
+    },
+    {
+      "id": "enrollment_trial.db.bookTrial.Program.READ",
+      "type": "db_operation",
+      "model": "Program",
+      "operation": "READ",
+      "description": "Validate program is ACTIVE and exists"
+    },
+    {
+      "id": "enrollment_trial.db.bookTrial.Trial.READ",
+      "type": "db_operation",
+      "model": "Trial",
+      "operation": "READ",
+      "description": "Check for duplicate trial booking (GP-01: one per child per program)"
+    },
+    {
+      "id": "enrollment_trial.db.bookTrial.Lead.READ",
+      "type": "db_operation",
+      "model": "Lead",
+      "operation": "READ",
+      "description": "Check if lead exists by parentEmail (GP-02: auto-create/link)"
+    },
+    {
+      "id": "enrollment_trial.db.bookTrial.Lead.CREATE",
+      "type": "db_operation",
+      "model": "Lead",
+      "operation": "CREATE",
+      "description": "Auto-create lead if not exists (GP-02), with status TRIAL_SCHEDULED"
+    },
+    {
+      "id": "enrollment_trial.db.bookTrial.Lead.UPDATE",
+      "type": "db_operation",
+      "model": "Lead",
+      "operation": "UPDATE",
+      "description": "Auto-advance existing lead status to TRIAL_SCHEDULED if applicable (GP-04)"
+    },
+    {
+      "id": "enrollment_trial.db.bookTrial.Trial.CREATE",
+      "type": "db_operation",
+      "model": "Trial",
+      "operation": "CREATE",
+      "description": "Create trial booking record"
+    },
+    {
+      "id": "enrollment_trial.db.bookTrial.LeadActivity.CREATE",
+      "type": "db_operation",
+      "model": "LeadActivity",
+      "operation": "CREATE",
+      "description": "Create activity records (LEAD_CREATED if new lead, STATUS_CHANGE for auto-advance)"
+    },
+    {
+      "id": "enrollment_trial.db.submitEnrollment.Program.READ",
+      "type": "db_operation",
+      "model": "Program",
+      "operation": "READ",
+      "description": "Validate program is ACTIVE, has capacity, fetch pricing"
+    },
+    {
+      "id": "enrollment_trial.db.submitEnrollment.Enrollment.READ",
+      "type": "db_operation",
+      "model": "Enrollment",
+      "operation": "READ",
+      "description": "Check for duplicate enrollment (GP-01: one per child per program)"
+    },
+    {
+      "id": "enrollment_trial.db.submitEnrollment.Coupon.READ",
+      "type": "db_operation",
+      "model": "Coupon",
+      "operation": "READ",
+      "description": "Validate coupon if provided (exists, not expired, within usage limit)"
+    },
+    {
+      "id": "enrollment_trial.db.submitEnrollment.Coupon.UPDATE",
+      "type": "db_operation",
+      "model": "Coupon",
+      "operation": "UPDATE",
+      "description": "Increment usageCount on coupon redemption"
+    },
+    {
+      "id": "enrollment_trial.db.submitEnrollment.Lead.READ",
+      "type": "db_operation",
+      "model": "Lead",
+      "operation": "READ",
+      "description": "Check if lead exists by parentEmail (GP-02)"
+    },
+    {
+      "id": "enrollment_trial.db.submitEnrollment.Lead.CREATE",
+      "type": "db_operation",
+      "model": "Lead",
+      "operation": "CREATE",
+      "description": "Auto-create lead if not exists (GP-02), with status ENROLLED"
+    },
+    {
+      "id": "enrollment_trial.db.submitEnrollment.Lead.UPDATE",
+      "type": "db_operation",
+      "model": "Lead",
+      "operation": "UPDATE",
+      "description": "Auto-advance existing lead status to ENROLLED (GP-04)"
+    },
+    {
+      "id": "enrollment_trial.db.submitEnrollment.Enrollment.CREATE",
+      "type": "db_operation",
+      "model": "Enrollment",
+      "operation": "CREATE",
+      "description": "Create enrollment record with price breakdown snapshot"
+    },
+    {
+      "id": "enrollment_trial.db.submitEnrollment.Payment.CREATE",
+      "type": "db_operation",
+      "model": "Payment",
+      "operation": "CREATE",
+      "description": "Auto-create Payment record for the enrollment (HO-02: enrollment_trial -> payment_tracking)"
+    },
+    {
+      "id": "enrollment_trial.db.submitEnrollment.LeadActivity.CREATE",
+      "type": "db_operation",
+      "model": "LeadActivity",
+      "operation": "CREATE",
+      "description": "Create activity records (ENROLLMENT_EVENT, STATUS_CHANGE, optionally LEAD_CREATED)"
+    },
+    {
+      "id": "enrollment_trial.db.getEnrollmentConfirmation.Enrollment.READ",
+      "type": "db_operation",
+      "model": "Enrollment",
+      "operation": "READ",
+      "description": "Fetch enrollment details for confirmation page"
+    },
+    {
+      "id": "enrollment_trial.db.getEnrollmentConfirmation.LocationSettings.READ",
+      "type": "db_operation",
+      "model": "LocationSettings",
+      "operation": "READ",
+      "description": "Fetch location/Zelle info for payment instructions reference"
+    },
+    {
+      "id": "enrollment_trial.effect.updateEnrollmentStatus.audit_enrollment_status_change",
+      "type": "side_effect",
+      "effectType": "app_event",
+      "name": "audit_enrollment_status_change",
+      "description": "Audit log records enrollment status transition"
+    },
+    {
+      "id": "enrollment_trial.effect.bookTrial.trial_booked_email",
+      "type": "side_effect",
+      "effectType": "email",
+      "name": "trial_booked_email",
+      "description": "Fires trial confirmation email to parent (HO-03: enrollment_trial -> communication)"
+    },
+    {
+      "id": "enrollment_trial.effect.bookTrial.lead_created_notification",
+      "type": "side_effect",
+      "effectType": "app_event",
+      "name": "lead_created_notification",
+      "description": "If new lead created, triggers LEAD_CREATED automation (if enabled)"
+    },
+    {
+      "id": "enrollment_trial.effect.submitEnrollment.enrollment_confirmation_email",
+      "type": "side_effect",
+      "effectType": "email",
+      "name": "enrollment_confirmation_email",
+      "description": "Fires enrollment confirmation email to parent (HO-03)"
+    },
+    {
+      "id": "enrollment_trial.effect.submitEnrollment.lead_created_notification",
+      "type": "side_effect",
+      "effectType": "app_event",
+      "name": "lead_created_notification",
+      "description": "If new lead created, triggers LEAD_CREATED automation"
+    }
+  ],
+  "edges": [
+    {
+      "id": "enrollment_trial.edge.loadEnrollments.getEnrollments",
+      "type": "screen_action_to_endpoint",
+      "from": "enrollment_trial.screen.admin_enrollment_list",
+      "to": "enrollment_trial.endpoint.getEnrollments",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/enrollments.get", "fe_details://admin_enrollment_list.endpointProposals[0]"]
+    },
+    {
+      "id": "enrollment_trial.edge.loadEnrollment.getEnrollment",
+      "type": "screen_action_to_endpoint",
+      "from": "enrollment_trial.screen.admin_enrollment_detail",
+      "to": "enrollment_trial.endpoint.getEnrollment",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/enrollments/{enrollmentId}.get", "fe_details://admin_enrollment_detail.endpointProposals[0]"]
+    },
+    {
+      "id": "enrollment_trial.edge.updateEnrollmentStatus.updateEnrollmentStatus",
+      "type": "screen_action_to_endpoint",
+      "from": "enrollment_trial.screen.admin_enrollment_detail",
+      "to": "enrollment_trial.endpoint.updateEnrollmentStatus",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/enrollments/{enrollmentId}/status.patch", "fe_details://admin_enrollment_detail.endpointProposals[1]"]
+    },
+    {
+      "id": "enrollment_trial.edge.loadPublicPrograms.getPublicPrograms",
+      "type": "screen_action_to_endpoint",
+      "from": "enrollment_trial.screen.program_discovery",
+      "to": "enrollment_trial.endpoint.getPublicPrograms",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/public/programs.get", "fe_details://program_discovery.endpointProposals[0]"]
+    },
+    {
+      "id": "enrollment_trial.edge.loadPublicProgram.getPublicProgram",
+      "type": "screen_action_to_endpoint",
+      "from": "enrollment_trial.screen.trial_booking_form",
+      "to": "enrollment_trial.endpoint.getPublicProgram",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/public/programs/{programId}.get", "fe_details://trial_booking_form.endpointProposals[0]"]
+    },
+    {
+      "id": "enrollment_trial.edge.submitTrialBooking.bookTrial",
+      "type": "screen_action_to_endpoint",
+      "from": "enrollment_trial.screen.trial_booking_form",
+      "to": "enrollment_trial.endpoint.bookTrial",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/public/trials.post", "fe_details://trial_booking_form.endpointProposals[1]"]
+    },
+    {
+      "id": "enrollment_trial.edge.getPriceBreakdown.getPriceBreakdown",
+      "type": "screen_action_to_endpoint",
+      "from": "enrollment_trial.screen.enrollment_form",
+      "to": "enrollment_trial.endpoint.getPriceBreakdown",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/public/programs/{programId}/price.post", "fe_details://enrollment_form.endpointProposals[0]"]
+    },
+    {
+      "id": "enrollment_trial.edge.submitEnrollment.submitEnrollment",
+      "type": "screen_action_to_endpoint",
+      "from": "enrollment_trial.screen.enrollment_form",
+      "to": "enrollment_trial.endpoint.submitEnrollment",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/public/enrollments.post", "fe_details://enrollment_form.endpointProposals[1]"]
+    },
+    {
+      "id": "enrollment_trial.edge.loadConfirmation.getEnrollmentConfirmation",
+      "type": "screen_action_to_endpoint",
+      "from": "enrollment_trial.screen.enrollment_confirmation",
+      "to": "enrollment_trial.endpoint.getEnrollmentConfirmation",
+      "confidence": "high",
+      "evidenceRefs": ["openapi:///api/public/enrollments/{enrollmentId}/confirmation.get", "fe_details://enrollment_confirmation.endpointProposals[0]"]
+    },
+    {
+      "id": "enrollment_trial.edge.getEnrollments.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.getEnrollments",
+      "to": "enrollment_trial.mw.getEnrollments.request_id"
+    },
+    {
+      "id": "enrollment_trial.edge.getEnrollments.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.getEnrollments",
+      "to": "enrollment_trial.mw.getEnrollments.auth_session"
+    },
+    {
+      "id": "enrollment_trial.edge.getEnrollments.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.getEnrollments",
+      "to": "enrollment_trial.mw.getEnrollments.role_permission_check"
+    },
+    {
+      "id": "enrollment_trial.edge.getEnrollments.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.getEnrollments",
+      "to": "enrollment_trial.mw.getEnrollments.input_validation"
+    },
+    {
+      "id": "enrollment_trial.edge.getEnrollment.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.getEnrollment",
+      "to": "enrollment_trial.mw.getEnrollment.request_id"
+    },
+    {
+      "id": "enrollment_trial.edge.getEnrollment.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.getEnrollment",
+      "to": "enrollment_trial.mw.getEnrollment.auth_session"
+    },
+    {
+      "id": "enrollment_trial.edge.getEnrollment.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.getEnrollment",
+      "to": "enrollment_trial.mw.getEnrollment.role_permission_check"
+    },
+    {
+      "id": "enrollment_trial.edge.updateEnrollmentStatus.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.updateEnrollmentStatus",
+      "to": "enrollment_trial.mw.updateEnrollmentStatus.request_id"
+    },
+    {
+      "id": "enrollment_trial.edge.updateEnrollmentStatus.mw.auth_session",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.updateEnrollmentStatus",
+      "to": "enrollment_trial.mw.updateEnrollmentStatus.auth_session"
+    },
+    {
+      "id": "enrollment_trial.edge.updateEnrollmentStatus.mw.role_permission_check",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.updateEnrollmentStatus",
+      "to": "enrollment_trial.mw.updateEnrollmentStatus.role_permission_check"
+    },
+    {
+      "id": "enrollment_trial.edge.updateEnrollmentStatus.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.updateEnrollmentStatus",
+      "to": "enrollment_trial.mw.updateEnrollmentStatus.input_validation"
+    },
+    {
+      "id": "enrollment_trial.edge.updateEnrollmentStatus.mw.business_rule_guard",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.updateEnrollmentStatus",
+      "to": "enrollment_trial.mw.updateEnrollmentStatus.business_rule_guard"
+    },
+    {
+      "id": "enrollment_trial.edge.updateEnrollmentStatus.mw.audit_log",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.updateEnrollmentStatus",
+      "to": "enrollment_trial.mw.updateEnrollmentStatus.audit_log"
+    },
+    {
+      "id": "enrollment_trial.edge.getPublicPrograms.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.getPublicPrograms",
+      "to": "enrollment_trial.mw.getPublicPrograms.request_id"
+    },
+    {
+      "id": "enrollment_trial.edge.getPublicPrograms.mw.rate_limit",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.getPublicPrograms",
+      "to": "enrollment_trial.mw.getPublicPrograms.rate_limit"
+    },
+    {
+      "id": "enrollment_trial.edge.getPublicProgram.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.getPublicProgram",
+      "to": "enrollment_trial.mw.getPublicProgram.request_id"
+    },
+    {
+      "id": "enrollment_trial.edge.getPublicProgram.mw.rate_limit",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.getPublicProgram",
+      "to": "enrollment_trial.mw.getPublicProgram.rate_limit"
+    },
+    {
+      "id": "enrollment_trial.edge.getPriceBreakdown.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.getPriceBreakdown",
+      "to": "enrollment_trial.mw.getPriceBreakdown.request_id"
+    },
+    {
+      "id": "enrollment_trial.edge.getPriceBreakdown.mw.rate_limit",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.getPriceBreakdown",
+      "to": "enrollment_trial.mw.getPriceBreakdown.rate_limit"
+    },
+    {
+      "id": "enrollment_trial.edge.getPriceBreakdown.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.getPriceBreakdown",
+      "to": "enrollment_trial.mw.getPriceBreakdown.input_validation"
+    },
+    {
+      "id": "enrollment_trial.edge.bookTrial.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.bookTrial",
+      "to": "enrollment_trial.mw.bookTrial.request_id"
+    },
+    {
+      "id": "enrollment_trial.edge.bookTrial.mw.rate_limit",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.bookTrial",
+      "to": "enrollment_trial.mw.bookTrial.rate_limit"
+    },
+    {
+      "id": "enrollment_trial.edge.bookTrial.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.bookTrial",
+      "to": "enrollment_trial.mw.bookTrial.input_validation"
+    },
+    {
+      "id": "enrollment_trial.edge.bookTrial.mw.business_rule_guard",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.bookTrial",
+      "to": "enrollment_trial.mw.bookTrial.business_rule_guard"
+    },
+    {
+      "id": "enrollment_trial.edge.bookTrial.mw.audit_log",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.bookTrial",
+      "to": "enrollment_trial.mw.bookTrial.audit_log"
+    },
+    {
+      "id": "enrollment_trial.edge.submitEnrollment.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.submitEnrollment",
+      "to": "enrollment_trial.mw.submitEnrollment.request_id"
+    },
+    {
+      "id": "enrollment_trial.edge.submitEnrollment.mw.rate_limit",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.submitEnrollment",
+      "to": "enrollment_trial.mw.submitEnrollment.rate_limit"
+    },
+    {
+      "id": "enrollment_trial.edge.submitEnrollment.mw.input_validation",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.submitEnrollment",
+      "to": "enrollment_trial.mw.submitEnrollment.input_validation"
+    },
+    {
+      "id": "enrollment_trial.edge.submitEnrollment.mw.business_rule_guard",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.submitEnrollment",
+      "to": "enrollment_trial.mw.submitEnrollment.business_rule_guard"
+    },
+    {
+      "id": "enrollment_trial.edge.submitEnrollment.mw.audit_log",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.submitEnrollment",
+      "to": "enrollment_trial.mw.submitEnrollment.audit_log"
+    },
+    {
+      "id": "enrollment_trial.edge.getEnrollmentConfirmation.mw.request_id",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.getEnrollmentConfirmation",
+      "to": "enrollment_trial.mw.getEnrollmentConfirmation.request_id"
+    },
+    {
+      "id": "enrollment_trial.edge.getEnrollmentConfirmation.mw.rate_limit",
+      "type": "endpoint_to_middleware",
+      "from": "enrollment_trial.endpoint.getEnrollmentConfirmation",
+      "to": "enrollment_trial.mw.getEnrollmentConfirmation.rate_limit"
+    },
+    {
+      "id": "enrollment_trial.edge.getEnrollments.perm",
+      "type": "endpoint_to_permission",
+      "from": "enrollment_trial.endpoint.getEnrollments",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "enrollment_trial.edge.getEnrollment.perm",
+      "type": "endpoint_to_permission",
+      "from": "enrollment_trial.endpoint.getEnrollment",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "enrollment_trial.edge.updateEnrollmentStatus.perm",
+      "type": "endpoint_to_permission",
+      "from": "enrollment_trial.endpoint.updateEnrollmentStatus",
+      "permissionMatrix": { "roles": ["admin"], "permissions": [], "source": "openapi+fe_details", "precedence": "openapi" }
+    },
+    {
+      "id": "enrollment_trial.edge.getPublicPrograms.perm",
+      "type": "endpoint_to_permission",
+      "from": "enrollment_trial.endpoint.getPublicPrograms",
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" }
+    },
+    {
+      "id": "enrollment_trial.edge.getPublicProgram.perm",
+      "type": "endpoint_to_permission",
+      "from": "enrollment_trial.endpoint.getPublicProgram",
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" }
+    },
+    {
+      "id": "enrollment_trial.edge.getPriceBreakdown.perm",
+      "type": "endpoint_to_permission",
+      "from": "enrollment_trial.endpoint.getPriceBreakdown",
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" }
+    },
+    {
+      "id": "enrollment_trial.edge.bookTrial.perm",
+      "type": "endpoint_to_permission",
+      "from": "enrollment_trial.endpoint.bookTrial",
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" }
+    },
+    {
+      "id": "enrollment_trial.edge.submitEnrollment.perm",
+      "type": "endpoint_to_permission",
+      "from": "enrollment_trial.endpoint.submitEnrollment",
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" }
+    },
+    {
+      "id": "enrollment_trial.edge.getEnrollmentConfirmation.perm",
+      "type": "endpoint_to_permission",
+      "from": "enrollment_trial.endpoint.getEnrollmentConfirmation",
+      "permissionMatrix": { "roles": [], "permissions": [], "source": "openapi", "precedence": "openapi" }
+    },
+    {
+      "id": "enrollment_trial.edge.getEnrollments.db.Enrollment.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.getEnrollments",
+      "to": "enrollment_trial.db.getEnrollments.Enrollment.READ"
+    },
+    {
+      "id": "enrollment_trial.edge.getEnrollment.db.Enrollment.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.getEnrollment",
+      "to": "enrollment_trial.db.getEnrollment.Enrollment.READ"
+    },
+    {
+      "id": "enrollment_trial.edge.updateEnrollmentStatus.db.Enrollment.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.updateEnrollmentStatus",
+      "to": "enrollment_trial.db.updateEnrollmentStatus.Enrollment.READ"
+    },
+    {
+      "id": "enrollment_trial.edge.updateEnrollmentStatus.db.Enrollment.UPDATE",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.updateEnrollmentStatus",
+      "to": "enrollment_trial.db.updateEnrollmentStatus.Enrollment.UPDATE"
+    },
+    {
+      "id": "enrollment_trial.edge.getPublicPrograms.db.Program.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.getPublicPrograms",
+      "to": "enrollment_trial.db.getPublicPrograms.Program.READ"
+    },
+    {
+      "id": "enrollment_trial.edge.getPublicProgram.db.Program.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.getPublicProgram",
+      "to": "enrollment_trial.db.getPublicProgram.Program.READ"
+    },
+    {
+      "id": "enrollment_trial.edge.getPriceBreakdown.db.Program.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.getPriceBreakdown",
+      "to": "enrollment_trial.db.getPriceBreakdown.Program.READ"
+    },
+    {
+      "id": "enrollment_trial.edge.getPriceBreakdown.db.Coupon.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.getPriceBreakdown",
+      "to": "enrollment_trial.db.getPriceBreakdown.Coupon.READ"
+    },
+    {
+      "id": "enrollment_trial.edge.bookTrial.db.CalendarDate.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.bookTrial",
+      "to": "enrollment_trial.db.bookTrial.CalendarDate.READ"
+    },
+    {
+      "id": "enrollment_trial.edge.bookTrial.db.Program.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.bookTrial",
+      "to": "enrollment_trial.db.bookTrial.Program.READ"
+    },
+    {
+      "id": "enrollment_trial.edge.bookTrial.db.Trial.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.bookTrial",
+      "to": "enrollment_trial.db.bookTrial.Trial.READ"
+    },
+    {
+      "id": "enrollment_trial.edge.bookTrial.db.Lead.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.bookTrial",
+      "to": "enrollment_trial.db.bookTrial.Lead.READ"
+    },
+    {
+      "id": "enrollment_trial.edge.bookTrial.db.Lead.CREATE",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.bookTrial",
+      "to": "enrollment_trial.db.bookTrial.Lead.CREATE"
+    },
+    {
+      "id": "enrollment_trial.edge.bookTrial.db.Lead.UPDATE",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.bookTrial",
+      "to": "enrollment_trial.db.bookTrial.Lead.UPDATE"
+    },
+    {
+      "id": "enrollment_trial.edge.bookTrial.db.Trial.CREATE",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.bookTrial",
+      "to": "enrollment_trial.db.bookTrial.Trial.CREATE"
+    },
+    {
+      "id": "enrollment_trial.edge.bookTrial.db.LeadActivity.CREATE",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.bookTrial",
+      "to": "enrollment_trial.db.bookTrial.LeadActivity.CREATE"
+    },
+    {
+      "id": "enrollment_trial.edge.submitEnrollment.db.Program.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.submitEnrollment",
+      "to": "enrollment_trial.db.submitEnrollment.Program.READ"
+    },
+    {
+      "id": "enrollment_trial.edge.submitEnrollment.db.Enrollment.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.submitEnrollment",
+      "to": "enrollment_trial.db.submitEnrollment.Enrollment.READ"
+    },
+    {
+      "id": "enrollment_trial.edge.submitEnrollment.db.Coupon.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.submitEnrollment",
+      "to": "enrollment_trial.db.submitEnrollment.Coupon.READ"
+    },
+    {
+      "id": "enrollment_trial.edge.submitEnrollment.db.Coupon.UPDATE",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.submitEnrollment",
+      "to": "enrollment_trial.db.submitEnrollment.Coupon.UPDATE"
+    },
+    {
+      "id": "enrollment_trial.edge.submitEnrollment.db.Lead.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.submitEnrollment",
+      "to": "enrollment_trial.db.submitEnrollment.Lead.READ"
+    },
+    {
+      "id": "enrollment_trial.edge.submitEnrollment.db.Lead.CREATE",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.submitEnrollment",
+      "to": "enrollment_trial.db.submitEnrollment.Lead.CREATE"
+    },
+    {
+      "id": "enrollment_trial.edge.submitEnrollment.db.Lead.UPDATE",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.submitEnrollment",
+      "to": "enrollment_trial.db.submitEnrollment.Lead.UPDATE"
+    },
+    {
+      "id": "enrollment_trial.edge.submitEnrollment.db.Enrollment.CREATE",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.submitEnrollment",
+      "to": "enrollment_trial.db.submitEnrollment.Enrollment.CREATE"
+    },
+    {
+      "id": "enrollment_trial.edge.submitEnrollment.db.Payment.CREATE",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.submitEnrollment",
+      "to": "enrollment_trial.db.submitEnrollment.Payment.CREATE"
+    },
+    {
+      "id": "enrollment_trial.edge.submitEnrollment.db.LeadActivity.CREATE",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.submitEnrollment",
+      "to": "enrollment_trial.db.submitEnrollment.LeadActivity.CREATE"
+    },
+    {
+      "id": "enrollment_trial.edge.getEnrollmentConfirmation.db.Enrollment.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.getEnrollmentConfirmation",
+      "to": "enrollment_trial.db.getEnrollmentConfirmation.Enrollment.READ"
+    },
+    {
+      "id": "enrollment_trial.edge.getEnrollmentConfirmation.db.LocationSettings.READ",
+      "type": "endpoint_to_db_operation",
+      "from": "enrollment_trial.endpoint.getEnrollmentConfirmation",
+      "to": "enrollment_trial.db.getEnrollmentConfirmation.LocationSettings.READ"
+    },
+    {
+      "id": "enrollment_trial.edge.updateEnrollmentStatus.effect.audit_enrollment_status_change",
+      "type": "db_to_side_effect",
+      "from": "enrollment_trial.db.updateEnrollmentStatus.Enrollment.UPDATE",
+      "to": "enrollment_trial.effect.updateEnrollmentStatus.audit_enrollment_status_change"
+    },
+    {
+      "id": "enrollment_trial.edge.bookTrial.effect.trial_booked_email",
+      "type": "db_to_side_effect",
+      "from": "enrollment_trial.db.bookTrial.Trial.CREATE",
+      "to": "enrollment_trial.effect.bookTrial.trial_booked_email"
+    },
+    {
+      "id": "enrollment_trial.edge.bookTrial.effect.lead_created_notification",
+      "type": "db_to_side_effect",
+      "from": "enrollment_trial.db.bookTrial.Lead.CREATE",
+      "to": "enrollment_trial.effect.bookTrial.lead_created_notification"
+    },
+    {
+      "id": "enrollment_trial.edge.submitEnrollment.effect.enrollment_confirmation_email",
+      "type": "db_to_side_effect",
+      "from": "enrollment_trial.db.submitEnrollment.Enrollment.CREATE",
+      "to": "enrollment_trial.effect.submitEnrollment.enrollment_confirmation_email"
+    },
+    {
+      "id": "enrollment_trial.edge.submitEnrollment.effect.lead_created_notification",
+      "type": "db_to_side_effect",
+      "from": "enrollment_trial.db.submitEnrollment.Lead.CREATE",
+      "to": "enrollment_trial.effect.submitEnrollment.lead_created_notification"
+    }
+  ],
+  "guards": [
+    { "route": "/admin/enrollments", "authRequired": true, "allowedRoles": ["admin"], "redirectIfUnauthenticated": "/admin/login", "confidence": "high", "evidenceRefs": ["fe_details://admin_enrollment_list"] },
+    { "route": "/admin/enrollments/{enrollmentId}", "authRequired": true, "allowedRoles": ["admin"], "redirectIfUnauthenticated": "/admin/login", "confidence": "high", "evidenceRefs": ["fe_details://admin_enrollment_detail"] },
+    { "route": "/programs", "authRequired": false, "allowedRoles": ["parent"], "confidence": "high", "evidenceRefs": ["fe_details://program_discovery"] },
+    { "route": "/programs/{programId}/book-trial", "authRequired": false, "allowedRoles": ["parent"], "confidence": "high", "evidenceRefs": ["fe_details://trial_booking_form"] },
+    { "route": "/programs/{programId}/enroll", "authRequired": false, "allowedRoles": ["parent"], "confidence": "high", "evidenceRefs": ["fe_details://enrollment_form"] },
+    { "route": "/enrollment/{enrollmentId}/confirmation", "authRequired": false, "allowedRoles": ["parent"], "confidence": "high", "evidenceRefs": ["fe_details://enrollment_confirmation"] }
+  ],
+  "crossModuleDependencies": [
+    {
+      "targetModule": "program_pricing",
+      "models": ["Program", "Coupon"],
+      "accessType": "READ+UPDATE",
+      "reason": "Program validation/pricing for booking/enrollment; coupon validation and usage increment",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.Trial.relations.program", "prisma_contract://models.Enrollment.relations.program"]
+    },
+    {
+      "targetModule": "calendar_scheduling",
+      "models": ["CalendarDate"],
+      "accessType": "READ",
+      "reason": "Trial date validation and capacity check for bookTrial",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.Trial.relations.trialDate"]
+    },
+    {
+      "targetModule": "lead_management",
+      "models": ["Lead", "LeadActivity"],
+      "accessType": "CREATE+READ+UPDATE",
+      "reason": "Auto-create/link leads on trial/enrollment (GP-02); auto-advance status (GP-04); create activity records",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.Trial.relations.lead", "prisma_contract://models.Enrollment.relations.lead"]
+    },
+    {
+      "targetModule": "payment_tracking",
+      "models": ["Payment"],
+      "accessType": "CREATE",
+      "reason": "Auto-create payment record on enrollment (HO-02)",
+      "confidence": "high",
+      "sourceRefs": ["normalized://signals.payment_record_creation"]
+    },
+    {
+      "targetModule": "settings",
+      "models": ["LocationSettings"],
+      "accessType": "READ",
+      "reason": "Location info for enrollment confirmation and lead creation",
+      "confidence": "high",
+      "sourceRefs": ["prisma_contract://models.LocationSettings"]
+    }
+  ],
+  "issues": {
+    "unresolvedLinks": [],
+    "gaps": [
+      {
+        "id": "ET-GAP-01",
+        "source": "be_policy_flow",
+        "description": "Enrollment confirmation is accessible by anyone with the enrollmentId (unguessable CUID). No additional auth — relies on ID obscurity. Acceptable for MVP.",
+        "severity": "low"
+      },
+      {
+        "id": "ET-GAP-02",
+        "source": "be_policy_flow",
+        "description": "Admin roles on getEnrollments/getEnrollment/updateEnrollmentStatus inferred from FE allowedRoles — OpenAPI lacks x-required-roles.",
+        "severity": "low"
+      },
+      {
+        "id": "ET-GAP-03",
+        "source": "be_policy_flow",
+        "description": "No explicit enrollment status transition rules in OpenAPI. Business rule guard on updateEnrollmentStatus is inferred.",
+        "severity": "medium"
+      },
+      {
+        "id": "ET-GAP-04",
+        "source": "be_policy_flow",
+        "description": "Public write endpoints (bookTrial, submitEnrollment) have no CAPTCHA or bot-protection specified. Rate limiting applied as mitigation.",
+        "severity": "medium"
+      },
+      {
+        "id": "ET-DB-U-01",
+        "source": "db_flow",
+        "description": "Capacity check race condition: concurrent enrollments could exceed program capacity. Recommend SELECT FOR UPDATE or optimistic locking.",
+        "severity": "medium"
+      }
+    ],
+    "inferredItems": [
+      { "nodeId": "enrollment_trial.mw.getEnrollments.request_id", "type": "middleware", "confidence": "high" },
+      { "nodeId": "enrollment_trial.mw.getEnrollments.role_permission_check", "type": "middleware", "confidence": "medium" },
+      { "nodeId": "enrollment_trial.mw.getEnrollment.request_id", "type": "middleware", "confidence": "high" },
+      { "nodeId": "enrollment_trial.mw.getEnrollment.role_permission_check", "type": "middleware", "confidence": "medium" },
+      { "nodeId": "enrollment_trial.mw.updateEnrollmentStatus.request_id", "type": "middleware", "confidence": "high" },
+      { "nodeId": "enrollment_trial.mw.updateEnrollmentStatus.role_permission_check", "type": "middleware", "confidence": "medium" },
+      { "nodeId": "enrollment_trial.mw.updateEnrollmentStatus.business_rule_guard", "type": "middleware", "confidence": "medium" },
+      { "nodeId": "enrollment_trial.mw.updateEnrollmentStatus.audit_log", "type": "middleware", "confidence": "medium" },
+      { "nodeId": "enrollment_trial.mw.getPublicPrograms.request_id", "type": "middleware", "confidence": "high" },
+      { "nodeId": "enrollment_trial.mw.getPublicPrograms.rate_limit", "type": "middleware", "confidence": "medium" },
+      { "nodeId": "enrollment_trial.mw.getPublicProgram.request_id", "type": "middleware", "confidence": "high" },
+      { "nodeId": "enrollment_trial.mw.getPublicProgram.rate_limit", "type": "middleware", "confidence": "medium" },
+      { "nodeId": "enrollment_trial.mw.getPriceBreakdown.request_id", "type": "middleware", "confidence": "high" },
+      { "nodeId": "enrollment_trial.mw.getPriceBreakdown.rate_limit", "type": "middleware", "confidence": "medium" },
+      { "nodeId": "enrollment_trial.mw.bookTrial.request_id", "type": "middleware", "confidence": "high" },
+      { "nodeId": "enrollment_trial.mw.bookTrial.rate_limit", "type": "middleware", "confidence": "high" },
+      { "nodeId": "enrollment_trial.mw.bookTrial.business_rule_guard", "type": "middleware", "confidence": "high" },
+      { "nodeId": "enrollment_trial.mw.bookTrial.audit_log", "type": "middleware", "confidence": "medium" },
+      { "nodeId": "enrollment_trial.mw.submitEnrollment.request_id", "type": "middleware", "confidence": "high" },
+      { "nodeId": "enrollment_trial.mw.submitEnrollment.rate_limit", "type": "middleware", "confidence": "high" },
+      { "nodeId": "enrollment_trial.mw.submitEnrollment.business_rule_guard", "type": "middleware", "confidence": "high" },
+      { "nodeId": "enrollment_trial.mw.submitEnrollment.audit_log", "type": "middleware", "confidence": "high" },
+      { "nodeId": "enrollment_trial.mw.getEnrollmentConfirmation.request_id", "type": "middleware", "confidence": "high" },
+      { "nodeId": "enrollment_trial.mw.getEnrollmentConfirmation.rate_limit", "type": "middleware", "confidence": "medium" },
+      { "nodeId": "enrollment_trial.effect.updateEnrollmentStatus.audit_enrollment_status_change", "type": "side_effect", "confidence": "medium" },
+      { "nodeId": "enrollment_trial.effect.bookTrial.lead_created_notification", "type": "side_effect", "confidence": "high" },
+      { "nodeId": "enrollment_trial.effect.submitEnrollment.lead_created_notification", "type": "side_effect", "confidence": "high" },
+      { "nodeId": "enrollment_trial.db.bookTrial.LeadActivity.CREATE", "type": "db_operation", "confidence": "high" },
+      { "nodeId": "enrollment_trial.db.submitEnrollment.LeadActivity.CREATE", "type": "db_operation", "confidence": "high" },
+      { "nodeId": "enrollment_trial.db.getEnrollmentConfirmation.LocationSettings.READ", "type": "db_operation", "confidence": "high" }
+    ]
+  }
+}
