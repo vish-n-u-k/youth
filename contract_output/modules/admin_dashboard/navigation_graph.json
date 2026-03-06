@@ -1,0 +1,84 @@
+{
+  "moduleId": "admin_dashboard",
+  "contractVersion": "v1.0.0",
+  "edges": [
+    {
+      "edgeId": "ad-e-01",
+      "fromScreenId": "dashboard_overview",
+      "trigger": {
+        "type": "click",
+        "sourceId": "recentLeadRow",
+        "event": "Open lead detail"
+      },
+      "toScreenId": "lead_management:lead_detail",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/dashboard_overview/interactions/1"
+    },
+    {
+      "edgeId": "ad-e-02",
+      "fromScreenId": "dashboard_overview",
+      "trigger": {
+        "type": "click",
+        "sourceId": "upcomingTrialRow",
+        "event": "Open lead detail for upcoming trial"
+      },
+      "toScreenId": "lead_management:lead_detail",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/dashboard_overview/interactions/2"
+    },
+    {
+      "edgeId": "ad-e-03",
+      "fromScreenId": "dashboard_overview",
+      "trigger": {
+        "type": "click",
+        "sourceId": "pendingPaymentRow",
+        "event": "Open payment detail"
+      },
+      "toScreenId": "payment_tracking:payment_detail",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/dashboard_overview/interactions/3"
+    },
+    {
+      "edgeId": "ad-e-04",
+      "fromScreenId": "dashboard_overview",
+      "trigger": {
+        "type": "click",
+        "sourceId": "leadsMetricCard",
+        "event": "Navigate to lead management"
+      },
+      "toScreenId": "lead_management:lead_list",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/dashboard_overview/interactions/0"
+    },
+    {
+      "edgeId": "ad-e-05",
+      "fromScreenId": "dashboard_overview",
+      "trigger": {
+        "type": "click",
+        "sourceId": "enrollmentsMetricCard",
+        "event": "Navigate to enrollments"
+      },
+      "toScreenId": "lead_management:lead_list",
+      "condition": "Filter by status=enrolled",
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/dashboard_overview/interactions/0"
+    },
+    {
+      "edgeId": "ad-e-06",
+      "fromScreenId": "dashboard_overview",
+      "trigger": {
+        "type": "click",
+        "sourceId": "paymentsMetricCard",
+        "event": "Navigate to payment tracking"
+      },
+      "toScreenId": "payment_tracking:payment_dashboard",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/dashboard_overview/interactions/0"
+    }
+  ]
+}

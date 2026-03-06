@@ -1,0 +1,149 @@
+{
+  "moduleId": "program_pricing",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "program_list",
+      "template": "list",
+      "widgets": [
+        {
+          "widgetId": "pp-w-01",
+          "type": "header",
+          "bind": {
+            "kind": "custom",
+            "ref": "Programs heading + Create Program button"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "pp-w-02",
+          "type": "custom:filter_bar",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Filter by status"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "pp-w-03",
+          "type": "table",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "programs (name, age group, dates, enrollment/capacity, status, fee)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "pp-w-04",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Navigate to coupon management"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "Create new program",
+      "primaryActionTarget": "program_setup",
+      "sourceRefs": [
+        "fe_details://screens/program_list",
+        "navigation_graph://edges/pp-e-01"
+      ]
+    },
+    {
+      "screenId": "program_setup",
+      "template": "form",
+      "widgets": [
+        {
+          "widgetId": "pp-w-05",
+          "type": "header",
+          "bind": {
+            "kind": "custom",
+            "ref": "Create/Edit Program heading"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "pp-w-06",
+          "type": "card",
+          "bind": {
+            "kind": "custom",
+            "ref": "Program Details section (name, age group, sessions, duration, location, dates, capacity, status)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "pp-w-07",
+          "type": "card",
+          "bind": {
+            "kind": "custom",
+            "ref": "Pricing section (base fee, fee type, registration fee toggle, trial available toggle)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "pp-w-08",
+          "type": "custom:price_breakdown",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Computed total fee preview"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "pp-w-09",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Save program"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "Save program",
+      "primaryActionTarget": "program_list",
+      "sourceRefs": [
+        "fe_details://screens/program_setup",
+        "navigation_graph://edges/pp-e-03"
+      ]
+    },
+    {
+      "screenId": "coupon_management",
+      "template": "list",
+      "widgets": [
+        {
+          "widgetId": "pp-w-10",
+          "type": "header",
+          "bind": {
+            "kind": "custom",
+            "ref": "Coupon Management heading + Create Coupon button"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "pp-w-11",
+          "type": "table",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "coupons (code, type, value, scope, expiry, usage)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "pp-w-12",
+          "type": "modal_placeholder",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Create/Edit coupon form modal"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "Create coupon",
+      "primaryActionTarget": null,
+      "sourceRefs": [
+        "fe_details://screens/coupon_management"
+      ]
+    }
+  ]
+}

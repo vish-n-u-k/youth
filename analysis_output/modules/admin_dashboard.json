@@ -1,0 +1,61 @@
+{
+  "module_id": "admin_dashboard",
+  "module_name": "Admin Dashboard",
+  "description": "Central overview for admin showing key metrics, conversion rates, and quick-access views for leads, enrollments, programs, calendar, and communications.",
+  "priority": "high",
+  "mvp": true,
+  "screens": [
+    {
+      "screen_id": "AD-SCR-01",
+      "screen_name": "Dashboard Overview",
+      "description": "Main admin landing page with summary metrics and quick access to key areas",
+      "features": [
+        {
+          "feature_id": "AD-FT-01",
+          "feature_name": "Key Metrics Display",
+          "description": "Show lead counts by source, conversion rates, active enrollments, and payment status summary",
+          "priority": "high",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "AD-REQ-01",
+              "description": "Dashboard displays: total leads by source (Facebook, Google, Website), lead-to-trial conversion rate, trial-to-enrollment conversion rate, total active enrollments, payment status summary (pending, paid, partial, waived counts)",
+              "acceptance_criteria": "All metrics are computed from current data; dashboard refreshes on page load; numbers match actual record counts"
+            },
+            {
+              "req_id": "AD-REQ-02",
+              "description": "Metrics are displayed as cards or widgets with clear labels and values",
+              "acceptance_criteria": "Each metric has a label, value, and optional trend indicator; layout is clean and scannable"
+            }
+          ]
+        },
+        {
+          "feature_id": "AD-FT-02",
+          "feature_name": "Quick Access Navigation",
+          "description": "Dashboard provides direct links to key views: recent leads, upcoming trials, pending payments",
+          "priority": "medium",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "AD-REQ-03",
+              "description": "Dashboard shows shortcut sections: 5 most recent leads, upcoming trials this week, enrollments with pending payments",
+              "acceptance_criteria": "Each section shows a compact list with clickable items that navigate to the full detail view"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "business_rules": [
+    {
+      "rule_id": "AD-BR-01",
+      "rule": "Dashboard metrics are calculated in real-time from current data, not pre-aggregated snapshots",
+      "acceptance_criteria": "Creating a new lead or enrollment is reflected in dashboard metrics on next page load"
+    },
+    {
+      "rule_id": "AD-BR-02",
+      "rule": "Dashboard is the default landing page for admin after login",
+      "acceptance_criteria": "Admin login redirects to dashboard; sidebar highlights dashboard as active"
+    }
+  ]
+}

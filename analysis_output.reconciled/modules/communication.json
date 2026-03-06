@@ -1,0 +1,104 @@
+{
+  "module_id": "communication",
+  "module_name": "Communication Automation",
+  "description": "Automated email communication triggered by enrollment lifecycle events. Admin configures templates and automation rules. SMS/WhatsApp deferred to Phase 2.",
+  "priority": "high",
+  "mvp": true,
+  "screens": [
+    {
+      "screen_id": "CM-SCR-01",
+      "screen_name": "Template Manager",
+      "description": "Admin creates and edits email templates with variable placeholders",
+      "features": [
+        {
+          "feature_id": "CM-FT-01",
+          "feature_name": "Email Template CRUD",
+          "description": "Create, edit, preview, and activate/deactivate email templates",
+          "priority": "critical",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "CM-REQ-01",
+              "description": "Admin can create email templates with: subject line, body (rich text), and variable placeholders (e.g., {{parent_name}}, {{program_name}}, {{trial_date}}, {{payment_amount}})",
+              "acceptance_criteria": "Templates can be saved with placeholders; preview mode shows sample data substituted into placeholders"
+            },
+            {
+              "req_id": "CM-REQ-02",
+              "description": "System provides default templates for: lead received, trial confirmation, trial reminder, enrollment confirmation, payment reminder, class start reminder",
+              "acceptance_criteria": "All 6 default templates exist on initial setup; admin can edit but not delete defaults"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "screen_id": "CM-SCR-02",
+      "screen_name": "Automation Rules",
+      "description": "Admin configures which templates are sent on which triggers",
+      "features": [
+        {
+          "feature_id": "CM-FT-02",
+          "feature_name": "Trigger-Based Automation",
+          "description": "Map enrollment lifecycle events to email templates",
+          "priority": "critical",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "CM-REQ-03",
+              "description": "Admin can configure automation rules mapping triggers to templates: lead created → lead received email, trial scheduled → trial confirmation, trial date approaching → trial reminder, enrollment completed → enrollment confirmation + payment instructions, payment overdue → payment reminder, class start approaching → class start reminder",
+              "acceptance_criteria": "Each trigger has an assigned template; admin can enable/disable individual automations; disabled automations do not send emails"
+            },
+            {
+              "req_id": "CM-REQ-04",
+              "description": "Admin can configure timing for time-based triggers: trial reminder (N hours before), payment overdue (N days after enrollment), class start reminder (N days before)",
+              "acceptance_criteria": "Timing is configurable per trigger; default values are pre-set (24h for trial reminder, 3 days for payment overdue, 2 days for class start)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "screen_id": "CM-SCR-03",
+      "screen_name": "Communications Log",
+      "description": "Chronological log of all automated and manual communications sent",
+      "features": [
+        {
+          "feature_id": "CM-FT-03",
+          "feature_name": "Communication History",
+          "description": "View all emails sent by the system with status and details",
+          "priority": "high",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "CM-REQ-05",
+              "description": "Log displays: recipient email, subject, template used, trigger event, sent timestamp, delivery status (sent, failed)",
+              "acceptance_criteria": "All automated emails appear in the log; log is filterable by recipient, template, and status"
+            },
+            {
+              "req_id": "CM-REQ-06",
+              "description": "Failed emails are flagged and admin is notified for manual follow-up",
+              "acceptance_criteria": "Failed emails show 'Failed' status with error reason; admin sees a notification or badge for unsent communications"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "business_rules": [
+    {
+      "rule_id": "CM-BR-01",
+      "rule": "All automated emails use admin-configurable templates; no hardcoded email content",
+      "acceptance_criteria": "Changing a template's content is reflected in the next email sent using that template"
+    },
+    {
+      "rule_id": "CM-BR-02",
+      "rule": "Each automation trigger sends at most one email per event occurrence (no duplicates)",
+      "acceptance_criteria": "If an event fires multiple times (e.g., enrollment re-submitted), only one email is sent per unique event"
+    },
+    {
+      "rule_id": "CM-BR-03",
+      "rule": "Admin can disable any automation without deleting the template or rule",
+      "acceptance_criteria": "Disabled automations show as 'inactive' in the automation rules screen; no emails are sent for disabled triggers"
+    }
+  ]
+}

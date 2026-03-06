@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Tracking — Young Engineers Enrollment &amp; Operations Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @media print { .no-print { display: none !important; } }
+    details summary::-webkit-details-marker { display: none; }
+    details summary::marker { content: ''; }
+    details summary::before { content: '▶ '; font-size: 0.75em; }
+    details[open] summary::before { content: '▼ '; }
+  </style>
+</head>
+<body class="bg-white text-gray-900 antialiased">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <nav class="mb-6 no-print">
+      <a href="../prd_interactive.html#modules-overview" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Back to PRD
+      </a>
+    </nav>
+    <section id="module-payment_tracking" class="mb-14">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6 pb-2 border-b-2 border-gray-200">Module: Payment Tracking</h2>
+    <a href="#modules-overview" class="text-sm text-blue-600 hover:underline mb-4 inline-block">&larr; Back to Modules Overview</a><div class="bg-gradient-to-r from-gray-50 to-white rounded-lg p-5 border mb-6">
+    <div class="flex flex-wrap items-center gap-2 mb-2"><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600"></span> <span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-red-100 text-red-700">critical</span> <span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-emerald-100 text-emerald-700">MVP</span></div>
+    <p class="text-sm text-gray-700">Offline payment acknowledgment system for tracking Zelle payments. Admin marks payment status; system displays instructions and sends reminders. No payment gateway.</p></div><div class="mb-6"><h3 class="text-lg font-semibold text-gray-800 mb-3">Screens (3)</h3><div class="overflow-x-auto border rounded-lg">
+    <table class="min-w-full text-sm divide-y divide-gray-200">
+      <thead><tr><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">ID</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">Name</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">Description</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">MVP</th></tr></thead>
+      <tbody class="divide-y divide-gray-100"><tr class="bg-white"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">PT-SCR-01</code></td><td class="px-4 py-3">Payment Dashboard</td><td class="px-4 py-3">Admin view of all enrollment payments with status filtering</td><td class="px-4 py-3"></td></tr><tr class="bg-gray-50/50"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">PT-SCR-02</code></td><td class="px-4 py-3">Payment Detail</td><td class="px-4 py-3">Detailed payment view for a single enrollment with admin controls</td><td class="px-4 py-3"></td></tr><tr class="bg-white"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">PT-SCR-03</code></td><td class="px-4 py-3">Zelle Instructions (Parent-Facing)</td><td class="px-4 py-3">Page displayed to parents after enrollment showing Zelle payment details</td><td class="px-4 py-3"></td></tr></tbody>
+    </table></div></div><div class="mb-6"><h3 class="text-lg font-semibold text-gray-800 mb-3">Features (3)</h3><div class="space-y-2"><div class="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+      <code class="text-xs bg-white px-1.5 py-0.5 rounded border flex-shrink-0 mt-0.5 whitespace-nowrap">PT-FT-01</code>
+      <div><span class="font-medium text-sm">Payment Status Overview</span><p class="text-xs text-gray-600 mt-0.5">List all enrollments with payment status, amount due, and amount received</p></div>
+    </div><div class="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+      <code class="text-xs bg-white px-1.5 py-0.5 rounded border flex-shrink-0 mt-0.5 whitespace-nowrap">PT-FT-02</code>
+      <div><span class="font-medium text-sm">Payment Status Management</span><p class="text-xs text-gray-600 mt-0.5">Admin can update payment status and record payment details</p></div>
+    </div><div class="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+      <code class="text-xs bg-white px-1.5 py-0.5 rounded border flex-shrink-0 mt-0.5 whitespace-nowrap">PT-FT-03</code>
+      <div><span class="font-medium text-sm">Payment Instructions Display</span><p class="text-xs text-gray-600 mt-0.5">Show Zelle recipient info, amount, and reference instructions</p></div>
+    </div></div></div><div class="mb-6"><h3 class="text-lg font-semibold text-gray-800 mb-3">Requirements (5)</h3><div class="space-y-3"><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">PT-REQ-01</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Dashboard lists all enrollments with columns: parent name, child name, program, amount due, amount received, payment status, payment method, last updated</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">All columns are visible and sortable; list can be filtered by payment status (pending, paid, partial, waived)</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">PT-REQ-02</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Admin can set payment status to: pending, paid, partial, waived</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">Status change is saved immediately and reflected across all views</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">PT-REQ-03</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Admin can record: amount received, payment method, and free-text notes (e.g., 'Paid via Zelle on Jan 12')</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">All fields are saved and visible on the payment detail screen</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">PT-REQ-04</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Payment detail shows the full price breakdown from the enrollment (base fee, registration, coupon, total)</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">Price breakdown matches the enrollment record and is read-only on the payment screen</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">PT-REQ-05</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Page displays: Zelle recipient name/email/phone, exact amount to pay, and a reference note to include (e.g., child name + program name)</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">All payment instruction fields are configured by admin in settings and displayed accurately to the parent</p></div></details>
+    </div></div></div><div class="mb-6"><h3 class="text-lg font-semibold text-gray-800 mb-3">Business Rules (4)</h3><div class="overflow-x-auto border rounded-lg">
+    <table class="min-w-full text-sm divide-y divide-gray-200">
+      <thead><tr><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">ID</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">Description</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">Type</th></tr></thead>
+      <tbody class="divide-y divide-gray-100"><tr class="bg-white"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">PT-BR-01</code></td><td class="px-4 py-3">Payment status defaults to 'pending' when an enrollment is created</td><td class="px-4 py-3"></td></tr><tr class="bg-gray-50/50"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">PT-BR-02</code></td><td class="px-4 py-3">Admin is the only user who can change payment status</td><td class="px-4 py-3"></td></tr><tr class="bg-white"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">PT-BR-03</code></td><td class="px-4 py-3">Payment reminder automation is triggered when payment is overdue (configurable threshold, default 3 days after enrollment)</td><td class="px-4 py-3"></td></tr><tr class="bg-gray-50/50"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">PT-BR-04</code></td><td class="px-4 py-3">Partial payments are tracked: admin records amount received; system calculates remaining balance</td><td class="px-4 py-3"></td></tr></tbody>
+    </table></div></div>
+  </section>
+    <footer class="mt-16 pt-8 border-t border-gray-200 text-center text-sm text-gray-400">
+      Generated on 2026-03-06
+    </footer>
+  </div>
+</body>
+</html>

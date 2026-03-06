@@ -1,0 +1,128 @@
+{
+  "module_id": "program_pricing",
+  "module_name": "Program & Pricing Configuration",
+  "description": "Allows admin to create and manage programs with flexible, modular pricing including base fees, registration fees, coupons, and per-enrollment overrides.",
+  "priority": "critical",
+  "mvp": true,
+  "screens": [
+    {
+      "screen_id": "PP-SCR-01",
+      "screen_name": "Program List",
+      "description": "List of all programs with status, dates, and enrollment counts",
+      "features": [
+        {
+          "feature_id": "PP-FT-01",
+          "feature_name": "Program Overview List",
+          "description": "Tabular or card view of all programs showing key details at a glance",
+          "priority": "high",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "PP-REQ-01",
+              "description": "Display program name, age group, date range, enrollment count vs capacity, and status (draft, active, closed)",
+              "acceptance_criteria": "All fields visible for each program; list is sortable by name, start date, and status"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "screen_id": "PP-SCR-02",
+      "screen_name": "Program Setup / Edit",
+      "description": "Form to create or edit a program with all configuration fields",
+      "features": [
+        {
+          "feature_id": "PP-FT-02",
+          "feature_name": "Program Details Configuration",
+          "description": "Set program name, age group, sessions, duration, location, dates",
+          "priority": "critical",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "PP-REQ-02",
+              "description": "Admin can set: program name, age group, number of sessions, session duration, location, start date, end date",
+              "acceptance_criteria": "All fields are required for publishing; draft programs can have incomplete fields"
+            },
+            {
+              "req_id": "PP-REQ-03",
+              "description": "Program has status: draft, active, closed",
+              "acceptance_criteria": "Only 'active' programs are visible to parents; admin can change status at any time"
+            }
+          ]
+        },
+        {
+          "feature_id": "PP-FT-03",
+          "feature_name": "Modular Pricing Engine",
+          "description": "Configure base program fee, registration fee, and fee toggles",
+          "priority": "critical",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "PP-REQ-04",
+              "description": "Admin can set a base program fee (total or per-session rate × number of sessions)",
+              "acceptance_criteria": "Fee can be entered as total amount or calculated from per-session rate; final amount displays correctly"
+            },
+            {
+              "req_id": "PP-REQ-05",
+              "description": "Admin can set a registration fee and toggle it as required or waived at the program level",
+              "acceptance_criteria": "When set to 'waived', registration fee is not included in enrollment price breakdown; when 'required', it is added"
+            },
+            {
+              "req_id": "PP-REQ-06",
+              "description": "Admin can apply per-enrollment manual overrides: waive registration fee, give free sessions",
+              "acceptance_criteria": "Override is applied to a specific enrollment and reflected in that enrollment's price breakdown without affecting the program-level pricing"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "screen_id": "PP-SCR-03",
+      "screen_name": "Coupon Management",
+      "description": "Create and manage discount coupons",
+      "features": [
+        {
+          "feature_id": "PP-FT-04",
+          "feature_name": "Coupon CRUD",
+          "description": "Create, edit, and deactivate coupon codes",
+          "priority": "high",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "PP-REQ-07",
+              "description": "Admin can create coupons with: code, discount type (percentage or flat amount), applicable scope (program fee only, registration fee only, or both), optional expiry date, optional usage limit",
+              "acceptance_criteria": "Coupon with all fields can be created, edited, and deactivated; deactivated coupons are not accepted during enrollment"
+            },
+            {
+              "req_id": "PP-REQ-08",
+              "description": "Parent can enter a coupon code during enrollment and see the discount applied to the price breakdown in real time",
+              "acceptance_criteria": "Valid coupon reduces the displayed total; invalid or expired coupon shows an error message; discount is applied to the correct fee component based on scope"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "business_rules": [
+    {
+      "rule_id": "PP-BR-01",
+      "rule": "Price breakdown must always show individual components: base fee, registration fee (or waived), coupon discount (if any), and total",
+      "acceptance_criteria": "Every enrollment displays an itemized breakdown with each component labeled and the final total calculated correctly"
+    },
+    {
+      "rule_id": "PP-BR-02",
+      "rule": "Coupons cannot reduce the total below zero",
+      "acceptance_criteria": "If a coupon discount exceeds the applicable fee, the discount is capped at the fee amount and total shows $0 for that component"
+    },
+    {
+      "rule_id": "PP-BR-03",
+      "rule": "Per-enrollment overrides take precedence over program-level defaults",
+      "acceptance_criteria": "If admin waives registration for a specific enrollment, that enrollment shows $0 registration even if the program requires it"
+    },
+    {
+      "rule_id": "PP-BR-04",
+      "rule": "Only active programs are visible to parents on the enrollment page",
+      "acceptance_criteria": "Draft and closed programs do not appear in parent-facing program listings"
+    }
+  ]
+}

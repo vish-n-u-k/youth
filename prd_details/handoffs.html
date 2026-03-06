@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cross-Module Handoffs — Young Engineers Enrollment &amp; Operations Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @media print { .no-print { display: none !important; } }
+    details summary::-webkit-details-marker { display: none; }
+    details summary::marker { content: ''; }
+    details summary::before { content: '▶ '; font-size: 0.75em; }
+    details[open] summary::before { content: '▼ '; }
+  </style>
+</head>
+<body class="bg-white text-gray-900 antialiased">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <nav class="mb-6 no-print">
+      <a href="../prd_interactive.html" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Back to PRD
+      </a>
+    </nav>
+    <section id="handoffs" class="mb-14">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6 pb-2 border-b-2 border-gray-200">Cross-Module Handoffs</h2>
+    <div class="overflow-x-auto border rounded-lg">
+    <table class="min-w-full text-sm divide-y divide-gray-200">
+      <thead><tr><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">ID</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">From</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">To</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">Trigger</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">Next Screen</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">Fallback</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">Priority</th></tr></thead>
+      <tbody class="divide-y divide-gray-100"><tr class="bg-white"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">HO-01</code></td><td class="px-4 py-3">lead_management</td><td class="px-4 py-3">enrollment_trial</td><td class="px-4 py-3">Lead status changes to 'trial_scheduled' or admin sends trial booking link</td><td class="px-4 py-3">Trial Booking Form (pre-filled with lead data)</td><td class="px-4 py-3">If lead data is incomplete, show trial booking form with available fields pre-filled and remaining fields required</td><td class="px-4 py-3"><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-red-100 text-red-700">critical</span></td></tr><tr class="bg-gray-50/50"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">HO-02</code></td><td class="px-4 py-3">enrollment_trial</td><td class="px-4 py-3">payment_tracking</td><td class="px-4 py-3">Enrollment form submitted successfully</td><td class="px-4 py-3">Zelle payment instructions with amount breakdown</td><td class="px-4 py-3">If pricing cannot be calculated, show enrollment confirmation with note that admin will send payment details separately</td><td class="px-4 py-3"><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-red-100 text-red-700">critical</span></td></tr><tr class="bg-white"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">HO-03</code></td><td class="px-4 py-3">enrollment_trial</td><td class="px-4 py-3">communication</td><td class="px-4 py-3">Trial booked or enrollment completed</td><td class="px-4 py-3">N/A (background automation sends confirmation email)</td><td class="px-4 py-3">If email fails, log in communications log and flag for admin manual follow-up</td><td class="px-4 py-3"><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-orange-100 text-orange-700">high</span></td></tr><tr class="bg-gray-50/50"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">HO-04</code></td><td class="px-4 py-3">payment_tracking</td><td class="px-4 py-3">communication</td><td class="px-4 py-3">Payment overdue (configurable threshold)</td><td class="px-4 py-3">N/A (background automation sends payment reminder)</td><td class="px-4 py-3">If reminder fails, flag in communications log for admin manual follow-up</td><td class="px-4 py-3"><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-orange-100 text-orange-700">high</span></td></tr><tr class="bg-white"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">HO-05</code></td><td class="px-4 py-3">calendar</td><td class="px-4 py-3">enrollment_trial</td><td class="px-4 py-3">Parent selects a trial date from the calendar</td><td class="px-4 py-3">Trial Booking Form with selected date pre-filled</td><td class="px-4 py-3">If selected date becomes unavailable, show next available dates</td><td class="px-4 py-3"><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-orange-100 text-orange-700">high</span></td></tr></tbody>
+    </table></div>
+  </section>
+    <footer class="mt-16 pt-8 border-t border-gray-200 text-center text-sm text-gray-400">
+      Generated on 2026-03-06
+    </footer>
+  </div>
+</body>
+</html>

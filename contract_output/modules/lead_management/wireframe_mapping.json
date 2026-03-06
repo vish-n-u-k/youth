@@ -1,0 +1,157 @@
+{
+  "moduleId": "lead_management",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "lead_list",
+      "template": "list",
+      "widgets": [
+        {
+          "widgetId": "lm-w-01",
+          "type": "header",
+          "bind": {
+            "kind": "custom",
+            "ref": "Lead Management heading with view toggle (Kanban/Table)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "lm-w-02",
+          "type": "custom:filter_bar",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Filter by source, status, program + search"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "lm-w-03",
+          "type": "custom:kanban_board",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "leads (grouped by status columns)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "lm-w-04",
+          "type": "table",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "leads (table view alternative)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "lm-w-05",
+          "type": "card",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Lead card: parentName, childAge, source, interestedProgram"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "Click lead card to open detail",
+      "primaryActionTarget": "lead_detail",
+      "sourceRefs": [
+        "fe_details://screens/lead_list",
+        "navigation_graph://edges/lm-e-01"
+      ]
+    },
+    {
+      "screenId": "lead_detail",
+      "template": "detail",
+      "widgets": [
+        {
+          "widgetId": "lm-w-06",
+          "type": "header",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Lead name + status badge"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "lm-w-07",
+          "type": "card",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Lead profile: parentName, email, phone, childName, childAge, interestedProgram"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "lm-w-08",
+          "type": "custom:status_dropdown",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Change lead status"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "lm-w-09",
+          "type": "card",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Notes section (reverse-chronological with author + timestamp)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "lm-w-10",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "noteText"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "lm-w-11",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Add a note"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "lm-w-12",
+          "type": "custom:timeline",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Activity timeline (auto-logged events)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "lm-w-13",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Send trial booking link"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "lm-w-14",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Save lead changes"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "Save lead changes",
+      "primaryActionTarget": null,
+      "sourceRefs": [
+        "fe_details://screens/lead_detail",
+        "navigation_graph://edges/lm-e-02",
+        "navigation_graph://edges/lm-e-03"
+      ]
+    }
+  ]
+}

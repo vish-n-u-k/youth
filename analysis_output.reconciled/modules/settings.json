@@ -1,0 +1,91 @@
+{
+  "module_id": "settings",
+  "module_name": "Settings & Configuration",
+  "description": "Global configuration for location details, Zelle payment instructions, staff roles (Phase 2), and notification preferences.",
+  "priority": "medium",
+  "mvp": true,
+  "screens": [
+    {
+      "screen_id": "ST-SCR-01",
+      "screen_name": "General Settings",
+      "description": "Configure location details, Zelle payment info, and global preferences",
+      "features": [
+        {
+          "feature_id": "ST-FT-01",
+          "feature_name": "Location Configuration",
+          "description": "Set business name, address, and contact details displayed on parent-facing pages",
+          "priority": "high",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "ST-REQ-01",
+              "description": "Admin can configure: business name, address, phone, email, website URL",
+              "acceptance_criteria": "Settings are saved and used in parent-facing pages and email templates"
+            }
+          ]
+        },
+        {
+          "feature_id": "ST-FT-02",
+          "feature_name": "Zelle Payment Configuration",
+          "description": "Configure Zelle recipient details shown to parents after enrollment",
+          "priority": "critical",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "ST-REQ-02",
+              "description": "Admin can configure Zelle payment instructions: recipient name, Zelle email or phone, and any custom instructions text",
+              "acceptance_criteria": "Configured Zelle details appear on the enrollment confirmation page and in payment instruction emails"
+            }
+          ]
+        },
+        {
+          "feature_id": "ST-FT-03",
+          "feature_name": "Notification Preferences",
+          "description": "Admin configures when and how they receive system notifications",
+          "priority": "medium",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "ST-REQ-03",
+              "description": "Admin can toggle receiving email notifications for: new lead received, new enrollment submitted, payment marked as received",
+              "acceptance_criteria": "Each notification type has an on/off toggle; admin receives emails only for enabled notifications"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "screen_id": "ST-SCR-02",
+      "screen_name": "Staff & Roles (Phase 2)",
+      "description": "Manage staff accounts and role permissions — Phase 2",
+      "features": [
+        {
+          "feature_id": "ST-FT-04",
+          "feature_name": "Staff Management",
+          "description": "Add staff members and assign roles with limited permissions",
+          "priority": "low",
+          "mvp": false,
+          "requirements": [
+            {
+              "req_id": "ST-REQ-04",
+              "description": "Admin can invite staff members by email and assign role-based access (view-only calendar, view-only enrollments)",
+              "acceptance_criteria": "Phase 2: Staff accounts can be created; permissions limit accessible modules"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "business_rules": [
+    {
+      "rule_id": "ST-BR-01",
+      "rule": "Zelle payment configuration must be set before the first program can be published",
+      "acceptance_criteria": "Attempting to publish a program without Zelle configuration shows a setup prompt directing to settings"
+    },
+    {
+      "rule_id": "ST-BR-02",
+      "rule": "Location configuration supports one location in MVP; data model includes location_id for future multi-location support",
+      "acceptance_criteria": "Single location is configured; all programs and leads are associated with this location"
+    }
+  ]
+}

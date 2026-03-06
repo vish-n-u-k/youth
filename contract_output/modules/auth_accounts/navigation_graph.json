@@ -1,0 +1,71 @@
+{
+  "moduleId": "auth_accounts",
+  "contractVersion": "v1.0.0",
+  "edges": [
+    {
+      "edgeId": "auth-e-01",
+      "fromScreenId": "admin_login",
+      "trigger": {
+        "type": "submit",
+        "sourceId": "loginForm",
+        "event": "Login successful"
+      },
+      "toScreenId": "admin_dashboard:dashboard_overview",
+      "condition": "Valid credentials",
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/admin_login/interactions/0"
+    },
+    {
+      "edgeId": "auth-e-02",
+      "fromScreenId": "admin_login",
+      "trigger": {
+        "type": "click",
+        "sourceId": "forgotPasswordLink",
+        "event": "Navigate to forgot password"
+      },
+      "toScreenId": "password_reset_request",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/admin_login/interactions/1"
+    },
+    {
+      "edgeId": "auth-e-03",
+      "fromScreenId": "password_reset_request",
+      "trigger": {
+        "type": "submit",
+        "sourceId": "resetRequestForm",
+        "event": "Reset link sent"
+      },
+      "toScreenId": null,
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/password_reset_request/interactions/0"
+    },
+    {
+      "edgeId": "auth-e-04",
+      "fromScreenId": "password_reset_request",
+      "trigger": {
+        "type": "click",
+        "sourceId": "backToLoginLink",
+        "event": "Navigate back to login"
+      },
+      "toScreenId": "admin_login",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/password_reset_request/interactions/1"
+    },
+    {
+      "edgeId": "auth-e-05",
+      "fromScreenId": "set_new_password",
+      "trigger": {
+        "type": "submit",
+        "sourceId": "setPasswordForm",
+        "event": "Password updated successfully"
+      },
+      "toScreenId": "admin_login",
+      "condition": "Valid token",
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/set_new_password/interactions/0"
+    }
+  ]
+}

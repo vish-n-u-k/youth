@@ -1,0 +1,50 @@
+[
+  {
+    "question_id": "OQ-01",
+    "question": "Should trial classes be free, or can some programs charge for trials? If charged, should the trial fee be deducted from the program fee upon enrollment?",
+    "proposed_default": "Trials are free by default. Admin can optionally set a trial fee per program. Trial fee is not automatically deducted from enrollment fee.",
+    "priority": "medium",
+    "assumption_source": "ai_assumed",
+    "approval_state": "pending_human_review"
+  },
+  {
+    "question_id": "OQ-02",
+    "question": "When enrollment closes (capacity reached or window closed), should parents be able to join a waitlist?",
+    "proposed_default": "No waitlist in MVP. Parents see a 'Program Full' message. Admin can manually override to add enrollments beyond capacity.",
+    "priority": "medium",
+    "assumption_source": "ai_assumed",
+    "approval_state": "pending_human_review"
+  },
+  {
+    "question_id": "OQ-03",
+    "question": "Should there be an enrollment approval step (admin reviews and approves each enrollment) or is enrollment instant upon form submission?",
+    "proposed_default": "Enrollment is instant upon form submission. Admin can cancel/modify enrollments after the fact.",
+    "priority": "high",
+    "assumption_source": "ai_assumed",
+    "approval_state": "pending_human_review"
+  },
+  {
+    "question_id": "OQ-04",
+    "question": "For the 'Trial Attended' status — how is this tracked? Does admin manually mark it, or is there an attendance check-in feature?",
+    "proposed_default": "Admin manually marks trial as attended in the lead detail view. Automated attendance tracking deferred to Phase 2.",
+    "priority": "medium",
+    "assumption_source": "ai_assumed",
+    "approval_state": "pending_human_review"
+  },
+  {
+    "question_id": "OQ-05",
+    "question": "Should the system support sibling discounts or family-level pricing rules?",
+    "proposed_default": "No automatic sibling discount in MVP. Admin can manually apply a coupon or override pricing per enrollment to achieve the same effect.",
+    "priority": "medium",
+    "assumption_source": "ai_assumed",
+    "approval_state": "pending_human_review"
+  },
+  {
+    "question_id": "OQ-06",
+    "question": "What should happen when an enrollment is cancelled? Specifically: should capacity be released, should payment status change, should a cancellation email be sent, and should the lead status revert?",
+    "proposed_default": "Cancellation releases capacity, sets payment status to 'refund_pending' if paid or 'cancelled' if unpaid, sends cancellation confirmation email, and reverts lead status to 'Trial Attended' or 'Contacted'.",
+    "priority": "high",
+    "assumption_source": "ai_assumed",
+    "approval_state": "pending_human_review"
+  }
+]

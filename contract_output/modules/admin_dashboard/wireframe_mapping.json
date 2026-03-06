@@ -1,0 +1,101 @@
+{
+  "moduleId": "admin_dashboard",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "dashboard_overview",
+      "template": "dashboard",
+      "widgets": [
+        {
+          "widgetId": "ad-w-01",
+          "type": "header",
+          "bind": {
+            "kind": "custom",
+            "ref": "Dashboard heading"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "ad-w-02",
+          "type": "card",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Total Leads by Source metric"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "ad-w-03",
+          "type": "card",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Lead-to-Trial Conversion Rate metric"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "ad-w-04",
+          "type": "card",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Trial-to-Enrollment Conversion Rate metric"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "ad-w-05",
+          "type": "card",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Total Active Enrollments metric"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "ad-w-06",
+          "type": "card",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Payment Status Summary (pending/paid/partial/waived counts)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "ad-w-07",
+          "type": "table",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "5 Most Recent Leads (name, source, status, date)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "ad-w-08",
+          "type": "table",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Upcoming Trials This Week (parent, child, program, date)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "ad-w-09",
+          "type": "table",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Enrollments with Pending Payments (parent, child, program, amount)"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "Click metric card for quick navigation",
+      "primaryActionTarget": null,
+      "sourceRefs": [
+        "fe_details://screens/dashboard_overview",
+        "navigation_graph://edges/ad-e-01",
+        "navigation_graph://edges/ad-e-03",
+        "navigation_graph://edges/ad-e-04"
+      ]
+    }
+  ]
+}

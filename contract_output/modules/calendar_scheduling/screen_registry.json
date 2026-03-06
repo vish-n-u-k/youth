@@ -1,0 +1,26 @@
+{
+  "moduleId": "calendar_scheduling",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "admin_calendar",
+      "name": "Admin Calendar Management",
+      "route": "/admin/calendar",
+      "entry": true,
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "visibilityCondition": null,
+      "sourceRef": "fe_details://screens/admin_calendar"
+    },
+    {
+      "screenId": "parent_calendar",
+      "name": "Parent-Facing Calendar",
+      "route": "/programs/:programId/trial-dates",
+      "entry": false,
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "visibilityCondition": "Program must be active and have trial dates",
+      "sourceRef": "fe_details://screens/parent_calendar"
+    }
+  ]
+}

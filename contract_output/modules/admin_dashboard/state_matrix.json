@@ -1,0 +1,29 @@
+{
+  "moduleId": "admin_dashboard",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "dashboard_overview",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Loading dashboard..."
+        },
+        "empty": {
+          "applicability": "required",
+          "message": "Welcome! Your dashboard will populate as you add programs and capture leads."
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Failed to load dashboard. Please refresh.",
+          "retryAction": "Refresh page"
+        },
+        "success": {
+          "applicability": "not_applicable",
+          "message": null
+        }
+      },
+      "sourceRef": "fe_details://screens/dashboard_overview/states"
+    }
+  ]
+}

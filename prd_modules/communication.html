@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Communication Automation — Young Engineers Enrollment &amp; Operations Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @media print { .no-print { display: none !important; } }
+    details summary::-webkit-details-marker { display: none; }
+    details summary::marker { content: ''; }
+    details summary::before { content: '▶ '; font-size: 0.75em; }
+    details[open] summary::before { content: '▼ '; }
+  </style>
+</head>
+<body class="bg-white text-gray-900 antialiased">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <nav class="mb-6 no-print">
+      <a href="../prd_interactive.html#modules-overview" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Back to PRD
+      </a>
+    </nav>
+    <section id="module-communication" class="mb-14">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6 pb-2 border-b-2 border-gray-200">Module: Communication Automation</h2>
+    <a href="#modules-overview" class="text-sm text-blue-600 hover:underline mb-4 inline-block">&larr; Back to Modules Overview</a><div class="bg-gradient-to-r from-gray-50 to-white rounded-lg p-5 border mb-6">
+    <div class="flex flex-wrap items-center gap-2 mb-2"><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600"></span> <span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-orange-100 text-orange-700">high</span> <span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-emerald-100 text-emerald-700">MVP</span></div>
+    <p class="text-sm text-gray-700">Automated email communication triggered by enrollment lifecycle events. Admin configures templates and automation rules. SMS/WhatsApp deferred to Phase 2.</p></div><div class="mb-6"><h3 class="text-lg font-semibold text-gray-800 mb-3">Screens (3)</h3><div class="overflow-x-auto border rounded-lg">
+    <table class="min-w-full text-sm divide-y divide-gray-200">
+      <thead><tr><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">ID</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">Name</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">Description</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">MVP</th></tr></thead>
+      <tbody class="divide-y divide-gray-100"><tr class="bg-white"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">CM-SCR-01</code></td><td class="px-4 py-3">Template Manager</td><td class="px-4 py-3">Admin creates and edits email templates with variable placeholders</td><td class="px-4 py-3"></td></tr><tr class="bg-gray-50/50"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">CM-SCR-02</code></td><td class="px-4 py-3">Automation Rules</td><td class="px-4 py-3">Admin configures which templates are sent on which triggers</td><td class="px-4 py-3"></td></tr><tr class="bg-white"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">CM-SCR-03</code></td><td class="px-4 py-3">Communications Log</td><td class="px-4 py-3">Chronological log of all automated and manual communications sent</td><td class="px-4 py-3"></td></tr></tbody>
+    </table></div></div><div class="mb-6"><h3 class="text-lg font-semibold text-gray-800 mb-3">Features (3)</h3><div class="space-y-2"><div class="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+      <code class="text-xs bg-white px-1.5 py-0.5 rounded border flex-shrink-0 mt-0.5 whitespace-nowrap">CM-FT-01</code>
+      <div><span class="font-medium text-sm">Email Template CRUD</span><p class="text-xs text-gray-600 mt-0.5">Create, edit, preview, and activate/deactivate email templates</p></div>
+    </div><div class="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+      <code class="text-xs bg-white px-1.5 py-0.5 rounded border flex-shrink-0 mt-0.5 whitespace-nowrap">CM-FT-02</code>
+      <div><span class="font-medium text-sm">Trigger-Based Automation</span><p class="text-xs text-gray-600 mt-0.5">Map enrollment lifecycle events to email templates</p></div>
+    </div><div class="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+      <code class="text-xs bg-white px-1.5 py-0.5 rounded border flex-shrink-0 mt-0.5 whitespace-nowrap">CM-FT-03</code>
+      <div><span class="font-medium text-sm">Communication History</span><p class="text-xs text-gray-600 mt-0.5">View all emails sent by the system with status and details</p></div>
+    </div></div></div><div class="mb-6"><h3 class="text-lg font-semibold text-gray-800 mb-3">Requirements (6)</h3><div class="space-y-3"><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">CM-REQ-01</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Admin can create email templates with: subject line, body (rich text), and variable placeholders (e.g., {{parent_name}}, {{program_name}}, {{trial_date}}, {{payment_amount}})</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">Templates can be saved with placeholders; preview mode shows sample data substituted into placeholders</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">CM-REQ-02</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">System provides default templates for: lead received, trial confirmation, trial reminder, enrollment confirmation, payment reminder, class start reminder</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">All 6 default templates exist on initial setup; admin can edit but not delete defaults</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">CM-REQ-03</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Admin can configure automation rules mapping triggers to templates: lead created → lead received email, trial scheduled → trial confirmation, trial date approaching → trial reminder, enrollment completed → enrollment confirmation + payment instructions, payment overdue → payment reminder, class start approaching → class start reminder</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">Each trigger has an assigned template; admin can enable/disable individual automations; disabled automations do not send emails</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">CM-REQ-04</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Admin can configure timing for time-based triggers: trial reminder (N hours before), payment overdue (N days after enrollment), class start reminder (N days before)</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">Timing is configurable per trigger; default values are pre-set (24h for trial reminder, 3 days for payment overdue, 2 days for class start)</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">CM-REQ-05</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Log displays: recipient email, subject, template used, trigger event, sent timestamp, delivery status (sent, failed)</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">All automated emails appear in the log; log is filterable by recipient, template, and status</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">CM-REQ-06</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Failed emails are flagged and admin is notified for manual follow-up</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">Failed emails show 'Failed' status with error reason; admin sees a notification or badge for unsent communications</p></div></details>
+    </div></div></div><div class="mb-6"><h3 class="text-lg font-semibold text-gray-800 mb-3">Business Rules (3)</h3><div class="overflow-x-auto border rounded-lg">
+    <table class="min-w-full text-sm divide-y divide-gray-200">
+      <thead><tr><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">ID</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">Description</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">Type</th></tr></thead>
+      <tbody class="divide-y divide-gray-100"><tr class="bg-white"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">CM-BR-01</code></td><td class="px-4 py-3">All automated emails use admin-configurable templates; no hardcoded email content</td><td class="px-4 py-3"></td></tr><tr class="bg-gray-50/50"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">CM-BR-02</code></td><td class="px-4 py-3">Each automation trigger sends at most one email per event occurrence (no duplicates)</td><td class="px-4 py-3"></td></tr><tr class="bg-white"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">CM-BR-03</code></td><td class="px-4 py-3">Admin can disable any automation without deleting the template or rule</td><td class="px-4 py-3"></td></tr></tbody>
+    </table></div></div>
+  </section>
+    <footer class="mt-16 pt-8 border-t border-gray-200 text-center text-sm text-gray-400">
+      Generated on 2026-03-06
+    </footer>
+  </div>
+</body>
+</html>

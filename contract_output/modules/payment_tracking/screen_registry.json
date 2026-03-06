@@ -1,0 +1,36 @@
+{
+  "moduleId": "payment_tracking",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "payment_dashboard",
+      "name": "Payment Dashboard",
+      "route": "/admin/payments",
+      "entry": true,
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "visibilityCondition": null,
+      "sourceRef": "fe_details://screens/payment_dashboard"
+    },
+    {
+      "screenId": "payment_detail",
+      "name": "Payment Detail",
+      "route": "/admin/payments/:paymentId",
+      "entry": false,
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "visibilityCondition": null,
+      "sourceRef": "fe_details://screens/payment_detail"
+    },
+    {
+      "screenId": "zelle_instructions",
+      "name": "Zelle Payment Instructions",
+      "route": "/enrollment/:enrollmentId/pay",
+      "entry": false,
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "visibilityCondition": "Valid enrollmentId required",
+      "sourceRef": "fe_details://screens/zelle_instructions"
+    }
+  ]
+}

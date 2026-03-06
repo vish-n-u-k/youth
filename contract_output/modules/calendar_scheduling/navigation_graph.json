@@ -1,0 +1,32 @@
+{
+  "moduleId": "calendar_scheduling",
+  "contractVersion": "v1.0.0",
+  "edges": [
+    {
+      "edgeId": "cs-e-01",
+      "fromScreenId": "parent_calendar",
+      "trigger": {
+        "type": "click",
+        "sourceId": "trialDateSelect",
+        "event": "Select trial date to book"
+      },
+      "toScreenId": "enrollment_trial:trial_booking_form",
+      "condition": "Date has spots remaining",
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/parent_calendar/interactions/0"
+    },
+    {
+      "edgeId": "cs-e-02",
+      "fromScreenId": "admin_calendar",
+      "trigger": {
+        "type": "click",
+        "sourceId": "addDateButton",
+        "event": "Add class date"
+      },
+      "toScreenId": null,
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/admin_calendar/interactions/0"
+    }
+  ]
+}

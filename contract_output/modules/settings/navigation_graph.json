@@ -1,0 +1,19 @@
+{
+  "moduleId": "settings",
+  "contractVersion": "v1.0.0",
+  "edges": [
+    {
+      "edgeId": "settings-e-01",
+      "fromScreenId": "general_settings",
+      "trigger": {
+        "type": "submit",
+        "sourceId": "settingsForm",
+        "event": "Settings saved successfully"
+      },
+      "toScreenId": null,
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/general_settings/interactions/0"
+    }
+  ]
+}

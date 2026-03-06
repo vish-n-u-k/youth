@@ -1,0 +1,87 @@
+{
+  "module_id": "calendar_scheduling",
+  "module_name": "Calendar & Scheduling",
+  "description": "Admin defines class dates, trial-eligible dates, and capacity. Parents see only available slots for trial booking and open enrollment programs.",
+  "priority": "high",
+  "mvp": true,
+  "screens": [
+    {
+      "screen_id": "CS-SCR-01",
+      "screen_name": "Admin Calendar Management",
+      "description": "Admin view to define and manage class dates, trial dates, and capacity",
+      "features": [
+        {
+          "feature_id": "CS-FT-01",
+          "feature_name": "Class Date Management",
+          "description": "Admin defines individual class session dates for each program",
+          "priority": "critical",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "CS-REQ-01",
+              "description": "Admin can add, edit, and remove individual class dates for a program",
+              "acceptance_criteria": "Class dates appear on a calendar view; changes are saved immediately and reflected in parent-facing views"
+            },
+            {
+              "req_id": "CS-REQ-02",
+              "description": "Admin can mark specific dates as trial-eligible",
+              "acceptance_criteria": "Trial-eligible dates are visually distinct on the admin calendar; only these dates appear in the parent trial date picker"
+            }
+          ]
+        },
+        {
+          "feature_id": "CS-FT-02",
+          "feature_name": "Capacity Management",
+          "description": "Admin sets capacity per program and monitors fill levels",
+          "priority": "high",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "CS-REQ-03",
+              "description": "Admin can set max capacity per program",
+              "acceptance_criteria": "Capacity field is editable; current enrollment count vs capacity is displayed"
+            },
+            {
+              "req_id": "CS-REQ-04",
+              "description": "System auto-locks enrollment when capacity is reached",
+              "acceptance_criteria": "When enrollment count equals capacity, parent-facing enrollment is disabled; admin can still manually add enrollments"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "screen_id": "CS-SCR-02",
+      "screen_name": "Parent-Facing Calendar",
+      "description": "Read-only view for parents showing available trial dates and open programs",
+      "features": [
+        {
+          "feature_id": "CS-FT-03",
+          "feature_name": "Trial Date Availability",
+          "description": "Parents see available trial dates and can select one to book",
+          "priority": "high",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "CS-REQ-05",
+              "description": "Calendar displays only trial-eligible dates for the selected program that have not reached trial capacity",
+              "acceptance_criteria": "Full trial dates do not appear as selectable; selecting a date leads to the trial booking form"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "business_rules": [
+    {
+      "rule_id": "CS-BR-01",
+      "rule": "Only future trial-eligible dates with available capacity are shown to parents",
+      "acceptance_criteria": "Past dates and full dates are excluded from parent-facing calendar"
+    },
+    {
+      "rule_id": "CS-BR-02",
+      "rule": "Admin can override auto-lock to add enrollments or trial bookings beyond capacity",
+      "acceptance_criteria": "Admin has an override toggle or action that bypasses capacity restriction for individual cases"
+    }
+  ]
+}

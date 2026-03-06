@@ -1,0 +1,13 @@
+[
+  "Payment gateway integration (Stripe, card payments) — Phase 2",
+  "SMS and WhatsApp communication channels — Phase 2",
+  "Parent portal with persistent login and enrollment history — Phase 2",
+  "Instructor attendance tracking — Phase 2",
+  "Reporting exports (CSV, PDF) — Phase 2",
+  "Multi-location management UI — Phase 2 (data model supports it from MVP)",
+  "Curriculum or lesson plan management",
+  "Student progress tracking or grading",
+  "Inventory or materials management",
+  "Financial accounting or invoicing beyond payment status tracking",
+  "Mobile native app (responsive web is the MVP approach)"
+]

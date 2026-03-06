@@ -1,0 +1,68 @@
+{
+  "version": "analysis.v2.1",
+  "generated_at": "2026-03-06T00:00:00Z",
+  "traceability_tier": "standard",
+  "files": [
+    "_meta.json",
+    "global_experience.json",
+    "modules/lead_management.json",
+    "modules/program_pricing.json",
+    "modules/enrollment_trial.json",
+    "modules/calendar_scheduling.json",
+    "modules/payment_tracking.json",
+    "modules/communication.json",
+    "modules/admin_dashboard.json",
+    "modules/auth_accounts.json",
+    "modules/settings.json",
+    "traceability/links.json",
+    "traceability/coverage.json",
+    "open_questions.json",
+    "assumptions.json",
+    "out_of_scope.json",
+    "technical_parking_lot.json",
+    "spikes_required.json"
+  ],
+  "module_ids": [
+    "lead_management",
+    "program_pricing",
+    "enrollment_trial",
+    "calendar_scheduling",
+    "payment_tracking",
+    "communication",
+    "admin_dashboard",
+    "auth_accounts",
+    "settings"
+  ],
+  "counts": {
+    "goals": 7,
+    "modules": 9,
+    "features": 20,
+    "requirements": 38,
+    "business_rules": 23,
+    "global_decisions": 7,
+    "cross_module_handoffs": 5,
+    "assumptions": 14,
+    "open_questions": 6,
+    "out_of_scope": 11,
+    "technical_parking_lot": 8,
+    "spikes_required": 4
+  },
+  "operation_intent": "reconcile",
+  "migration": {
+    "applied": true,
+    "repaired_files": [
+      "technical_parking_lot.json"
+    ],
+    "created_files": [],
+    "updated_files": [
+      "_meta.json",
+      "assumptions.json",
+      "open_questions.json",
+      "technical_parking_lot.json",
+      "modules/enrollment_trial.json",
+      "traceability/links.json",
+      "traceability/coverage.json",
+      "spikes_required.json"
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "moduleId": "communication",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "template_manager",
+      "name": "Template Manager",
+      "route": "/admin/communications/templates",
+      "entry": true,
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "visibilityCondition": null,
+      "sourceRef": "fe_details://screens/template_manager"
+    },
+    {
+      "screenId": "automation_rules",
+      "name": "Automation Rules",
+      "route": "/admin/communications/automations",
+      "entry": false,
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "visibilityCondition": null,
+      "sourceRef": "fe_details://screens/automation_rules"
+    },
+    {
+      "screenId": "communications_log",
+      "name": "Communications Log",
+      "route": "/admin/communications/log",
+      "entry": false,
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "visibilityCondition": null,
+      "sourceRef": "fe_details://screens/communications_log"
+    }
+  ]
+}

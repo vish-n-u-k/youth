@@ -1,0 +1,83 @@
+{
+  "moduleId": "lead_management",
+  "contractVersion": "v1.0.0",
+  "schemas": [
+    {
+      "schemaId": "LeadListQuery",
+      "purpose": "query",
+      "targetFile": null,
+      "definition": "z.object({ status: z.enum(['new','contacted','trial_scheduled','trial_attended','enrolled','dropped','not_interested']).optional(), source: z.enum(['facebook','google','website','manual']).optional(), programId: z.string().optional(), search: z.string().optional(), page: z.number().int().min(1).default(1), limit: z.number().int().min(1).max(100).default(25) })",
+      "usedBy": ["getLeads"]
+    },
+    {
+      "schemaId": "LeadListResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ leads: z.array(z.object({ leadId: z.string(), parentName: z.string(), email: z.string().email(), phone: z.string().nullable(), childName: z.string().nullable(), childAge: z.number().nullable(), source: z.enum(['facebook','google','website','manual']), status: z.enum(['new','contacted','trial_scheduled','trial_attended','enrolled','dropped','not_interested']), interestedProgram: z.string().nullable(), createdAt: z.string().datetime(), updatedAt: z.string().datetime() })), total: z.number(), page: z.number(), limit: z.number() })",
+      "usedBy": ["getLeads"]
+    },
+    {
+      "schemaId": "LeadResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ leadId: z.string(), parentName: z.string(), email: z.string().email(), phone: z.string().nullable(), childName: z.string().nullable(), childAge: z.number().nullable(), source: z.enum(['facebook','google','website','manual']), status: z.enum(['new','contacted','trial_scheduled','trial_attended','enrolled','dropped','not_interested']), interestedProgram: z.string().nullable(), locationId: z.string(), createdAt: z.string().datetime(), updatedAt: z.string().datetime() })",
+      "usedBy": ["getLead", "updateLead", "updateLeadStatus"]
+    },
+    {
+      "schemaId": "UpdateLeadRequest",
+      "purpose": "request",
+      "targetFile": null,
+      "definition": "z.object({ parentName: z.string().min(1), email: z.string().email(), phone: z.string().optional(), childName: z.string().optional(), childAge: z.number().int().min(0).max(18).optional(), interestedProgram: z.string().optional() })",
+      "usedBy": ["updateLead"]
+    },
+    {
+      "schemaId": "UpdateLeadStatusRequest",
+      "purpose": "request",
+      "targetFile": null,
+      "definition": "z.object({ status: z.enum(['new','contacted','trial_scheduled','trial_attended','enrolled','dropped','not_interested']) })",
+      "usedBy": ["updateLeadStatus"]
+    },
+    {
+      "schemaId": "LeadNotesResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ notes: z.array(z.object({ noteId: z.string(), text: z.string(), author: z.string(), createdAt: z.string().datetime() })) })",
+      "usedBy": ["getLeadNotes"]
+    },
+    {
+      "schemaId": "AddLeadNoteRequest",
+      "purpose": "request",
+      "targetFile": null,
+      "definition": "z.object({ text: z.string().min(1) })",
+      "usedBy": ["addLeadNote"]
+    },
+    {
+      "schemaId": "LeadNoteResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ noteId: z.string(), text: z.string(), author: z.string(), createdAt: z.string().datetime() })",
+      "usedBy": ["addLeadNote"]
+    },
+    {
+      "schemaId": "LeadActivityResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ activities: z.array(z.object({ activityId: z.string(), type: z.enum(['status_change','email_sent','enrollment_event','note_added','lead_created']), description: z.string(), timestamp: z.string().datetime(), metadata: z.record(z.string()).optional() })) })",
+      "usedBy": ["getLeadActivity"]
+    },
+    {
+      "schemaId": "SendTrialLinkRequest",
+      "purpose": "request",
+      "targetFile": null,
+      "definition": "z.object({ programId: z.string().optional() })",
+      "usedBy": ["sendTrialBookingLink"]
+    },
+    {
+      "schemaId": "SendTrialLinkResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ message: z.string(), emailSent: z.boolean() })",
+      "usedBy": ["sendTrialBookingLink"]
+    }
+  ]
+}

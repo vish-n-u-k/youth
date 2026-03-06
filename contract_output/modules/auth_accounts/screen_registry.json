@@ -1,0 +1,46 @@
+{
+  "moduleId": "auth_accounts",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "admin_login",
+      "name": "Admin Login",
+      "route": "/admin/login",
+      "entry": true,
+      "authRequired": false,
+      "allowedRoles": ["admin"],
+      "visibilityCondition": null,
+      "sourceRef": "fe_details://screens/admin_login"
+    },
+    {
+      "screenId": "password_reset_request",
+      "name": "Password Reset Request",
+      "route": "/admin/forgot-password",
+      "entry": false,
+      "authRequired": false,
+      "allowedRoles": ["admin"],
+      "visibilityCondition": null,
+      "sourceRef": "fe_details://screens/password_reset_request"
+    },
+    {
+      "screenId": "set_new_password",
+      "name": "Set New Password",
+      "route": "/admin/reset-password/:token",
+      "entry": false,
+      "authRequired": false,
+      "allowedRoles": ["admin"],
+      "visibilityCondition": "Valid reset token in URL",
+      "sourceRef": "fe_details://screens/set_new_password"
+    },
+    {
+      "screenId": "parent_login_stub",
+      "name": "Parent Registration/Login (Phase 2)",
+      "route": "/login",
+      "entry": false,
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "visibilityCondition": "Phase 2 only; not rendered in MVP",
+      "sourceRef": "fe_details://screens/parent_login_stub"
+    }
+  ]
+}

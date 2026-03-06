@@ -1,0 +1,166 @@
+{
+  "moduleId": "calendar_scheduling",
+  "contractVersion": "v1.0.0",
+  "status": "agreed",
+  "changeType": "none",
+  "globalBindings": {
+    "globalContractRef": "contract_output/global/fe_global_contract.json",
+    "inheritedDecisionIds": [
+      "nav.primary_model",
+      "enrollment.per_child"
+    ],
+    "inheritedPolicyIds": [
+      "GP-05",
+      "GP-06",
+      "GP-07",
+      "GP-08"
+    ],
+    "moduleOverrides": []
+  },
+  "screens": [
+    {
+      "screenId": "admin_calendar",
+      "name": "Admin Calendar Management",
+      "route": "/admin/calendar",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "dataDisplayed": [
+        {
+          "field": "calendarDates",
+          "source": "api",
+          "schemaRef": "zod://CalendarDatesResponse"
+        }
+      ],
+      "dataCaptured": [
+        {
+          "field": "date",
+          "required": true,
+          "schemaRef": "zod://CalendarDateRequest"
+        },
+        {
+          "field": "programId",
+          "required": true,
+          "schemaRef": "zod://CalendarDateRequest"
+        },
+        {
+          "field": "trialEligible",
+          "required": true,
+          "schemaRef": "zod://CalendarDateRequest"
+        },
+        {
+          "field": "notes",
+          "required": false,
+          "schemaRef": "zod://CalendarDateRequest"
+        }
+      ],
+      "interactions": [
+        "Add class date for a program",
+        "Edit existing class date",
+        "Remove class date",
+        "Toggle trial eligibility for a date",
+        "Filter calendar by program",
+        "View month/week toggle"
+      ],
+      "states": {
+        "loading": "Loading calendar...",
+        "empty": "No class dates scheduled yet. Add dates for your programs.",
+        "error": "Failed to load calendar. Please refresh."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "getCalendarDates",
+          "method": "GET",
+          "path": "/api/calendar",
+          "requestSchemaRef": "zod://CalendarDatesQuery",
+          "responseSchemaRef": "zod://CalendarDatesResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "addCalendarDate",
+          "method": "POST",
+          "path": "/api/calendar",
+          "requestSchemaRef": "zod://CalendarDateRequest",
+          "responseSchemaRef": "zod://CalendarDateResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "updateCalendarDate",
+          "method": "PUT",
+          "path": "/api/calendar/:dateId",
+          "requestSchemaRef": "zod://CalendarDateRequest",
+          "responseSchemaRef": "zod://CalendarDateResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "deleteCalendarDate",
+          "method": "DELETE",
+          "path": "/api/calendar/:dateId",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://DeleteResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    },
+    {
+      "screenId": "parent_calendar",
+      "name": "Parent-Facing Calendar",
+      "route": "/programs/:programId/trial-dates",
+      "type": "api_driven",
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "dataDisplayed": [
+        {
+          "field": "availableTrialDates",
+          "source": "api",
+          "schemaRef": "zod://AvailableTrialDatesResponse"
+        }
+      ],
+      "dataCaptured": [],
+      "interactions": [
+        "Select a trial date to proceed to booking"
+      ],
+      "states": {
+        "loading": "Loading available dates...",
+        "empty": "No trial dates available for this program right now. Check back later.",
+        "error": "Failed to load available dates. Please try again."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "getAvailableTrialDates",
+          "method": "GET",
+          "path": "/api/programs/:programId/trial-dates",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://AvailableTrialDatesResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "CS-A-01",
+      "text": "Trial booking requires selecting from admin-defined dates; walk-ins tracked manually by admin",
+      "severity": "low",
+      "state": "open",
+      "assumptionSource": "ai_assumed",
+      "approvalState": "pending_human_review",
+      "rewriteRisk": "low",
+      "isolationRecommended": false,
+      "isolationNote": "",
+      "sourceRef": "analysis_output/assumptions.json#id=A-11"
+    },
+    {
+      "id": "CS-A-02",
+      "text": "Calendar invites (.ics / Google Calendar links) are optional in MVP, sent as email attachments if implemented",
+      "severity": "low",
+      "state": "open",
+      "assumptionSource": "ai_assumed",
+      "approvalState": "pending_human_review",
+      "rewriteRisk": "low",
+      "isolationRecommended": false,
+      "isolationNote": "",
+      "sourceRef": "analysis_output/assumptions.json#id=A-05"
+    }
+  ]
+}

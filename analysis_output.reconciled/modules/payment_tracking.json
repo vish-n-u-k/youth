@@ -1,0 +1,104 @@
+{
+  "module_id": "payment_tracking",
+  "module_name": "Payment Tracking",
+  "description": "Offline payment acknowledgment system for tracking Zelle payments. Admin marks payment status; system displays instructions and sends reminders. No payment gateway.",
+  "priority": "critical",
+  "mvp": true,
+  "screens": [
+    {
+      "screen_id": "PT-SCR-01",
+      "screen_name": "Payment Dashboard",
+      "description": "Admin view of all enrollment payments with status filtering",
+      "features": [
+        {
+          "feature_id": "PT-FT-01",
+          "feature_name": "Payment Status Overview",
+          "description": "List all enrollments with payment status, amount due, and amount received",
+          "priority": "critical",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "PT-REQ-01",
+              "description": "Dashboard lists all enrollments with columns: parent name, child name, program, amount due, amount received, payment status, payment method, last updated",
+              "acceptance_criteria": "All columns are visible and sortable; list can be filtered by payment status (pending, paid, partial, waived)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "screen_id": "PT-SCR-02",
+      "screen_name": "Payment Detail",
+      "description": "Detailed payment view for a single enrollment with admin controls",
+      "features": [
+        {
+          "feature_id": "PT-FT-02",
+          "feature_name": "Payment Status Management",
+          "description": "Admin can update payment status and record payment details",
+          "priority": "critical",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "PT-REQ-02",
+              "description": "Admin can set payment status to: pending, paid, partial, waived",
+              "acceptance_criteria": "Status change is saved immediately and reflected across all views"
+            },
+            {
+              "req_id": "PT-REQ-03",
+              "description": "Admin can record: amount received, payment method, and free-text notes (e.g., 'Paid via Zelle on Jan 12')",
+              "acceptance_criteria": "All fields are saved and visible on the payment detail screen"
+            },
+            {
+              "req_id": "PT-REQ-04",
+              "description": "Payment detail shows the full price breakdown from the enrollment (base fee, registration, coupon, total)",
+              "acceptance_criteria": "Price breakdown matches the enrollment record and is read-only on the payment screen"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "screen_id": "PT-SCR-03",
+      "screen_name": "Zelle Instructions (Parent-Facing)",
+      "description": "Page displayed to parents after enrollment showing Zelle payment details",
+      "features": [
+        {
+          "feature_id": "PT-FT-03",
+          "feature_name": "Payment Instructions Display",
+          "description": "Show Zelle recipient info, amount, and reference instructions",
+          "priority": "critical",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "PT-REQ-05",
+              "description": "Page displays: Zelle recipient name/email/phone, exact amount to pay, and a reference note to include (e.g., child name + program name)",
+              "acceptance_criteria": "All payment instruction fields are configured by admin in settings and displayed accurately to the parent"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "business_rules": [
+    {
+      "rule_id": "PT-BR-01",
+      "rule": "Payment status defaults to 'pending' when an enrollment is created",
+      "acceptance_criteria": "Every new enrollment has payment_status = 'pending' and amount_received = 0"
+    },
+    {
+      "rule_id": "PT-BR-02",
+      "rule": "Admin is the only user who can change payment status",
+      "acceptance_criteria": "Parent-facing views do not have any payment status modification controls"
+    },
+    {
+      "rule_id": "PT-BR-03",
+      "rule": "Payment reminder automation is triggered when payment is overdue (configurable threshold, default 3 days after enrollment)",
+      "acceptance_criteria": "System sends payment reminder email when enrollment age exceeds threshold and payment_status is still 'pending'"
+    },
+    {
+      "rule_id": "PT-BR-04",
+      "rule": "Partial payments are tracked: admin records amount received; system calculates remaining balance",
+      "acceptance_criteria": "When amount_received < amount_due and status is 'partial', the remaining balance is displayed correctly"
+    }
+  ]
+}

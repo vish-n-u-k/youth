@@ -1,0 +1,324 @@
+{
+  "moduleId": "enrollment_trial",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "program_discovery",
+      "template": "list",
+      "widgets": [
+        {
+          "widgetId": "et-w-01",
+          "type": "header",
+          "bind": {
+            "kind": "custom",
+            "ref": "Our Programs heading"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-02",
+          "type": "card",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Program cards (name, age group, schedule, price, trial availability, full status)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-03",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Book Trial"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-04",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Enroll Now (disabled + 'Full' label when at capacity)"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "Enroll Now",
+      "primaryActionTarget": "enrollment_form",
+      "sourceRefs": [
+        "fe_details://screens/program_discovery",
+        "navigation_graph://edges/et-e-01",
+        "navigation_graph://edges/et-e-02"
+      ]
+    },
+    {
+      "screenId": "trial_booking_form",
+      "template": "form",
+      "widgets": [
+        {
+          "widgetId": "et-w-05",
+          "type": "header",
+          "bind": {
+            "kind": "custom",
+            "ref": "Book a Trial heading + program name"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-06",
+          "type": "card",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Program summary (name, age group, location)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-07",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "parentName"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-08",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "email"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-09",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "phone"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-10",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "childName"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-11",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "childAge"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-12",
+          "type": "custom:date_picker",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "trialDateId (select from available dates)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-13",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Submit trial booking"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-14",
+          "type": "alert",
+          "bind": {
+            "kind": "state",
+            "ref": "success"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "Submit trial booking",
+      "primaryActionTarget": null,
+      "sourceRefs": [
+        "fe_details://screens/trial_booking_form",
+        "navigation_graph://edges/et-e-03"
+      ]
+    },
+    {
+      "screenId": "enrollment_form",
+      "template": "form",
+      "widgets": [
+        {
+          "widgetId": "et-w-15",
+          "type": "header",
+          "bind": {
+            "kind": "custom",
+            "ref": "Enroll heading + program name"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-16",
+          "type": "card",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Program summary + price breakdown"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-17",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "parentName"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-18",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "email"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-19",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "phone"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-20",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "childName"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-21",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "childAge"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-22",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "couponCode"
+          },
+          "required": false
+        },
+        {
+          "widgetId": "et-w-23",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Apply coupon"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-24",
+          "type": "custom:price_breakdown",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Real-time price breakdown with coupon discount"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-25",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Submit enrollment"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "Submit enrollment",
+      "primaryActionTarget": "enrollment_confirmation",
+      "sourceRefs": [
+        "fe_details://screens/enrollment_form",
+        "navigation_graph://edges/et-e-04"
+      ]
+    },
+    {
+      "screenId": "enrollment_confirmation",
+      "template": "detail",
+      "widgets": [
+        {
+          "widgetId": "et-w-26",
+          "type": "header",
+          "bind": {
+            "kind": "custom",
+            "ref": "Enrollment Confirmed heading with success icon"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-27",
+          "type": "card",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Enrollment summary (program, child, schedule, location)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-28",
+          "type": "card",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Price breakdown"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-29",
+          "type": "card",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Zelle payment instructions (recipient, amount, reference note)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "et-w-30",
+          "type": "alert",
+          "bind": {
+            "kind": "custom",
+            "ref": "Next steps message: check email for confirmation + pay via Zelle"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "View Zelle payment instructions",
+      "primaryActionTarget": null,
+      "sourceRefs": [
+        "fe_details://screens/enrollment_confirmation"
+      ]
+    }
+  ]
+}

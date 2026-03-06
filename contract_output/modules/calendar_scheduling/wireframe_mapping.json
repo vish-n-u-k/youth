@@ -1,0 +1,92 @@
+{
+  "moduleId": "calendar_scheduling",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "admin_calendar",
+      "template": "custom:calendar",
+      "widgets": [
+        {
+          "widgetId": "cs-w-01",
+          "type": "header",
+          "bind": {
+            "kind": "custom",
+            "ref": "Calendar Management heading + program filter + view toggle (month/week)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "cs-w-02",
+          "type": "custom:calendar_grid",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "calendarDates (visual calendar with program dates)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "cs-w-03",
+          "type": "modal_placeholder",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Add/Edit class date form modal"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "cs-w-04",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Add class date"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "Add class date",
+      "primaryActionTarget": null,
+      "sourceRefs": [
+        "fe_details://screens/admin_calendar"
+      ]
+    },
+    {
+      "screenId": "parent_calendar",
+      "template": "list",
+      "widgets": [
+        {
+          "widgetId": "cs-w-05",
+          "type": "header",
+          "bind": {
+            "kind": "custom",
+            "ref": "Available Trial Dates heading + program name"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "cs-w-06",
+          "type": "card",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Trial date cards (date, spots remaining)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "cs-w-07",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Select date to book trial"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "Select trial date",
+      "primaryActionTarget": "enrollment_trial:trial_booking_form",
+      "sourceRefs": [
+        "fe_details://screens/parent_calendar",
+        "navigation_graph://edges/cs-e-01"
+      ]
+    }
+  ]
+}

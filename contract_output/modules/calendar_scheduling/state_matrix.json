@@ -1,0 +1,52 @@
+{
+  "moduleId": "calendar_scheduling",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "admin_calendar",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Loading calendar..."
+        },
+        "empty": {
+          "applicability": "required",
+          "message": "No class dates scheduled yet. Add dates for your programs."
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Failed to load calendar. Please refresh.",
+          "retryAction": "Refresh page"
+        },
+        "success": {
+          "applicability": "required",
+          "message": "Calendar updated."
+        }
+      },
+      "sourceRef": "fe_details://screens/admin_calendar/states"
+    },
+    {
+      "screenId": "parent_calendar",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Loading available dates..."
+        },
+        "empty": {
+          "applicability": "required",
+          "message": "No trial dates available for this program right now. Check back later."
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Failed to load available dates. Please try again.",
+          "retryAction": "Refresh page"
+        },
+        "success": {
+          "applicability": "not_applicable",
+          "message": null
+        }
+      },
+      "sourceRef": "fe_details://screens/parent_calendar/states"
+    }
+  ]
+}

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enrollment &amp; Trial Booking — Young Engineers Enrollment &amp; Operations Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @media print { .no-print { display: none !important; } }
+    details summary::-webkit-details-marker { display: none; }
+    details summary::marker { content: ''; }
+    details summary::before { content: '▶ '; font-size: 0.75em; }
+    details[open] summary::before { content: '▼ '; }
+  </style>
+</head>
+<body class="bg-white text-gray-900 antialiased">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <nav class="mb-6 no-print">
+      <a href="../prd_interactive.html#modules-overview" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Back to PRD
+      </a>
+    </nav>
+    <section id="module-enrollment_trial" class="mb-14">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6 pb-2 border-b-2 border-gray-200">Module: Enrollment & Trial Booking</h2>
+    <a href="#modules-overview" class="text-sm text-blue-600 hover:underline mb-4 inline-block">&larr; Back to Modules Overview</a><div class="bg-gradient-to-r from-gray-50 to-white rounded-lg p-5 border mb-6">
+    <div class="flex flex-wrap items-center gap-2 mb-2"><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600"></span> <span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-red-100 text-red-700">critical</span> <span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-emerald-100 text-emerald-700">MVP</span></div>
+    <p class="text-sm text-gray-700">Parent-facing flows for discovering programs, booking trial classes, and enrolling children. Supports both trial-first and direct enrollment paths.</p></div><div class="mb-6"><h3 class="text-lg font-semibold text-gray-800 mb-3">Screens (4)</h3><div class="overflow-x-auto border rounded-lg">
+    <table class="min-w-full text-sm divide-y divide-gray-200">
+      <thead><tr><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">ID</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">Name</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">Description</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">MVP</th></tr></thead>
+      <tbody class="divide-y divide-gray-100"><tr class="bg-white"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">ET-SCR-01</code></td><td class="px-4 py-3">Program Discovery</td><td class="px-4 py-3">Public page listing all active programs with key details for parents to browse</td><td class="px-4 py-3"></td></tr><tr class="bg-gray-50/50"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">ET-SCR-02</code></td><td class="px-4 py-3">Trial Booking Form</td><td class="px-4 py-3">Step-by-step form for parents to book a trial class</td><td class="px-4 py-3"></td></tr><tr class="bg-white"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">ET-SCR-03</code></td><td class="px-4 py-3">Direct Enrollment Form</td><td class="px-4 py-3">Step-by-step form for parents to enroll a child directly in a program</td><td class="px-4 py-3"></td></tr><tr class="bg-gray-50/50"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">ET-SCR-04</code></td><td class="px-4 py-3">Enrollment Confirmation</td><td class="px-4 py-3">Confirmation screen shown after successful enrollment with payment instructions</td><td class="px-4 py-3"></td></tr></tbody>
+    </table></div></div><div class="mb-6"><h3 class="text-lg font-semibold text-gray-800 mb-3">Features (4)</h3><div class="space-y-2"><div class="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+      <code class="text-xs bg-white px-1.5 py-0.5 rounded border flex-shrink-0 mt-0.5 whitespace-nowrap">ET-FT-01</code>
+      <div><span class="font-medium text-sm">Active Program Listing</span><p class="text-xs text-gray-600 mt-0.5">Display all active programs with age group, schedule, pricing summary, and trial availability</p></div>
+    </div><div class="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+      <code class="text-xs bg-white px-1.5 py-0.5 rounded border flex-shrink-0 mt-0.5 whitespace-nowrap">ET-FT-02</code>
+      <div><span class="font-medium text-sm">Trial Booking Flow</span><p class="text-xs text-gray-600 mt-0.5">Parent selects program, enters child details, picks trial date, and submits</p></div>
+    </div><div class="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+      <code class="text-xs bg-white px-1.5 py-0.5 rounded border flex-shrink-0 mt-0.5 whitespace-nowrap">ET-FT-03</code>
+      <div><span class="font-medium text-sm">Direct Enrollment Flow</span><p class="text-xs text-gray-600 mt-0.5">Parent selects program, enters child details, sees price breakdown, applies coupon, and submits</p></div>
+    </div><div class="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+      <code class="text-xs bg-white px-1.5 py-0.5 rounded border flex-shrink-0 mt-0.5 whitespace-nowrap">ET-FT-04</code>
+      <div><span class="font-medium text-sm">Confirmation &amp; Payment Instructions</span><p class="text-xs text-gray-600 mt-0.5">Display enrollment summary and Zelle payment instructions</p></div>
+    </div></div></div><div class="mb-6"><h3 class="text-lg font-semibold text-gray-800 mb-3">Requirements (12)</h3><div class="space-y-3"><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">ET-REQ-01</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Page displays all active programs as cards or list items showing: program name, age group, schedule summary, price, and whether trial is available</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">All active programs appear; closed/draft programs do not; each card has a 'Book Trial' and/or 'Enroll Now' action button</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">ET-REQ-02</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Programs at capacity show a 'Full' indicator and disable the enroll button</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">When enrollment count equals capacity, the 'Enroll Now' button is disabled and 'Full' label is shown</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">ET-REQ-03</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Form collects: parent name, email, phone, child name, child age, preferred trial date (from available dates)</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">All fields are required; trial date picker shows only admin-defined trial-eligible dates with available capacity</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">ET-REQ-04</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">If parent email matches an existing lead or parent record, pre-fill known fields</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">Parent name, email, phone are pre-filled; parent can edit pre-filled values</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">ET-REQ-05</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">On submission, system creates or updates a lead record with status 'Trial Scheduled'</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">Lead record exists with correct status, child info, and selected trial date within 10 seconds of submission</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">ET-REQ-06</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">On submission, parent receives a confirmation email with trial details and optional calendar invite</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">Email is sent within 2 minutes of submission; email contains program name, date, time, and location</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">ET-REQ-07</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Form collects: parent name, email, phone, child name, child age, optional coupon code</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">All fields except coupon are required; form validates child age against program age group</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">ET-REQ-08</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Price breakdown displays before submission: base fee, registration fee (or waived), coupon discount, total</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">Breakdown updates in real-time when coupon is applied; total matches calculated values</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">ET-REQ-09</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">On submission, enrollment record is created with payment status 'pending'</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">Enrollment record exists with correct program, child, pricing, and payment_status = 'pending'</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">ET-REQ-10</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Each enrollment is for exactly one child; parents with multiple children submit separate enrollment forms</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">Form has fields for one child only; no multi-child selection is available</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">ET-REQ-11</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Confirmation screen shows: enrollment summary (program, child, price breakdown) and Zelle payment instructions (recipient info, amount, reference)</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">All enrollment details and payment instructions are visible; parent can screenshot or print the page</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">ET-REQ-12</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">System sends a confirmation email with the same enrollment summary and payment instructions</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">Email is sent within 2 minutes; content matches confirmation screen</p></div></details>
+    </div></div></div><div class="mb-6"><h3 class="text-lg font-semibold text-gray-800 mb-3">Business Rules (5)</h3><div class="overflow-x-auto border rounded-lg">
+    <table class="min-w-full text-sm divide-y divide-gray-200">
+      <thead><tr><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">ID</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">Description</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">Type</th></tr></thead>
+      <tbody class="divide-y divide-gray-100"><tr class="bg-white"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">ET-BR-01</code></td><td class="px-4 py-3">Enrollment is blocked when program capacity is reached</td><td class="px-4 py-3"></td></tr><tr class="bg-gray-50/50"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">ET-BR-02</code></td><td class="px-4 py-3">Enrollment is blocked when the enrollment window is closed (past end date or manually closed by admin)</td><td class="px-4 py-3"></td></tr><tr class="bg-white"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">ET-BR-03</code></td><td class="px-4 py-3">Admin can override capacity and enrollment window restrictions to manually add enrollments</td><td class="px-4 py-3"></td></tr><tr class="bg-gray-50/50"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">ET-BR-04</code></td><td class="px-4 py-3">Trial booking creates or updates a lead record; direct enrollment also creates a lead if one doesn't exist</td><td class="px-4 py-3"></td></tr><tr class="bg-white"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">ET-BR-05</code></td><td class="px-4 py-3">Child age is validated against the program's age group at enrollment time</td><td class="px-4 py-3"></td></tr></tbody>
+    </table></div></div>
+  </section>
+    <footer class="mt-16 pt-8 border-t border-gray-200 text-center text-sm text-gray-400">
+      Generated on 2026-03-06
+    </footer>
+  </div>
+</body>
+</html>

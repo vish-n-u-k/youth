@@ -1,0 +1,176 @@
+{
+  "moduleId": "payment_tracking",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "payment_dashboard",
+      "template": "list",
+      "widgets": [
+        {
+          "widgetId": "pt-w-01",
+          "type": "header",
+          "bind": {
+            "kind": "custom",
+            "ref": "Payment Tracking heading"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "pt-w-02",
+          "type": "custom:filter_bar",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Filter by status + search"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "pt-w-03",
+          "type": "table",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "payments (parent, child, program, amount due, received, status, method, updated)"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "Click payment to view detail",
+      "primaryActionTarget": "payment_detail",
+      "sourceRefs": [
+        "fe_details://screens/payment_dashboard",
+        "navigation_graph://edges/pt-e-01"
+      ]
+    },
+    {
+      "screenId": "payment_detail",
+      "template": "detail",
+      "widgets": [
+        {
+          "widgetId": "pt-w-04",
+          "type": "header",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Payment for [childName] - [programName]"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "pt-w-05",
+          "type": "card",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Price breakdown (read-only)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "pt-w-06",
+          "type": "card",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Payment summary (amount due, received, remaining)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "pt-w-07",
+          "type": "custom:status_dropdown",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "status"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "pt-w-08",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "amountReceived"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "pt-w-09",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "paymentMethod"
+          },
+          "required": false
+        },
+        {
+          "widgetId": "pt-w-10",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "notes"
+          },
+          "required": false
+        },
+        {
+          "widgetId": "pt-w-11",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Update payment"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "Update payment",
+      "primaryActionTarget": null,
+      "sourceRefs": [
+        "fe_details://screens/payment_detail",
+        "navigation_graph://edges/pt-e-02"
+      ]
+    },
+    {
+      "screenId": "zelle_instructions",
+      "template": "detail",
+      "widgets": [
+        {
+          "widgetId": "pt-w-12",
+          "type": "header",
+          "bind": {
+            "kind": "custom",
+            "ref": "Payment Instructions heading"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "pt-w-13",
+          "type": "card",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "Zelle recipient name, contact info, exact amount, reference note"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "pt-w-14",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Copy Zelle details to clipboard"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "pt-w-15",
+          "type": "alert",
+          "bind": {
+            "kind": "custom",
+            "ref": "Custom instructions from admin (if configured)"
+          },
+          "required": false
+        }
+      ],
+      "primaryAction": "Copy Zelle details",
+      "primaryActionTarget": null,
+      "sourceRefs": [
+        "fe_details://screens/zelle_instructions"
+      ]
+    }
+  ]
+}

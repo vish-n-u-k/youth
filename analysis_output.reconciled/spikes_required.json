@@ -1,0 +1,34 @@
+[
+  {
+    "spike_id": "SP-01",
+    "title": "Facebook Lead Forms webhook integration feasibility",
+    "reason": "Need to verify Facebook API access requirements, webhook setup complexity, and data format for auto-creating lead records",
+    "priority": "high",
+    "estimated_effort": "small",
+    "blocking": ["lead_management"]
+  },
+  {
+    "spike_id": "SP-02",
+    "title": "Google Forms / Ads lead capture integration approach",
+    "reason": "Multiple integration paths exist (Sheets API, Zapier, direct webhook). Need to evaluate simplest reliable approach for the chosen tech stack.",
+    "priority": "high",
+    "estimated_effort": "small",
+    "blocking": ["lead_management"]
+  },
+  {
+    "spike_id": "SP-03",
+    "title": "Email delivery service evaluation",
+    "reason": "Need to select an email service that supports templates, variable substitution, and scheduled sends within budget constraints",
+    "priority": "medium",
+    "estimated_effort": "small",
+    "blocking": ["communication"]
+  },
+  {
+    "spike_id": "SP-04",
+    "title": "COPPA applicability assessment for child data collection",
+    "reason": "System collects child names and ages. COPPA applies to operators of websites or online services directed at children under 13, or that knowingly collect data from children. Need legal/compliance review to determine if parental-proxy data entry exempts the system.",
+    "priority": "high",
+    "estimated_effort": "small",
+    "blocking": ["auth_accounts", "enrollment_trial"]
+  }
+]

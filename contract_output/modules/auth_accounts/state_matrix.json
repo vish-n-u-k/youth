@@ -1,0 +1,98 @@
+{
+  "moduleId": "auth_accounts",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "admin_login",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Signing you in..."
+        },
+        "empty": {
+          "applicability": "not_applicable",
+          "message": ""
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Invalid email or password. Please try again.",
+          "retryAction": "Correct credentials and resubmit"
+        },
+        "success": {
+          "applicability": "required",
+          "message": null
+        }
+      },
+      "sourceRef": "fe_details://screens/admin_login/states"
+    },
+    {
+      "screenId": "password_reset_request",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Sending reset link..."
+        },
+        "empty": {
+          "applicability": "not_applicable",
+          "message": ""
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Something went wrong. Please try again.",
+          "retryAction": "Resubmit email"
+        },
+        "success": {
+          "applicability": "required",
+          "message": "Check your email for a reset link."
+        }
+      },
+      "sourceRef": "fe_details://screens/password_reset_request/states"
+    },
+    {
+      "screenId": "set_new_password",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Updating your password..."
+        },
+        "empty": {
+          "applicability": "not_applicable",
+          "message": ""
+        },
+        "error": {
+          "applicability": "required",
+          "message": "This link has expired. Request a new one.",
+          "retryAction": "Navigate to forgot password to request a new link"
+        },
+        "success": {
+          "applicability": "required",
+          "message": "Password updated successfully. Redirecting to login..."
+        }
+      },
+      "sourceRef": "fe_details://screens/set_new_password/states"
+    },
+    {
+      "screenId": "parent_login_stub",
+      "states": {
+        "loading": {
+          "applicability": "not_applicable",
+          "message": ""
+        },
+        "empty": {
+          "applicability": "not_applicable",
+          "message": ""
+        },
+        "error": {
+          "applicability": "not_applicable",
+          "message": "",
+          "retryAction": null
+        },
+        "success": {
+          "applicability": "not_applicable",
+          "message": null
+        }
+      },
+      "sourceRef": "fe_details://screens/parent_login_stub/states"
+    }
+  ]
+}

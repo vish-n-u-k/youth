@@ -1,0 +1,37 @@
+[
+  {
+    "item_id": "TP-01",
+    "title": "Facebook Lead Forms integration method",
+    "source": "BRD Section 4.1",
+    "detail": "BRD specifies capturing leads from Facebook Lead Forms. Integration could use Facebook Webhooks (real-time) or periodic API polling. Decision deferred to implementation.",
+    "constraint_note": "Must auto-create lead records without manual data entry"
+  },
+  {
+    "item_id": "TP-02",
+    "title": "Google Forms / Ads lead capture integration",
+    "source": "BRD Section 4.1",
+    "detail": "BRD specifies Google Forms and Google Ads as lead sources. Integration method (Google Sheets webhook, Zapier, direct API) deferred to implementation.",
+    "constraint_note": "Must funnel into the same lead record format as other sources"
+  },
+  {
+    "item_id": "TP-03",
+    "title": "Email delivery service selection",
+    "source": "BRD Section 4.6",
+    "detail": "System requires transactional email for confirmations, reminders, and payment instructions. Service choice (SendGrid, SES, Resend, etc.) deferred to implementation.",
+    "constraint_note": "Must support template-based emails with variable substitution"
+  },
+  {
+    "item_id": "TP-04",
+    "title": "Calendar invite generation",
+    "source": "BRD Section 4.3",
+    "detail": "BRD mentions optional calendar invite on trial confirmation. Implementation method (.ics attachment vs Google Calendar link vs both) deferred.",
+    "constraint_note": "Should work across major calendar apps (Google, Apple, Outlook)"
+  },
+  {
+    "item_id": "TP-05",
+    "title": "Technology stack and hosting",
+    "source": "General",
+    "detail": "No technology stack specified in BRD. Framework, database, and hosting decisions deferred to implementation phase.",
+    "constraint_note": "Must support the non-functional requirements (mobile-responsive, secure, scalable)"
+  }
+]

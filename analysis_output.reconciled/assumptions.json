@@ -1,0 +1,128 @@
+[
+  {
+    "assumption_id": "A-01",
+    "description": "Returning parents are identified by email address match. If a parent uses a different email, they will be treated as a new lead.",
+    "assumption_source": "ai_assumed",
+    "approval_state": "pending_human_review",
+    "rewrite_risk": "low",
+    "isolation_recommended": false,
+    "isolation_note": ""
+  },
+  {
+    "assumption_id": "A-02",
+    "description": "Parent-facing enrollment and trial booking flows in MVP are public (no login required). Parents access them via links shared by admin or found on the website. Email verification confirms identity.",
+    "assumption_source": "ai_assumed",
+    "approval_state": "pending_human_review",
+    "rewrite_risk": "medium",
+    "isolation_recommended": true,
+    "isolation_note": "Keep parent identity resolution separate from flow logic so adding login in Phase 2 does not require rewriting enrollment forms"
+  },
+  {
+    "assumption_id": "A-03",
+    "description": "Facebook Lead Form integration uses a webhook or polling mechanism to auto-create lead records. Specific integration method deferred to implementation.",
+    "assumption_source": "ai_assumed",
+    "approval_state": "pending_human_review",
+    "rewrite_risk": "low",
+    "isolation_recommended": false,
+    "isolation_note": ""
+  },
+  {
+    "assumption_id": "A-04",
+    "description": "Google Forms/Ads lead capture uses a similar ingest mechanism as Facebook leads. All lead sources funnel into the same lead record format.",
+    "assumption_source": "ai_assumed",
+    "approval_state": "pending_human_review",
+    "rewrite_risk": "low",
+    "isolation_recommended": false,
+    "isolation_note": ""
+  },
+  {
+    "assumption_id": "A-05",
+    "description": "Calendar invites (e.g., .ics files or Google Calendar links) are optional in MVP and may be sent as attachments in confirmation emails.",
+    "assumption_source": "ai_assumed",
+    "approval_state": "pending_human_review",
+    "rewrite_risk": "low",
+    "isolation_recommended": false,
+    "isolation_note": ""
+  },
+  {
+    "assumption_id": "A-06",
+    "description": "Coupon codes are created and managed by admin. There is no self-serve coupon generation. Coupons have optional expiry dates and usage limits.",
+    "assumption_source": "ai_assumed",
+    "approval_state": "pending_human_review",
+    "rewrite_risk": "low",
+    "isolation_recommended": false,
+    "isolation_note": ""
+  },
+  {
+    "assumption_id": "A-07",
+    "description": "Payment overdue threshold is configurable by admin (e.g., 3 days, 7 days after enrollment). Default is 3 days.",
+    "assumption_source": "ai_assumed",
+    "approval_state": "pending_human_review",
+    "rewrite_risk": "low",
+    "isolation_recommended": false,
+    "isolation_note": ""
+  },
+  {
+    "assumption_id": "A-08",
+    "description": "Admin dashboard metrics are real-time (or near real-time) calculated from current data, not pre-aggregated reports.",
+    "assumption_source": "ai_assumed",
+    "approval_state": "pending_human_review",
+    "rewrite_risk": "low",
+    "isolation_recommended": false,
+    "isolation_note": ""
+  },
+  {
+    "assumption_id": "A-09",
+    "description": "The system supports a single location in MVP. Multi-location support is Phase 2 but the data model includes location_id from the start.",
+    "assumption_source": "ai_assumed",
+    "approval_state": "pending_human_review",
+    "rewrite_risk": "low",
+    "isolation_recommended": false,
+    "isolation_note": ""
+  },
+  {
+    "assumption_id": "A-10",
+    "description": "Staff role in Phase 2 has limited access: can view calendar and enrollment list but cannot modify programs, pricing, or payment records.",
+    "assumption_source": "ai_assumed",
+    "approval_state": "pending_human_review",
+    "rewrite_risk": "low",
+    "isolation_recommended": false,
+    "isolation_note": ""
+  },
+  {
+    "assumption_id": "A-11",
+    "description": "Trial booking requires selecting a specific date from admin-defined trial-eligible dates. Walk-in trials are tracked by admin manually updating lead status.",
+    "assumption_source": "ai_assumed",
+    "approval_state": "pending_human_review",
+    "rewrite_risk": "low",
+    "isolation_recommended": false,
+    "isolation_note": ""
+  },
+  {
+    "assumption_id": "A-12",
+    "description": "Enrollment capacity is per-program (not per-session). When a program reaches capacity, enrollment is locked for that program.",
+    "assumption_source": "ai_assumed",
+    "approval_state": "pending_human_review",
+    "rewrite_risk": "medium",
+    "isolation_recommended": true,
+    "isolation_note": "Capacity logic should be configurable (per-program vs per-session) to allow future flexibility without restructuring"
+  },
+  {
+    "assumption_id": "A-13",
+    "description": "Partial payments are tracked manually by admin. The system does not enforce payment installment schedules automatically.",
+    "assumption_source": "ai_assumed",
+    "approval_state": "pending_human_review",
+    "rewrite_risk": "low",
+    "isolation_recommended": false,
+    "isolation_note": ""
+  },
+  {
+    "assumption_id": "A-14",
+    "description": "COPPA may not apply because child data (name, age) is collected from parents/guardians, not directly from children. However, this requires legal/compliance confirmation before launch.",
+    "assumption_source": "ai_assumed",
+    "approval_state": "pending_human_review",
+    "rewrite_risk": "medium",
+    "isolation_recommended": true,
+    "isolation_note": "If COPPA applies, verifiable parental consent mechanisms and data handling policies must be added before collecting any child PII"
+  }
+]

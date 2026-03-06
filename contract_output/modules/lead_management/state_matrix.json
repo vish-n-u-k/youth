@@ -1,0 +1,52 @@
+{
+  "moduleId": "lead_management",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "lead_list",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Loading leads..."
+        },
+        "empty": {
+          "applicability": "required",
+          "message": "No leads yet. Leads will appear here when captured from your website, Facebook, or Google forms."
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Failed to load leads. Please refresh.",
+          "retryAction": "Refresh page"
+        },
+        "success": {
+          "applicability": "optional",
+          "message": "Lead status updated."
+        }
+      },
+      "sourceRef": "fe_details://screens/lead_list/states"
+    },
+    {
+      "screenId": "lead_detail",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Loading lead details..."
+        },
+        "empty": {
+          "applicability": "not_applicable",
+          "message": ""
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Failed to load lead details. Please try again.",
+          "retryAction": "Refresh page"
+        },
+        "success": {
+          "applicability": "required",
+          "message": "Lead updated successfully."
+        }
+      },
+      "sourceRef": "fe_details://screens/lead_detail/states"
+    }
+  ]
+}

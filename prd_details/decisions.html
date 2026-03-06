@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Architectural Decisions — Young Engineers Enrollment &amp; Operations Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @media print { .no-print { display: none !important; } }
+    details summary::-webkit-details-marker { display: none; }
+    details summary::marker { content: ''; }
+    details summary::before { content: '▶ '; font-size: 0.75em; }
+    details[open] summary::before { content: '▼ '; }
+  </style>
+</head>
+<body class="bg-white text-gray-900 antialiased">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <nav class="mb-6 no-print">
+      <a href="../prd_interactive.html" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Back to PRD
+      </a>
+    </nav>
+    <section id="decisions" class="mb-14">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6 pb-2 border-b-2 border-gray-200">Architectural Decisions</h2>
+    <div class="space-y-4">
+    <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">nav.primary_model</code>
+        <span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-amber-100 text-amber-700">pending_human_review</span><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-700">low</span>
+        
+      </div>
+      <p class="text-sm text-gray-800 mb-2">Admin uses sidebar navigation; parents use simplified top navigation bar</p>
+      
+    </div><div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">layout.page_template_strategy</code>
+        <span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-amber-100 text-amber-700">pending_human_review</span><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-700">low</span>
+        
+      </div>
+      <p class="text-sm text-gray-800 mb-2">Shared page templates across all modules (list, detail, form, dashboard, wizard)</p>
+      
+    </div><div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">enrollment.per_child</code>
+        <span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-700">user_approved</span><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">medium</span>
+        <span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-amber-100 text-amber-700">Isolation Recommended</span>
+      </div>
+      <p class="text-sm text-gray-800 mb-2">Each enrollment is for exactly one child; multi-child families submit separate enrollments</p>
+      <p class="text-xs text-gray-500 italic">Enrollment form and data model should not assume single-child permanently; keep child_id as a foreign key so multi-child enrollment could be added later without restructuring</p>
+    </div><div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">parent.returning_recognition</code>
+        <span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-amber-100 text-amber-700">pending_human_review</span><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-700">low</span>
+        
+      </div>
+      <p class="text-sm text-gray-800 mb-2">Returning parents are recognized by email and skip lead capture, going directly to enrollment</p>
+      
+    </div><div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">payment.offline_only_mvp</code>
+        <span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-700">user_approved</span><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-700">low</span>
+        <span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-amber-100 text-amber-700">Isolation Recommended</span>
+      </div>
+      <p class="text-sm text-gray-800 mb-2">MVP supports only offline payment tracking (Zelle); no payment gateway integration</p>
+      <p class="text-xs text-gray-500 italic">Payment module should abstract payment method so Stripe/card payments can be added in Phase 2 without rewriting core payment tracking</p>
+    </div><div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">comm.email_only_mvp</code>
+        <span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-700">user_approved</span><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-700">low</span>
+        <span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-amber-100 text-amber-700">Isolation Recommended</span>
+      </div>
+      <p class="text-sm text-gray-800 mb-2">MVP uses email-only communication; SMS/WhatsApp deferred to Phase 2</p>
+      <p class="text-xs text-gray-500 italic">Communication module should use a channel abstraction so SMS/WhatsApp can be added as additional channels without rewriting automation logic</p>
+    </div><div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">auth.parent_portal_phase2</code>
+        <span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-amber-100 text-amber-700">pending_human_review</span><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">medium</span>
+        <span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-amber-100 text-amber-700">Isolation Recommended</span>
+      </div>
+      <p class="text-sm text-gray-800 mb-2">Parent portal with login is Phase 2; MVP parent flows are public/link-based with email verification</p>
+      <p class="text-xs text-gray-500 italic">Parent-facing flows should be designed so adding authentication in Phase 2 wraps existing flows rather than replacing them</p>
+    </div>
+  </div>
+  </section>
+    <footer class="mt-16 pt-8 border-t border-gray-200 text-center text-sm text-gray-400">
+      Generated on 2026-03-06
+    </footer>
+  </div>
+</body>
+</html>

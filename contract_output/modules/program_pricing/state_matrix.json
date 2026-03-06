@@ -1,0 +1,75 @@
+{
+  "moduleId": "program_pricing",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "program_list",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Loading programs..."
+        },
+        "empty": {
+          "applicability": "required",
+          "message": "No programs created yet. Click 'Create Program' to get started."
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Failed to load programs. Please refresh.",
+          "retryAction": "Refresh page"
+        },
+        "success": {
+          "applicability": "not_applicable",
+          "message": null
+        }
+      },
+      "sourceRef": "fe_details://screens/program_list/states"
+    },
+    {
+      "screenId": "program_setup",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Loading program..."
+        },
+        "empty": {
+          "applicability": "not_applicable",
+          "message": ""
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Failed to save program. Please try again.",
+          "retryAction": "Resubmit form"
+        },
+        "success": {
+          "applicability": "required",
+          "message": "Program saved successfully."
+        }
+      },
+      "sourceRef": "fe_details://screens/program_setup/states"
+    },
+    {
+      "screenId": "coupon_management",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Loading coupons..."
+        },
+        "empty": {
+          "applicability": "required",
+          "message": "No coupons created yet. Create one to offer discounts."
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Failed to load coupons. Please refresh.",
+          "retryAction": "Refresh page"
+        },
+        "success": {
+          "applicability": "required",
+          "message": "Coupon saved successfully."
+        }
+      },
+      "sourceRef": "fe_details://screens/coupon_management/states"
+    }
+  ]
+}

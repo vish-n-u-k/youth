@@ -1,0 +1,98 @@
+{
+  "moduleId": "enrollment_trial",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "program_discovery",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Loading programs..."
+        },
+        "empty": {
+          "applicability": "required",
+          "message": "No programs available right now. Check back soon!"
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Unable to load programs. Please try again.",
+          "retryAction": "Refresh page"
+        },
+        "success": {
+          "applicability": "not_applicable",
+          "message": null
+        }
+      },
+      "sourceRef": "fe_details://screens/program_discovery/states"
+    },
+    {
+      "screenId": "trial_booking_form",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Booking your trial..."
+        },
+        "empty": {
+          "applicability": "not_applicable",
+          "message": ""
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Unable to book trial. Please try again.",
+          "retryAction": "Resubmit form"
+        },
+        "success": {
+          "applicability": "required",
+          "message": "Trial booked! Check your email for a confirmation with details."
+        }
+      },
+      "sourceRef": "fe_details://screens/trial_booking_form/states"
+    },
+    {
+      "screenId": "enrollment_form",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Processing your enrollment..."
+        },
+        "empty": {
+          "applicability": "not_applicable",
+          "message": ""
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Unable to complete enrollment. Please try again.",
+          "retryAction": "Resubmit form"
+        },
+        "success": {
+          "applicability": "required",
+          "message": null
+        }
+      },
+      "sourceRef": "fe_details://screens/enrollment_form/states"
+    },
+    {
+      "screenId": "enrollment_confirmation",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Loading confirmation..."
+        },
+        "empty": {
+          "applicability": "not_applicable",
+          "message": ""
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Unable to load confirmation. Please contact us for assistance.",
+          "retryAction": "Refresh page"
+        },
+        "success": {
+          "applicability": "not_applicable",
+          "message": null
+        }
+      },
+      "sourceRef": "fe_details://screens/enrollment_confirmation/states"
+    }
+  ]
+}

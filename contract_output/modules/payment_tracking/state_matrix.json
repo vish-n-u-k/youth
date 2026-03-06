@@ -1,0 +1,75 @@
+{
+  "moduleId": "payment_tracking",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "payment_dashboard",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Loading payments..."
+        },
+        "empty": {
+          "applicability": "required",
+          "message": "No payments to track yet. Payments will appear here after enrollments."
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Failed to load payments. Please refresh.",
+          "retryAction": "Refresh page"
+        },
+        "success": {
+          "applicability": "not_applicable",
+          "message": null
+        }
+      },
+      "sourceRef": "fe_details://screens/payment_dashboard/states"
+    },
+    {
+      "screenId": "payment_detail",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Loading payment details..."
+        },
+        "empty": {
+          "applicability": "not_applicable",
+          "message": ""
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Failed to load payment details. Please try again.",
+          "retryAction": "Refresh page"
+        },
+        "success": {
+          "applicability": "required",
+          "message": "Payment updated successfully."
+        }
+      },
+      "sourceRef": "fe_details://screens/payment_detail/states"
+    },
+    {
+      "screenId": "zelle_instructions",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Loading payment instructions..."
+        },
+        "empty": {
+          "applicability": "not_applicable",
+          "message": ""
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Unable to load payment instructions. Please contact us.",
+          "retryAction": "Refresh page"
+        },
+        "success": {
+          "applicability": "not_applicable",
+          "message": null
+        }
+      },
+      "sourceRef": "fe_details://screens/zelle_instructions/states"
+    }
+  ]
+}

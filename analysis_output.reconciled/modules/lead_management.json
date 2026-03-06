@@ -1,0 +1,139 @@
+{
+  "module_id": "lead_management",
+  "module_name": "Lead Management (CRM-lite)",
+  "description": "Captures leads from multiple sources (Facebook, Google, Website), creates unified lead records, and tracks each lead through a defined lifecycle from first contact to enrollment or drop-off.",
+  "priority": "critical",
+  "mvp": true,
+  "screens": [
+    {
+      "screen_id": "LM-SCR-01",
+      "screen_name": "Lead List",
+      "description": "Displays all leads in Kanban board or table view with filtering and sorting capabilities",
+      "features": [
+        {
+          "feature_id": "LM-FT-01",
+          "feature_name": "Kanban View",
+          "description": "Visual board with columns for each lead status (New, Contacted, Trial Scheduled, Trial Attended, Enrolled, Dropped)",
+          "priority": "high",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "LM-REQ-01",
+              "description": "Lead cards can be dragged between status columns to update status",
+              "acceptance_criteria": "Dragging a card from 'New' to 'Contacted' updates the lead status in the database and reflects immediately in the UI"
+            },
+            {
+              "req_id": "LM-REQ-02",
+              "description": "Each card displays parent name, child age, source, and interested program",
+              "acceptance_criteria": "All four fields are visible on the card without expanding it"
+            }
+          ]
+        },
+        {
+          "feature_id": "LM-FT-02",
+          "feature_name": "Table View",
+          "description": "Tabular list of all leads with sortable columns",
+          "priority": "high",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "LM-REQ-03",
+              "description": "Table displays columns: Parent Name, Email, Phone, Child Age, Source, Program, Status, Date Created",
+              "acceptance_criteria": "All columns are visible and each column is sortable in ascending/descending order"
+            }
+          ]
+        },
+        {
+          "feature_id": "LM-FT-03",
+          "feature_name": "Lead Filtering",
+          "description": "Filter leads by source, status, and program",
+          "priority": "high",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "LM-REQ-04",
+              "description": "Admin can filter leads by source (Facebook, Google, Website), status (any lifecycle stage), and interested program",
+              "acceptance_criteria": "Applying a filter immediately updates the visible leads; multiple filters can be combined; filters can be cleared individually or all at once"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "screen_id": "LM-SCR-02",
+      "screen_name": "Lead Detail",
+      "description": "Detailed view of a single lead with all information, notes, and activity history",
+      "features": [
+        {
+          "feature_id": "LM-FT-04",
+          "feature_name": "Lead Profile",
+          "description": "Full lead information display and edit",
+          "priority": "critical",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "LM-REQ-05",
+              "description": "Display all lead fields: parent name, email, phone, child age, source, interested program, status, date created",
+              "acceptance_criteria": "All fields are displayed and editable by admin"
+            },
+            {
+              "req_id": "LM-REQ-06",
+              "description": "Admin can manually change lead status to any lifecycle stage",
+              "acceptance_criteria": "Status dropdown shows all stages; selecting a new status saves immediately"
+            }
+          ]
+        },
+        {
+          "feature_id": "LM-FT-05",
+          "feature_name": "Lead Notes",
+          "description": "Admin can add timestamped notes to a lead record",
+          "priority": "high",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "LM-REQ-07",
+              "description": "Admin can add free-text notes to any lead; each note is timestamped and attributed to the admin user",
+              "acceptance_criteria": "Notes appear in reverse chronological order; each note shows text, timestamp, and author"
+            }
+          ]
+        },
+        {
+          "feature_id": "LM-FT-06",
+          "feature_name": "Activity Timeline",
+          "description": "Chronological log of all actions taken on this lead (status changes, emails sent, notes added)",
+          "priority": "medium",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "LM-REQ-08",
+              "description": "System automatically logs status changes, communications sent, and enrollment events for each lead",
+              "acceptance_criteria": "Timeline shows entries for each logged event with timestamp, event type, and details"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "business_rules": [
+    {
+      "rule_id": "LM-BR-01",
+      "rule": "Leads from Facebook, Google, and Website sources are auto-created with source field populated",
+      "acceptance_criteria": "When a lead form is submitted from any integrated source, a lead record is created within 5 minutes with the correct source tag"
+    },
+    {
+      "rule_id": "LM-BR-02",
+      "rule": "Lead status auto-advances: booking a trial sets status to 'Trial Scheduled'; attending trial sets 'Trial Attended'; completing enrollment sets 'Enrolled'",
+      "acceptance_criteria": "Each enrollment event triggers the corresponding status change without admin intervention; admin can still override"
+    },
+    {
+      "rule_id": "LM-BR-03",
+      "rule": "Duplicate leads (same email) are merged or flagged rather than creating separate records",
+      "acceptance_criteria": "When a new lead arrives with an email matching an existing lead, system either merges data into the existing record or alerts admin of the duplicate"
+    },
+    {
+      "rule_id": "LM-BR-04",
+      "rule": "Lead lifecycle stages are: New Lead → Contacted → Trial Scheduled → Trial Attended → Enrolled → Dropped / Not Interested",
+      "acceptance_criteria": "Only these stages are available in the system; status transitions are logged in the activity timeline"
+    }
+  ]
+}

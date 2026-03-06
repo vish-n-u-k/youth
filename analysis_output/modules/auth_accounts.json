@@ -1,0 +1,73 @@
+{
+  "module_id": "auth_accounts",
+  "module_name": "Authentication & Accounts",
+  "description": "Admin login for MVP. Parent registration/login is Phase 2. MVP parent flows use link-based access with email verification.",
+  "priority": "high",
+  "mvp": true,
+  "screens": [
+    {
+      "screen_id": "AA-SCR-01",
+      "screen_name": "Admin Login",
+      "description": "Login page for admin users",
+      "features": [
+        {
+          "feature_id": "AA-FT-01",
+          "feature_name": "Admin Authentication",
+          "description": "Email/password login for admin users",
+          "priority": "critical",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "AA-REQ-01",
+              "description": "Admin can log in with email and password",
+              "acceptance_criteria": "Valid credentials redirect to admin dashboard; invalid credentials show error message; session persists across page reloads"
+            },
+            {
+              "req_id": "AA-REQ-02",
+              "description": "Admin can log out from any page",
+              "acceptance_criteria": "Logout button is accessible from the sidebar; clicking it clears the session and redirects to login page"
+            },
+            {
+              "req_id": "AA-REQ-03",
+              "description": "Admin can reset password via email",
+              "acceptance_criteria": "Forgot password link sends a reset email; reset link expires after 24 hours"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "screen_id": "AA-SCR-02",
+      "screen_name": "Parent Registration / Login (Phase 2)",
+      "description": "Future parent portal login — stubbed in MVP architecture but not built",
+      "features": [
+        {
+          "feature_id": "AA-FT-02",
+          "feature_name": "Parent Portal Authentication",
+          "description": "Parent registration and login for accessing enrollment history and profile",
+          "priority": "low",
+          "mvp": false,
+          "requirements": [
+            {
+              "req_id": "AA-REQ-04",
+              "description": "Parents can register with email and password and log in to view their enrollment history",
+              "acceptance_criteria": "Phase 2: Registration creates a parent account; login shows past and current enrollments for all children"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "business_rules": [
+    {
+      "rule_id": "AA-BR-01",
+      "rule": "All admin routes require authentication; unauthenticated access redirects to login",
+      "acceptance_criteria": "Accessing any admin URL without a valid session redirects to the admin login page"
+    },
+    {
+      "rule_id": "AA-BR-02",
+      "rule": "Parent-facing pages (program discovery, trial booking, enrollment) are publicly accessible in MVP without login",
+      "acceptance_criteria": "Parent-facing URLs load without authentication; no login prompt is shown"
+    }
+  ]
+}

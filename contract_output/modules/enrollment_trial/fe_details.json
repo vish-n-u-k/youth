@@ -1,0 +1,319 @@
+{
+  "moduleId": "enrollment_trial",
+  "contractVersion": "v1.0.0",
+  "status": "agreed",
+  "changeType": "none",
+  "globalBindings": {
+    "globalContractRef": "contract_output/global/fe_global_contract.json",
+    "inheritedDecisionIds": [
+      "enrollment.per_child",
+      "parent.returning_recognition",
+      "payment.offline_only_mvp",
+      "auth.parent_portal_phase2"
+    ],
+    "inheritedPolicyIds": [
+      "GP-01",
+      "GP-02",
+      "GP-03",
+      "GP-06",
+      "GP-07",
+      "GP-08"
+    ],
+    "moduleOverrides": []
+  },
+  "screens": [
+    {
+      "screenId": "program_discovery",
+      "name": "Program Discovery",
+      "route": "/programs",
+      "type": "api_driven",
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "dataDisplayed": [
+        {
+          "field": "activePrograms",
+          "source": "api",
+          "schemaRef": "zod://PublicProgramListResponse"
+        }
+      ],
+      "dataCaptured": [],
+      "interactions": [
+        "View program details",
+        "Click 'Book Trial' to start trial booking",
+        "Click 'Enroll Now' to start enrollment"
+      ],
+      "states": {
+        "loading": "Loading programs...",
+        "empty": "No programs available right now. Check back soon!",
+        "error": "Unable to load programs. Please try again."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "getPublicPrograms",
+          "method": "GET",
+          "path": "/api/public/programs",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://PublicProgramListResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    },
+    {
+      "screenId": "trial_booking_form",
+      "name": "Trial Booking Form",
+      "route": "/programs/:programId/book-trial",
+      "type": "input_driven",
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "dataDisplayed": [
+        {
+          "field": "programSummary",
+          "source": "api",
+          "schemaRef": "zod://PublicProgramResponse"
+        },
+        {
+          "field": "availableTrialDates",
+          "source": "api",
+          "schemaRef": "zod://AvailableTrialDatesResponse"
+        }
+      ],
+      "dataCaptured": [
+        {
+          "field": "parentName",
+          "required": true,
+          "schemaRef": "zod://TrialBookingRequest"
+        },
+        {
+          "field": "email",
+          "required": true,
+          "schemaRef": "zod://TrialBookingRequest"
+        },
+        {
+          "field": "phone",
+          "required": true,
+          "schemaRef": "zod://TrialBookingRequest"
+        },
+        {
+          "field": "childName",
+          "required": true,
+          "schemaRef": "zod://TrialBookingRequest"
+        },
+        {
+          "field": "childAge",
+          "required": true,
+          "schemaRef": "zod://TrialBookingRequest"
+        },
+        {
+          "field": "trialDateId",
+          "required": true,
+          "schemaRef": "zod://TrialBookingRequest"
+        }
+      ],
+      "interactions": [
+        "Select trial date from available dates",
+        "Submit trial booking",
+        "Navigate back to program discovery"
+      ],
+      "states": {
+        "loading": "Booking your trial...",
+        "empty": "N/A",
+        "error": "Unable to book trial. Please try again."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "getPublicProgram",
+          "method": "GET",
+          "path": "/api/public/programs/:programId",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://PublicProgramResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "bookTrial",
+          "method": "POST",
+          "path": "/api/public/trials",
+          "requestSchemaRef": "zod://TrialBookingRequest",
+          "responseSchemaRef": "zod://TrialBookingResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    },
+    {
+      "screenId": "enrollment_form",
+      "name": "Direct Enrollment Form",
+      "route": "/programs/:programId/enroll",
+      "type": "input_driven",
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "dataDisplayed": [
+        {
+          "field": "programSummary",
+          "source": "api",
+          "schemaRef": "zod://PublicProgramResponse"
+        },
+        {
+          "field": "priceBreakdown",
+          "source": "api",
+          "schemaRef": "zod://PriceBreakdownResponse"
+        }
+      ],
+      "dataCaptured": [
+        {
+          "field": "parentName",
+          "required": true,
+          "schemaRef": "zod://EnrollmentRequest"
+        },
+        {
+          "field": "email",
+          "required": true,
+          "schemaRef": "zod://EnrollmentRequest"
+        },
+        {
+          "field": "phone",
+          "required": true,
+          "schemaRef": "zod://EnrollmentRequest"
+        },
+        {
+          "field": "childName",
+          "required": true,
+          "schemaRef": "zod://EnrollmentRequest"
+        },
+        {
+          "field": "childAge",
+          "required": true,
+          "schemaRef": "zod://EnrollmentRequest"
+        },
+        {
+          "field": "couponCode",
+          "required": false,
+          "schemaRef": "zod://EnrollmentRequest"
+        }
+      ],
+      "interactions": [
+        "Enter coupon code and apply",
+        "Submit enrollment",
+        "Navigate back to program discovery"
+      ],
+      "states": {
+        "loading": "Processing your enrollment...",
+        "empty": "N/A",
+        "error": "Unable to complete enrollment. Please try again."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "getPriceBreakdown",
+          "method": "POST",
+          "path": "/api/public/programs/:programId/price",
+          "requestSchemaRef": "zod://PriceBreakdownRequest",
+          "responseSchemaRef": "zod://PriceBreakdownResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "submitEnrollment",
+          "method": "POST",
+          "path": "/api/public/enrollments",
+          "requestSchemaRef": "zod://EnrollmentRequest",
+          "responseSchemaRef": "zod://EnrollmentResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    },
+    {
+      "screenId": "enrollment_confirmation",
+      "name": "Enrollment Confirmation",
+      "route": "/enrollment/:enrollmentId/confirmation",
+      "type": "api_driven",
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "dataDisplayed": [
+        {
+          "field": "enrollmentSummary",
+          "source": "api",
+          "schemaRef": "zod://EnrollmentConfirmationResponse"
+        }
+      ],
+      "dataCaptured": [],
+      "interactions": [
+        "View Zelle payment instructions",
+        "Navigate back to programs"
+      ],
+      "states": {
+        "loading": "Loading confirmation...",
+        "empty": "N/A",
+        "error": "Unable to load confirmation. Please contact us for assistance."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "getEnrollmentConfirmation",
+          "method": "GET",
+          "path": "/api/public/enrollments/:enrollmentId/confirmation",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://EnrollmentConfirmationResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "ET-A-01",
+      "text": "Returning parents identified by email; known fields pre-filled automatically",
+      "severity": "low",
+      "state": "open",
+      "assumptionSource": "ai_assumed",
+      "approvalState": "pending_human_review",
+      "rewriteRisk": "low",
+      "isolationRecommended": false,
+      "isolationNote": "",
+      "sourceRef": "analysis_output/assumptions.json#id=A-01"
+    },
+    {
+      "id": "ET-A-02",
+      "text": "Enrollment is instant on form submission; admin can cancel/modify after the fact",
+      "severity": "high",
+      "state": "open",
+      "assumptionSource": "ai_assumed",
+      "approvalState": "pending_human_review",
+      "rewriteRisk": "medium",
+      "isolationRecommended": true,
+      "isolationNote": "If approval flow is added later, insert approval step between submit and confirmation without rewriting enrollment form",
+      "sourceRef": "analysis_output/open_questions.json#id=OQ-03"
+    },
+    {
+      "id": "ET-A-03",
+      "text": "Trials are free by default; admin can set optional fee but it is not auto-deducted from program fee",
+      "severity": "medium",
+      "state": "open",
+      "assumptionSource": "ai_assumed",
+      "approvalState": "pending_human_review",
+      "rewriteRisk": "low",
+      "isolationRecommended": false,
+      "isolationNote": "",
+      "sourceRef": "analysis_output/open_questions.json#id=OQ-01"
+    },
+    {
+      "id": "ET-A-04",
+      "text": "No waitlist in MVP; full programs show 'Program Full' with disabled enrollment button; admin can manually override",
+      "severity": "medium",
+      "state": "open",
+      "assumptionSource": "ai_assumed",
+      "approvalState": "pending_human_review",
+      "rewriteRisk": "low",
+      "isolationRecommended": false,
+      "isolationNote": "",
+      "sourceRef": "analysis_output/open_questions.json#id=OQ-02"
+    },
+    {
+      "id": "ET-A-05",
+      "text": "Child age validated against program age group; warning shown but admin can override",
+      "severity": "low",
+      "state": "open",
+      "assumptionSource": "ai_assumed",
+      "approvalState": "pending_human_review",
+      "rewriteRisk": "low",
+      "isolationRecommended": false,
+      "isolationNote": "",
+      "sourceRef": "analysis_output/modules/enrollment_trial.json"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "moduleId": "program_pricing",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "program_list",
+      "name": "Program List",
+      "route": "/admin/programs",
+      "entry": true,
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "visibilityCondition": null,
+      "sourceRef": "fe_details://screens/program_list"
+    },
+    {
+      "screenId": "program_setup",
+      "name": "Program Setup / Edit",
+      "route": "/admin/programs/:programId",
+      "entry": false,
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "visibilityCondition": null,
+      "sourceRef": "fe_details://screens/program_setup"
+    },
+    {
+      "screenId": "coupon_management",
+      "name": "Coupon Management",
+      "route": "/admin/programs/coupons",
+      "entry": false,
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "visibilityCondition": null,
+      "sourceRef": "fe_details://screens/coupon_management"
+    }
+  ]
+}

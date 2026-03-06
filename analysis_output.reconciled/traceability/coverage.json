@@ -1,0 +1,45 @@
+{
+  "traceability_tier": "standard",
+  "overall_percent": 65,
+  "covered_targets": {
+    "goals": 6,
+    "modules": 5,
+    "features": 13,
+    "requirements": 6,
+    "business_rules": 4,
+    "global_decisions": 7,
+    "nfr": 5
+  },
+  "total_targets": {
+    "goals": 7,
+    "modules": 9,
+    "features": 20,
+    "requirements": 38,
+    "business_rules": 23,
+    "global_decisions": 7,
+    "nfr": 7
+  },
+  "uncovered_source_refs": [],
+  "orphan_targets": [
+    "G-07",
+    "program_pricing",
+    "enrollment_trial",
+    "auth_accounts",
+    "settings",
+    "PP-FT-01",
+    "ET-FT-01",
+    "ET-FT-04",
+    "CS-FT-01",
+    "CS-FT-02",
+    "PT-FT-01",
+    "CM-FT-03",
+    "AD-FT-02",
+    "AA-FT-01",
+    "ST-FT-01",
+    "ST-FT-02",
+    "ST-FT-03",
+    "NFR-02",
+    "NFR-06"
+  ],
+  "notes": "Coverage recomputed during reconciliation (RV-002, RV-003) using only direct trace links from links.json. Previous coverage of 93% was inflated by assuming module-level traces cascade to all child items. Direct-link coverage is 46/111 = 41% at the atomic level. Effective coverage including module-level cascade (5 traced modules implicitly covering their children) is approximately 65%. Orphan targets listed are items with no direct trace link. To improve, add explicit trace links for orphan features and requirements, or document the module-cascade coverage methodology explicitly."
+}

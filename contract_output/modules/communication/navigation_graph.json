@@ -1,0 +1,58 @@
+{
+  "moduleId": "communication",
+  "contractVersion": "v1.0.0",
+  "edges": [
+    {
+      "edgeId": "cm-e-01",
+      "fromScreenId": "template_manager",
+      "trigger": {
+        "type": "click",
+        "sourceId": "automationsTab",
+        "event": "Navigate to automation rules"
+      },
+      "toScreenId": "automation_rules",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/template_manager/interactions/0"
+    },
+    {
+      "edgeId": "cm-e-02",
+      "fromScreenId": "template_manager",
+      "trigger": {
+        "type": "click",
+        "sourceId": "logTab",
+        "event": "Navigate to communications log"
+      },
+      "toScreenId": "communications_log",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/template_manager/interactions/0"
+    },
+    {
+      "edgeId": "cm-e-03",
+      "fromScreenId": "automation_rules",
+      "trigger": {
+        "type": "click",
+        "sourceId": "templatesTab",
+        "event": "Navigate to template manager"
+      },
+      "toScreenId": "template_manager",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/automation_rules/interactions/0"
+    },
+    {
+      "edgeId": "cm-e-04",
+      "fromScreenId": "communications_log",
+      "trigger": {
+        "type": "click",
+        "sourceId": "retryButton",
+        "event": "Retry failed email"
+      },
+      "toScreenId": null,
+      "condition": "Email delivery status is 'failed'",
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/communications_log/interactions/3"
+    }
+  ]
+}

@@ -1,0 +1,250 @@
+{
+  "review_summary": {
+    "overall_score": 76,
+    "estimation_readiness_score": 75,
+    "schema_integrity_score": 85,
+    "requirement_quality_score": 65,
+    "traceability_score": 77,
+    "critical_findings_count": 0,
+    "high_findings_count": 2,
+    "medium_findings_count": 6,
+    "low_findings_count": 1,
+    "risk_posture": "medium",
+    "review_mode": "standalone",
+    "missing_context": [
+      "Original BRD document not provided for cross-validation",
+      "Generator metadata not provided"
+    ]
+  },
+  "findings": [
+    {
+      "finding_id": "RV-001",
+      "severity": "high",
+      "category": "schema",
+      "title": "Technical parking lot uses generic item_id instead of typed key",
+      "description": "technical_parking_lot entries use 'item_id' (e.g., TP-01) as the canonical key. Per typed ID key enforcement, this should be a domain-typed key such as 'tp_id' or 'parking_lot_id'. 'item_id' is generic and does not convey domain meaning.",
+      "evidence": {
+        "target_id": "TP-01",
+        "target_type": "module",
+        "json_path": "$.technical_parking_lot[*].item_id"
+      },
+      "impact": "Downstream agents relying on typed key conventions may misparse or fail to index technical parking lot items. Reduces schema consistency across the bundle.",
+      "recommended_fix": "Rename 'item_id' to 'tp_id' across all technical_parking_lot entries and update any downstream references.",
+      "confidence": "high"
+    },
+    {
+      "finding_id": "RV-002",
+      "severity": "high",
+      "category": "traceability",
+      "title": "Coverage metrics inflated — per-category totals claim 100% but trace links are sparse",
+      "description": "coverage.json reports covered_targets matching total_targets across all categories (e.g., 20/20 features, 38/38 requirements, 22/22 business_rules). However, links.json contains only 44 trace entries. Direct link analysis shows only ~12 of 20 features, ~6 of 38 requirements, and ~3 of 22 business rules have explicit trace links. The remaining items have no direct traceability link. Module-level traces (5 modules directly traced) may implicitly cover children, but this is not stated and inflates confidence in coverage.",
+      "evidence": {
+        "target_id": "coverage.json",
+        "target_type": "traceability",
+        "json_path": "$.traceability_coverage.covered_targets"
+      },
+      "impact": "Teams relying on traceability coverage to assess estimation readiness will overestimate how well requirements are grounded in source inputs. Orphan requirements may not be validated against BRD intent.",
+      "recommended_fix": "Recompute coverage by counting only targets with at least one direct trace link in links.json. Report actual coverage per category. If module-level coverage is intended to cascade to children, document this rule explicitly in coverage.json and lower the traceability_tier expectation.",
+      "confidence": "high"
+    },
+    {
+      "finding_id": "RV-003",
+      "severity": "medium",
+      "category": "traceability",
+      "title": "Coverage overall_percent contradicts per-category 100% totals",
+      "description": "coverage.json reports overall_percent as 93, but every per-category row shows covered_targets equal to total_targets (i.e., 100% across goals, modules, features, requirements, business_rules, global_decisions, nfr). A 93% overall is mathematically inconsistent with 100% per-category unless an unlisted category has lower coverage. The notes attribute the gap to 'Phase 2 items having lighter traceability' but no Phase 2 category is broken out.",
+      "evidence": {
+        "target_id": "coverage.json",
+        "target_type": "traceability",
+        "json_path": "$.traceability_coverage.overall_percent"
+      },
+      "impact": "Ambiguous coverage signal — downstream consumers cannot determine what the 7% gap represents or whether to trust per-category or overall figure.",
+      "recommended_fix": "Either reconcile overall_percent to match per-category math, or add an explicit category for Phase 2 items showing lower coverage to explain the delta.",
+      "confidence": "high"
+    },
+    {
+      "finding_id": "RV-004",
+      "severity": "medium",
+      "category": "requirements",
+      "title": "Goals G-01, G-02, G-03 lack measurable baselines or quantitative targets",
+      "description": "G-01 states 'Eliminate manual email and messaging work by 70%+' without defining the current baseline or measurement method. G-02 ('Increase trial-to-enrollment conversion rate') and G-03 ('Reduce time spent per enrollment process') specify no target percentage or time reduction. Without baselines or targets, these goals are aspirational but not testable.",
+      "evidence": {
+        "target_id": "G-01",
+        "target_type": "goal",
+        "json_path": "$.goals[0]"
+      },
+      "impact": "Goal completion cannot be objectively verified at launch. Estimation teams cannot scope the delta between current and target state.",
+      "recommended_fix": "Add a 'current_baseline' and 'target_metric' field to each goal. For G-01, define which manual tasks count and how to measure 70%. For G-02/G-03, set numeric targets (e.g., 'from X% to Y%', 'from N minutes to M minutes').",
+      "confidence": "high"
+    },
+    {
+      "finding_id": "RV-005",
+      "severity": "medium",
+      "category": "nfr",
+      "title": "No accessibility (WCAG) or COPPA compliance requirements",
+      "description": "The system handles children's personal data (child name, age) and is parent-facing, but no accessibility standard (WCAG 2.1 AA) or children's data compliance (COPPA) requirement is defined. NFRs cover usability, security, scalability, and performance but omit accessibility and regulatory compliance.",
+      "evidence": {
+        "target_id": "NFR-04",
+        "target_type": "nfr",
+        "json_path": "$.non_functional_requirements"
+      },
+      "impact": "Legal risk from collecting children's data without COPPA consideration. Accessibility gaps may exclude users with disabilities and create ADA liability.",
+      "recommended_fix": "Add NFR for WCAG 2.1 AA compliance on parent-facing screens. Add NFR or assumption addressing COPPA applicability (children's data is collected by proxy through parents, which may exempt the system, but this should be explicitly stated).",
+      "confidence": "medium"
+    },
+    {
+      "finding_id": "RV-006",
+      "severity": "medium",
+      "category": "requirements",
+      "title": "No enrollment cancellation, modification, or refund flow defined",
+      "description": "The PRD defines enrollment creation and payment tracking but does not specify what happens when an enrollment needs to be cancelled or modified after submission. No cancellation flow, refund policy handling, or status for cancelled enrollments is defined. Business rules cover capacity lock and admin override but not enrollment reversal.",
+      "evidence": {
+        "target_id": "enrollment_trial",
+        "target_type": "module",
+        "json_path": "$.modules[2]"
+      },
+      "impact": "Admin will need to cancel enrollments in practice but the system behavior is undefined — does the capacity counter decrement? Is the lead status reverted? Is a cancellation email sent? Without this, implementation will require ad-hoc decisions.",
+      "recommended_fix": "Add a business rule or open question defining enrollment cancellation behavior: status transitions, capacity adjustment, communication triggers, and payment status handling on cancellation.",
+      "confidence": "high"
+    },
+    {
+      "finding_id": "RV-007",
+      "severity": "medium",
+      "category": "assumptions",
+      "title": "All 13 assumptions are AI-assumed with zero human confirmations",
+      "description": "Every assumption in assumptions.json has assumption_source='ai_assumed' and approval_state='pending_human_review'. While individually most are low rewrite-risk, the aggregate risk of 13 unconfirmed assumptions is significant. Two assumptions (A-02: parent flows are public, A-12: capacity is per-program) have medium rewrite risk and could require architectural changes if rejected.",
+      "evidence": {
+        "target_id": "A-02",
+        "target_type": "assumption",
+        "json_path": "$.assumptions"
+      },
+      "impact": "If multiple assumptions are rejected during human review, cascading changes across modules could be substantial. The PRD cannot be safely estimated until at least high-impact assumptions are confirmed.",
+      "recommended_fix": "Prioritize human review of A-02 (public parent flows) and A-12 (capacity per-program) before estimation. Consider batching the remaining 11 low-risk assumptions for expedited confirmation.",
+      "confidence": "high"
+    },
+    {
+      "finding_id": "RV-008",
+      "severity": "medium",
+      "category": "open_questions",
+      "title": "OQ-03 (enrollment approval step) is high priority and could reshape the enrollment flow",
+      "description": "Open question OQ-03 asks whether enrollment requires admin approval or is instant. The proposed default is 'instant', but if the answer changes to require approval, the enrollment_trial module needs an approval queue screen, a pending-approval status, admin notification, and a modified parent confirmation flow. This is the only high-priority open question and could significantly change feature scope.",
+      "evidence": {
+        "target_id": "OQ-03",
+        "target_type": "requirement",
+        "json_path": "$.open_questions[2]"
+      },
+      "impact": "If answered differently from the proposed default, the enrollment module scope increases by approximately 1 screen and 3-4 requirements. Estimation cannot be finalized until this is resolved.",
+      "recommended_fix": "Resolve OQ-03 with stakeholder input before estimation. If approval is required, add an 'Enrollment Approval Queue' screen to the enrollment_trial module and define the approval workflow.",
+      "confidence": "high"
+    },
+    {
+      "finding_id": "RV-009",
+      "severity": "low",
+      "category": "dependencies",
+      "title": "No explicit module delivery dependency chain defined",
+      "description": "The PRD defines 9 modules but does not specify delivery dependencies or recommended build order. Cross-module handoffs imply dependencies (e.g., enrollment_trial depends on program_pricing and lead_management, payment_tracking depends on enrollment_trial, communication depends on all event-producing modules), but these are not formalized.",
+      "evidence": {
+        "target_id": "HO-01",
+        "target_type": "module",
+        "json_path": "$.global_experience.cross_module_handoffs"
+      },
+      "impact": "Estimation and sprint planning teams will need to infer build order from handoff relationships, which may lead to inconsistent sequencing.",
+      "recommended_fix": "Add a module_dependencies or build_order field to index.json or _meta.json listing the recommended delivery sequence based on handoff and data dependencies.",
+      "confidence": "medium"
+    }
+  ],
+  "coverage_checks": {
+    "orphan_target_ids": [
+      "PP-FT-01",
+      "ET-FT-01",
+      "ET-FT-04",
+      "CS-FT-01",
+      "CS-FT-02",
+      "PT-FT-01",
+      "CM-FT-03",
+      "AD-FT-02",
+      "AA-FT-01",
+      "ST-FT-01",
+      "ST-FT-02",
+      "ST-FT-03"
+    ],
+    "uncovered_source_refs": [],
+    "enum_inconsistencies": [],
+    "id_collisions": [
+      "$.technical_parking_lot[*].item_id — uses generic 'item_id' instead of typed key"
+    ]
+  },
+  "assumption_audit": {
+    "ai_assumed_count": 13,
+    "human_confirmed_count": 0,
+    "high_rewrite_risk_count": 0,
+    "high_risk_without_isolation": []
+  },
+  "parked_technical_items": [
+    {
+      "item_id": "PT-001",
+      "title": "COPPA compliance assessment for children's data handling",
+      "detail": "System collects child name and age through parent-submitted forms. COPPA applicability depends on whether the operator is collecting data directly from children or from parents on their behalf. Legal assessment needed before implementation.",
+      "source": "RV-005 (NFR review finding)",
+      "suggested_phase": "security",
+      "reason_parked": "Compliance determination is a legal/policy decision, not a PRD-level requirement. PRD should note the concern; implementation phase should resolve."
+    },
+    {
+      "item_id": "PT-002",
+      "title": "Enrollment cancellation data flow design",
+      "detail": "When enrollment cancellation is defined at PRD level, the implementation needs to handle: enrollment status reversal, capacity counter decrement, payment status transition, lead status update, and cancellation notification trigger.",
+      "source": "RV-006 (requirement gap finding)",
+      "suggested_phase": "be",
+      "reason_parked": "Implementation-level data flow concern. PRD should define the business rules; technical design follows."
+    },
+    {
+      "item_id": "PT-003",
+      "title": "Real-time dashboard metric computation strategy",
+      "detail": "AD-BR-01 requires real-time metrics from current data. At scale, this may require materialized views, caching, or background aggregation. Strategy depends on tech stack selection.",
+      "source": "A-08 and AD-BR-01",
+      "suggested_phase": "be",
+      "reason_parked": "Performance optimization decision that depends on technology stack and expected data volume. Not a PRD concern."
+    }
+  ],
+  "top_5_actions": [
+    {
+      "priority": 1,
+      "action": "Resolve OQ-03 (enrollment approval step) with stakeholder — this high-priority open question can reshape the enrollment module scope",
+      "expected_outcome": "Enrollment flow scope is locked and estimable"
+    },
+    {
+      "priority": 2,
+      "action": "Conduct human review of assumptions A-02 (public parent flows) and A-12 (capacity per-program) — both have medium rewrite risk",
+      "expected_outcome": "Two highest-risk assumptions are confirmed or rejected, preventing late-stage architectural rework"
+    },
+    {
+      "priority": 3,
+      "action": "Recompute traceability coverage using only direct trace links from links.json — current coverage.json is inconsistent",
+      "expected_outcome": "Accurate coverage metrics that reflect actual traceability depth"
+    },
+    {
+      "priority": 4,
+      "action": "Add enrollment cancellation business rules and define cancellation impact on capacity, payment status, and communication triggers",
+      "expected_outcome": "Complete enrollment lifecycle defined from creation through cancellation"
+    },
+    {
+      "priority": 5,
+      "action": "Add accessibility (WCAG 2.1 AA) and COPPA consideration NFRs to the non_functional_requirements list",
+      "expected_outcome": "Compliance and accessibility requirements are documented before implementation begins"
+    }
+  ],
+  "spikes_required": [
+    {
+      "spike_id": "SPK-001",
+      "title": "COPPA applicability assessment for child data collection",
+      "reason": "System collects child names and ages. COPPA applies to operators of websites or online services directed at children under 13, or that knowingly collect data from children. Need legal/compliance review to determine if parental-proxy data entry exempts the system.",
+      "suggested_owner": "Product Owner / Legal",
+      "expected_outcome": "Clear determination of whether COPPA applies and what compliance measures (if any) are needed before launch"
+    }
+  ],
+  "next_step_recommendation": {
+    "decision": "auto_review_cycle",
+    "reason": "No critical findings, but 2 high findings (schema key typing, traceability inflation) and 6 medium findings including unresolved high-priority open question (OQ-03) and zero human-confirmed assumptions. The PRD is structurally sound but needs a targeted fix cycle: resolve OQ-03, confirm top assumptions, recompute traceability, and add cancellation flow. After one remediation pass, the PRD should be ready for estimation.",
+    "suggested_auto_cycle_limit": 2
+  }
+}

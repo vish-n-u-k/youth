@@ -1,0 +1,46 @@
+{
+  "moduleId": "enrollment_trial",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "program_discovery",
+      "name": "Program Discovery",
+      "route": "/programs",
+      "entry": true,
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "visibilityCondition": null,
+      "sourceRef": "fe_details://screens/program_discovery"
+    },
+    {
+      "screenId": "trial_booking_form",
+      "name": "Trial Booking Form",
+      "route": "/programs/:programId/book-trial",
+      "entry": false,
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "visibilityCondition": "Program must be active and have trial dates available",
+      "sourceRef": "fe_details://screens/trial_booking_form"
+    },
+    {
+      "screenId": "enrollment_form",
+      "name": "Direct Enrollment Form",
+      "route": "/programs/:programId/enroll",
+      "entry": false,
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "visibilityCondition": "Program must be active and not full",
+      "sourceRef": "fe_details://screens/enrollment_form"
+    },
+    {
+      "screenId": "enrollment_confirmation",
+      "name": "Enrollment Confirmation",
+      "route": "/enrollment/:enrollmentId/confirmation",
+      "entry": false,
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "visibilityCondition": "Valid enrollmentId required",
+      "sourceRef": "fe_details://screens/enrollment_confirmation"
+    }
+  ]
+}

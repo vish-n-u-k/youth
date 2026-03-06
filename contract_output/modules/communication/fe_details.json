@@ -1,0 +1,237 @@
+{
+  "moduleId": "communication",
+  "contractVersion": "v1.0.0",
+  "status": "agreed",
+  "changeType": "none",
+  "globalBindings": {
+    "globalContractRef": "contract_output/global/fe_global_contract.json",
+    "inheritedDecisionIds": [
+      "nav.primary_model",
+      "comm.email_only_mvp"
+    ],
+    "inheritedPolicyIds": [
+      "GP-03",
+      "GP-05",
+      "GP-07",
+      "GP-08"
+    ],
+    "moduleOverrides": []
+  },
+  "screens": [
+    {
+      "screenId": "template_manager",
+      "name": "Template Manager",
+      "route": "/admin/communications/templates",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "dataDisplayed": [
+        {
+          "field": "templates",
+          "source": "api",
+          "schemaRef": "zod://TemplateListResponse"
+        }
+      ],
+      "dataCaptured": [
+        {
+          "field": "name",
+          "required": true,
+          "schemaRef": "zod://TemplateRequest"
+        },
+        {
+          "field": "subject",
+          "required": true,
+          "schemaRef": "zod://TemplateRequest"
+        },
+        {
+          "field": "body",
+          "required": true,
+          "schemaRef": "zod://TemplateRequest"
+        }
+      ],
+      "interactions": [
+        "View template list",
+        "Edit existing template",
+        "Create new template",
+        "Preview template with sample data",
+        "Insert variable placeholder"
+      ],
+      "states": {
+        "loading": "Loading templates...",
+        "empty": "N/A",
+        "error": "Failed to load templates. Please refresh."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "getTemplates",
+          "method": "GET",
+          "path": "/api/communications/templates",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://TemplateListResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "getTemplate",
+          "method": "GET",
+          "path": "/api/communications/templates/:templateId",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://TemplateResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "createTemplate",
+          "method": "POST",
+          "path": "/api/communications/templates",
+          "requestSchemaRef": "zod://TemplateRequest",
+          "responseSchemaRef": "zod://TemplateResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "updateTemplate",
+          "method": "PUT",
+          "path": "/api/communications/templates/:templateId",
+          "requestSchemaRef": "zod://TemplateRequest",
+          "responseSchemaRef": "zod://TemplateResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    },
+    {
+      "screenId": "automation_rules",
+      "name": "Automation Rules",
+      "route": "/admin/communications/automations",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "dataDisplayed": [
+        {
+          "field": "automations",
+          "source": "api",
+          "schemaRef": "zod://AutomationListResponse"
+        }
+      ],
+      "dataCaptured": [
+        {
+          "field": "triggerEvent",
+          "required": true,
+          "schemaRef": "zod://AutomationRequest"
+        },
+        {
+          "field": "templateId",
+          "required": true,
+          "schemaRef": "zod://AutomationRequest"
+        },
+        {
+          "field": "delayMinutes",
+          "required": false,
+          "schemaRef": "zod://AutomationRequest"
+        },
+        {
+          "field": "enabled",
+          "required": true,
+          "schemaRef": "zod://AutomationRequest"
+        }
+      ],
+      "interactions": [
+        "View automation rules list",
+        "Edit automation rule",
+        "Enable/disable automation toggle",
+        "Set timing for time-based triggers"
+      ],
+      "states": {
+        "loading": "Loading automation rules...",
+        "empty": "N/A",
+        "error": "Failed to load automation rules. Please refresh."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "getAutomations",
+          "method": "GET",
+          "path": "/api/communications/automations",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://AutomationListResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "updateAutomation",
+          "method": "PUT",
+          "path": "/api/communications/automations/:automationId",
+          "requestSchemaRef": "zod://AutomationRequest",
+          "responseSchemaRef": "zod://AutomationResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    },
+    {
+      "screenId": "communications_log",
+      "name": "Communications Log",
+      "route": "/admin/communications/log",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "dataDisplayed": [
+        {
+          "field": "communications",
+          "source": "api",
+          "schemaRef": "zod://CommunicationsLogResponse"
+        }
+      ],
+      "dataCaptured": [],
+      "interactions": [
+        "Filter by delivery status (sent/failed/pending)",
+        "Filter by trigger event",
+        "Search by recipient",
+        "Retry failed email"
+      ],
+      "states": {
+        "loading": "Loading communications log...",
+        "empty": "No emails sent yet. Communications will appear here as automations fire.",
+        "error": "Failed to load communications log. Please refresh."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "getCommunicationsLog",
+          "method": "GET",
+          "path": "/api/communications/log",
+          "requestSchemaRef": "zod://CommunicationsLogQuery",
+          "responseSchemaRef": "zod://CommunicationsLogResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "retryEmail",
+          "method": "POST",
+          "path": "/api/communications/log/:logId/retry",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://RetryEmailResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "CM-A-01",
+      "text": "6 default templates are pre-created and editable but not deletable: lead received, trial confirmation, trial reminder, enrollment confirmation, payment reminder, class start reminder",
+      "severity": "low",
+      "state": "open",
+      "assumptionSource": "ai_assumed",
+      "approvalState": "pending_human_review",
+      "rewriteRisk": "low",
+      "isolationRecommended": false,
+      "isolationNote": "",
+      "sourceRef": "analysis_output/modules/communication.json"
+    },
+    {
+      "id": "CM-A-02",
+      "text": "Email only in MVP; SMS/WhatsApp channels are Phase 2. Channel abstraction should be built in.",
+      "severity": "low",
+      "state": "confirmed",
+      "assumptionSource": "human_confirmed",
+      "approvalState": "user_approved",
+      "rewriteRisk": "low",
+      "isolationRecommended": true,
+      "isolationNote": "Abstract channel delivery so SMS/WhatsApp can be added without rewriting template or automation logic",
+      "sourceRef": "analysis_output/global_experience.json#decision_id=comm.email_only_mvp"
+    }
+  ]
+}

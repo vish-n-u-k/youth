@@ -1,0 +1,171 @@
+{
+  "moduleId": "settings",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "general_settings",
+      "template": "form",
+      "widgets": [
+        {
+          "widgetId": "settings-w-01",
+          "type": "header",
+          "bind": {
+            "kind": "custom",
+            "ref": "General Settings heading"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "settings-w-02",
+          "type": "card",
+          "bind": {
+            "kind": "custom",
+            "ref": "Location Information section"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "settings-w-03",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "businessName"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "settings-w-04",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "address"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "settings-w-05",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "phone"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "settings-w-06",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "email"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "settings-w-07",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "websiteUrl"
+          },
+          "required": false
+        },
+        {
+          "widgetId": "settings-w-08",
+          "type": "card",
+          "bind": {
+            "kind": "custom",
+            "ref": "Zelle Payment Configuration section"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "settings-w-09",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "zelleRecipientName"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "settings-w-10",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "zelleContactInfo"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "settings-w-11",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "zelleInstructions"
+          },
+          "required": false
+        },
+        {
+          "widgetId": "settings-w-12",
+          "type": "card",
+          "bind": {
+            "kind": "custom",
+            "ref": "Notification Preferences section"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "settings-w-13",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "notifyNewLead"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "settings-w-14",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "notifyNewEnrollment"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "settings-w-15",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "notifyPaymentReceived"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "settings-w-16",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Save settings"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "settings-w-17",
+          "type": "alert",
+          "bind": {
+            "kind": "state",
+            "ref": "success"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "Save settings",
+      "primaryActionTarget": null,
+      "sourceRefs": [
+        "fe_details://screens/general_settings",
+        "navigation_graph://edges/settings-e-01"
+      ]
+    }
+  ]
+}

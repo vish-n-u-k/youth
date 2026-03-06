@@ -1,0 +1,26 @@
+{
+  "moduleId": "settings",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "general_settings",
+      "name": "General Settings",
+      "route": "/admin/settings",
+      "entry": true,
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "visibilityCondition": null,
+      "sourceRef": "fe_details://screens/general_settings"
+    },
+    {
+      "screenId": "staff_roles_stub",
+      "name": "Staff & Roles (Phase 2)",
+      "route": "/admin/settings/staff",
+      "entry": false,
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "visibilityCondition": "Phase 2 only; not rendered in MVP",
+      "sourceRef": "fe_details://screens/staff_roles_stub"
+    }
+  ]
+}

@@ -1,0 +1,165 @@
+{
+  "module_id": "enrollment_trial",
+  "module_name": "Enrollment & Trial Booking",
+  "description": "Parent-facing flows for discovering programs, booking trial classes, and enrolling children. Supports both trial-first and direct enrollment paths.",
+  "priority": "critical",
+  "mvp": true,
+  "screens": [
+    {
+      "screen_id": "ET-SCR-01",
+      "screen_name": "Program Discovery",
+      "description": "Public page listing all active programs with key details for parents to browse",
+      "features": [
+        {
+          "feature_id": "ET-FT-01",
+          "feature_name": "Active Program Listing",
+          "description": "Display all active programs with age group, schedule, pricing summary, and trial availability",
+          "priority": "critical",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "ET-REQ-01",
+              "description": "Page displays all active programs as cards or list items showing: program name, age group, schedule summary, price, and whether trial is available",
+              "acceptance_criteria": "All active programs appear; closed/draft programs do not; each card has a 'Book Trial' and/or 'Enroll Now' action button"
+            },
+            {
+              "req_id": "ET-REQ-02",
+              "description": "Programs at capacity show a 'Full' indicator and disable the enroll button",
+              "acceptance_criteria": "When enrollment count equals capacity, the 'Enroll Now' button is disabled and 'Full' label is shown"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "screen_id": "ET-SCR-02",
+      "screen_name": "Trial Booking Form",
+      "description": "Step-by-step form for parents to book a trial class",
+      "features": [
+        {
+          "feature_id": "ET-FT-02",
+          "feature_name": "Trial Booking Flow",
+          "description": "Parent selects program, enters child details, picks trial date, and submits",
+          "priority": "critical",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "ET-REQ-03",
+              "description": "Form collects: parent name, email, phone, child name, child age, preferred trial date (from available dates)",
+              "acceptance_criteria": "All fields are required; trial date picker shows only admin-defined trial-eligible dates with available capacity"
+            },
+            {
+              "req_id": "ET-REQ-04",
+              "description": "If parent email matches an existing lead or parent record, pre-fill known fields",
+              "acceptance_criteria": "Parent name, email, phone are pre-filled; parent can edit pre-filled values"
+            },
+            {
+              "req_id": "ET-REQ-05",
+              "description": "On submission, system creates or updates a lead record with status 'Trial Scheduled'",
+              "acceptance_criteria": "Lead record exists with correct status, child info, and selected trial date within 10 seconds of submission"
+            },
+            {
+              "req_id": "ET-REQ-06",
+              "description": "On submission, parent receives a confirmation email with trial details and optional calendar invite",
+              "acceptance_criteria": "Email is sent within 2 minutes of submission; email contains program name, date, time, and location"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "screen_id": "ET-SCR-03",
+      "screen_name": "Direct Enrollment Form",
+      "description": "Step-by-step form for parents to enroll a child directly in a program",
+      "features": [
+        {
+          "feature_id": "ET-FT-03",
+          "feature_name": "Direct Enrollment Flow",
+          "description": "Parent selects program, enters child details, sees price breakdown, applies coupon, and submits",
+          "priority": "critical",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "ET-REQ-07",
+              "description": "Form collects: parent name, email, phone, child name, child age, optional coupon code",
+              "acceptance_criteria": "All fields except coupon are required; form validates child age against program age group"
+            },
+            {
+              "req_id": "ET-REQ-08",
+              "description": "Price breakdown displays before submission: base fee, registration fee (or waived), coupon discount, total",
+              "acceptance_criteria": "Breakdown updates in real-time when coupon is applied; total matches calculated values"
+            },
+            {
+              "req_id": "ET-REQ-09",
+              "description": "On submission, enrollment record is created with payment status 'pending'",
+              "acceptance_criteria": "Enrollment record exists with correct program, child, pricing, and payment_status = 'pending'"
+            },
+            {
+              "req_id": "ET-REQ-10",
+              "description": "Each enrollment is for exactly one child; parents with multiple children submit separate enrollment forms",
+              "acceptance_criteria": "Form has fields for one child only; no multi-child selection is available"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "screen_id": "ET-SCR-04",
+      "screen_name": "Enrollment Confirmation",
+      "description": "Confirmation screen shown after successful enrollment with payment instructions",
+      "features": [
+        {
+          "feature_id": "ET-FT-04",
+          "feature_name": "Confirmation & Payment Instructions",
+          "description": "Display enrollment summary and Zelle payment instructions",
+          "priority": "critical",
+          "mvp": true,
+          "requirements": [
+            {
+              "req_id": "ET-REQ-11",
+              "description": "Confirmation screen shows: enrollment summary (program, child, price breakdown) and Zelle payment instructions (recipient info, amount, reference)",
+              "acceptance_criteria": "All enrollment details and payment instructions are visible; parent can screenshot or print the page"
+            },
+            {
+              "req_id": "ET-REQ-12",
+              "description": "System sends a confirmation email with the same enrollment summary and payment instructions",
+              "acceptance_criteria": "Email is sent within 2 minutes; content matches confirmation screen"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "business_rules": [
+    {
+      "rule_id": "ET-BR-01",
+      "rule": "Enrollment is blocked when program capacity is reached",
+      "acceptance_criteria": "When active enrollments equal program capacity, the enrollment form is unavailable and program shows 'Full'"
+    },
+    {
+      "rule_id": "ET-BR-02",
+      "rule": "Enrollment is blocked when the enrollment window is closed (past end date or manually closed by admin)",
+      "acceptance_criteria": "Closed programs show 'Enrollment Closed' and the enroll button is disabled"
+    },
+    {
+      "rule_id": "ET-BR-03",
+      "rule": "Admin can override capacity and enrollment window restrictions to manually add enrollments",
+      "acceptance_criteria": "Admin can enroll a child in a full or closed program from the admin panel"
+    },
+    {
+      "rule_id": "ET-BR-04",
+      "rule": "Trial booking creates or updates a lead record; direct enrollment also creates a lead if one doesn't exist",
+      "acceptance_criteria": "Every enrolled parent has a corresponding lead record with status 'Enrolled'"
+    },
+    {
+      "rule_id": "ET-BR-05",
+      "rule": "Child age is validated against the program's age group at enrollment time",
+      "acceptance_criteria": "If child age is outside the program's age range, enrollment form shows a warning; admin override is available"
+    },
+    {
+      "rule_id": "ET-BR-06",
+      "rule": "Admin can cancel an enrollment. Cancellation decrements the program enrollment count, updates payment status appropriately, and triggers a cancellation notification to the parent.",
+      "acceptance_criteria": "Cancelled enrollment is marked with status 'cancelled'; program capacity is released; parent receives cancellation email; cancellation is logged in lead activity timeline"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "moduleId": "settings",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "general_settings",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Loading settings..."
+        },
+        "empty": {
+          "applicability": "not_applicable",
+          "message": ""
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Failed to load settings. Please refresh.",
+          "retryAction": "Refresh page"
+        },
+        "success": {
+          "applicability": "required",
+          "message": "Settings saved successfully."
+        }
+      },
+      "sourceRef": "fe_details://screens/general_settings/states"
+    },
+    {
+      "screenId": "staff_roles_stub",
+      "states": {
+        "loading": {
+          "applicability": "not_applicable",
+          "message": ""
+        },
+        "empty": {
+          "applicability": "not_applicable",
+          "message": ""
+        },
+        "error": {
+          "applicability": "not_applicable",
+          "message": "",
+          "retryAction": null
+        },
+        "success": {
+          "applicability": "not_applicable",
+          "message": null
+        }
+      },
+      "sourceRef": "fe_details://screens/staff_roles_stub/states"
+    }
+  ]
+}

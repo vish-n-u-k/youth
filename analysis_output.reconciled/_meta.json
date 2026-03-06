@@ -1,0 +1,138 @@
+{
+  "app_name": "Young Engineers Enrollment & Operations Platform",
+  "app_description": "A lightweight, flexible enrollment and communication system built for children's enrichment programs. Eliminates manual work, reduces enrollment friction, and increases conversions from lead to trial to paid enrollment. Supports offline payment methods (Zelle) and automates communication around the enrollment lifecycle.",
+  "platform": "web",
+  "mode": "autonomous",
+  "traceability_tier": "standard",
+  "user_roles": [
+    {
+      "role_id": "admin",
+      "name": "Admin / Center Manager",
+      "description": "Configures programs, manages leads, enrollments, payments, and communicates with parents. Has full access to all modules."
+    },
+    {
+      "role_id": "parent",
+      "name": "Parent / Guardian",
+      "description": "Discovers programs, books trials, enrolls children, receives instructions and reminders. Each enrollment is per-child."
+    },
+    {
+      "role_id": "staff",
+      "name": "Staff / Instructor",
+      "description": "Future role for attendance tracking and limited admin capabilities. Phase 2.",
+      "phase": "phase_2"
+    }
+  ],
+  "goals": [
+    {
+      "goal_id": "G-01",
+      "description": "Eliminate manual email and messaging work by 70%+",
+      "priority": "critical",
+      "mvp": true,
+      "current_baseline": "pending_measurement",
+      "target_metric": "70% reduction in manual email and messaging work — baseline hours/week to be established before launch"
+    },
+    {
+      "goal_id": "G-02",
+      "description": "Increase trial-to-enrollment conversion rate",
+      "priority": "critical",
+      "mvp": true,
+      "current_baseline": "pending_measurement",
+      "target_metric": "Trial-to-enrollment conversion rate improvement — current rate and target percentage to be established"
+    },
+    {
+      "goal_id": "G-03",
+      "description": "Reduce time spent per enrollment process",
+      "priority": "high",
+      "mvp": true,
+      "current_baseline": "pending_measurement",
+      "target_metric": "Time reduction per enrollment process — current minutes and target minutes to be established"
+    },
+    {
+      "goal_id": "G-04",
+      "description": "Achieve zero missed follow-ups with leads and enrolled parents",
+      "priority": "critical",
+      "mvp": true
+    },
+    {
+      "goal_id": "G-05",
+      "description": "Provide parents a simple, mobile-friendly self-serve experience for discovery, trial booking, and enrollment",
+      "priority": "high",
+      "mvp": true
+    },
+    {
+      "goal_id": "G-06",
+      "description": "Systematize payment tracking for offline payment methods (Zelle) without requiring a payment gateway",
+      "priority": "high",
+      "mvp": true
+    },
+    {
+      "goal_id": "G-07",
+      "description": "Support multi-location operations in the future",
+      "priority": "medium",
+      "mvp": false
+    }
+  ],
+  "non_functional_requirements": [
+    {
+      "nfr_id": "NFR-01",
+      "category": "usability",
+      "description": "All parent-facing screens must be mobile-responsive and usable on phone screens without horizontal scrolling",
+      "acceptance_criteria": "Parent flows pass mobile usability testing on screens 375px wide and above"
+    },
+    {
+      "nfr_id": "NFR-02",
+      "category": "usability",
+      "description": "Parent-facing UI must be simple and minimal with no unnecessary complexity",
+      "acceptance_criteria": "Trial booking and enrollment flows complete in 3 steps or fewer"
+    },
+    {
+      "nfr_id": "NFR-03",
+      "category": "security",
+      "description": "Role-based access control separating admin and parent capabilities",
+      "acceptance_criteria": "Parents cannot access admin routes; admin routes require authentication"
+    },
+    {
+      "nfr_id": "NFR-04",
+      "category": "security",
+      "description": "Secure storage of parent and child personal data",
+      "acceptance_criteria": "PII is encrypted at rest and in transit; no PII exposed in URLs or logs"
+    },
+    {
+      "nfr_id": "NFR-05",
+      "category": "scalability",
+      "description": "System must support multiple locations and instructors",
+      "acceptance_criteria": "Data model supports location_id scoping; no hard-coded single-location assumptions"
+    },
+    {
+      "nfr_id": "NFR-06",
+      "category": "performance",
+      "description": "Parent-facing pages must load quickly on mobile networks",
+      "acceptance_criteria": "Initial page load under 3 seconds on 3G connection"
+    },
+    {
+      "nfr_id": "NFR-07",
+      "category": "accessibility",
+      "description": "All parent-facing screens must meet WCAG 2.1 Level AA accessibility standards",
+      "acceptance_criteria": "Parent-facing pages pass automated accessibility audit (axe-core or equivalent) with zero critical or serious violations"
+    }
+  ],
+  "extra_data": {
+    "franchise_context": "Young Engineers franchise, Greater Round Rock area",
+    "primary_payment_method": "Zelle (offline)",
+    "enrollment_model": "One enrollment per child; parents with multiple children submit separate enrollments",
+    "returning_parent_behavior": "Recognized by email, skip lead capture, go directly to enrollment",
+    "constraints": [],
+    "notes": [
+      "Question flow stopped: user requested draft mode after 2 questions.",
+      "TECH_PARKED: No specific technology stack mentioned in BRD; technology decisions deferred to implementation phase.",
+      "TECH_PARKED: Facebook Lead Forms integration method (webhook vs polling) to be determined during implementation.",
+      "TECH_PARKED: Email delivery service selection deferred to implementation phase."
+    ],
+    "global_experience_summary": {
+      "navigation": "Admin sidebar navigation; Parent top-nav with Programs, My Enrollments, Profile",
+      "layout": "Consistent templates: list views, detail/edit forms, dashboard",
+      "primary_funnel": "Lead → Trial Booking → Enrollment → Payment",
+      "note": "See global_experience.json for full detail; this is a backward-compatible summary."
+    }
+  }
+}

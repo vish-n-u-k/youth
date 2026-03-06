@@ -1,0 +1,192 @@
+{
+  "moduleId": "auth_accounts",
+  "contractVersion": "v1.0.0",
+  "status": "agreed",
+  "changeType": "none",
+  "globalBindings": {
+    "globalContractRef": "contract_output/global/fe_global_contract.json",
+    "inheritedDecisionIds": [
+      "auth.parent_portal_phase2",
+      "nav.primary_model"
+    ],
+    "inheritedPolicyIds": [
+      "GP-05",
+      "GP-06",
+      "GP-07",
+      "GP-08"
+    ],
+    "moduleOverrides": []
+  },
+  "screens": [
+    {
+      "screenId": "admin_login",
+      "name": "Admin Login",
+      "route": "/admin/login",
+      "type": "input_driven",
+      "authRequired": false,
+      "allowedRoles": ["admin"],
+      "dataDisplayed": [],
+      "dataCaptured": [
+        {
+          "field": "email",
+          "required": true,
+          "schemaRef": "zod://AdminLoginRequest"
+        },
+        {
+          "field": "password",
+          "required": true,
+          "schemaRef": "zod://AdminLoginRequest"
+        }
+      ],
+      "interactions": [
+        "Submit login form",
+        "Navigate to forgot password"
+      ],
+      "states": {
+        "loading": "Signing you in...",
+        "empty": "N/A",
+        "error": "Invalid email or password. Please try again."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "adminLogin",
+          "method": "POST",
+          "path": "/api/auth/login",
+          "requestSchemaRef": "zod://AdminLoginRequest",
+          "responseSchemaRef": "zod://AdminLoginResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    },
+    {
+      "screenId": "password_reset_request",
+      "name": "Password Reset Request",
+      "route": "/admin/forgot-password",
+      "type": "input_driven",
+      "authRequired": false,
+      "allowedRoles": ["admin"],
+      "dataDisplayed": [],
+      "dataCaptured": [
+        {
+          "field": "email",
+          "required": true,
+          "schemaRef": "zod://PasswordResetRequest"
+        }
+      ],
+      "interactions": [
+        "Submit reset request",
+        "Navigate back to login"
+      ],
+      "states": {
+        "loading": "Sending reset link...",
+        "empty": "N/A",
+        "error": "Something went wrong. Please try again."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "requestPasswordReset",
+          "method": "POST",
+          "path": "/api/auth/forgot-password",
+          "requestSchemaRef": "zod://PasswordResetRequest",
+          "responseSchemaRef": "zod://PasswordResetResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    },
+    {
+      "screenId": "set_new_password",
+      "name": "Set New Password",
+      "route": "/admin/reset-password/:token",
+      "type": "input_driven",
+      "authRequired": false,
+      "allowedRoles": ["admin"],
+      "dataDisplayed": [],
+      "dataCaptured": [
+        {
+          "field": "newPassword",
+          "required": true,
+          "schemaRef": "zod://SetNewPasswordRequest"
+        },
+        {
+          "field": "confirmPassword",
+          "required": true,
+          "schemaRef": "zod://SetNewPasswordRequest"
+        }
+      ],
+      "interactions": [
+        "Submit new password",
+        "Navigate to login after success"
+      ],
+      "states": {
+        "loading": "Updating your password...",
+        "empty": "N/A",
+        "error": "This link has expired. Request a new one."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "setNewPassword",
+          "method": "POST",
+          "path": "/api/auth/reset-password",
+          "requestSchemaRef": "zod://SetNewPasswordRequest",
+          "responseSchemaRef": "zod://SetNewPasswordResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    },
+    {
+      "screenId": "parent_login_stub",
+      "name": "Parent Registration/Login (Phase 2)",
+      "route": "/login",
+      "type": "static",
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "dataDisplayed": [],
+      "dataCaptured": [],
+      "interactions": [],
+      "states": {
+        "loading": "N/A",
+        "empty": "N/A",
+        "error": "N/A"
+      },
+      "endpointProposals": []
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "AA-A-01",
+      "text": "MVP parent flows are public/link-based with email verification; no parent login portal",
+      "severity": "medium",
+      "state": "confirmed",
+      "assumptionSource": "ai_assumed",
+      "approvalState": "user_approved",
+      "rewriteRisk": "medium",
+      "isolationRecommended": true,
+      "isolationNote": "Wrap parent auth check in abstraction so Phase 2 login can replace link-based access without rewriting parent screens",
+      "sourceRef": "analysis_output/assumptions.json#id=A-02"
+    },
+    {
+      "id": "AA-A-02",
+      "text": "Password reset links expire after 24 hours",
+      "severity": "low",
+      "state": "confirmed",
+      "assumptionSource": "ai_assumed",
+      "approvalState": "user_approved",
+      "rewriteRisk": "low",
+      "isolationRecommended": false,
+      "isolationNote": "",
+      "sourceRef": "analysis_output/modules/auth_accounts.json"
+    },
+    {
+      "id": "AA-A-03",
+      "text": "Password reset response shows same success message whether email exists or not to prevent information leakage",
+      "severity": "low",
+      "state": "confirmed",
+      "assumptionSource": "ai_assumed",
+      "approvalState": "user_approved",
+      "rewriteRisk": "low",
+      "isolationRecommended": false,
+      "isolationNote": "",
+      "sourceRef": ""
+    }
+  ]
+}

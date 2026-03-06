@@ -1,0 +1,34 @@
+{
+  "moduleId": "admin_dashboard",
+  "contractVersion": "v1.0.0",
+  "schemas": [
+    {
+      "schemaId": "DashboardMetricsResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ totalLeadsBySource: z.array(z.object({ source: z.string(), count: z.number() })), leadToTrialConversionRate: z.number(), trialToEnrollmentConversionRate: z.number(), totalActiveEnrollments: z.number(), paymentStatusSummary: z.object({ pending: z.number(), paid: z.number(), partial: z.number(), waived: z.number() }) })",
+      "usedBy": ["getDashboardMetrics"]
+    },
+    {
+      "schemaId": "DashboardRecentLeadsResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ leads: z.array(z.object({ leadId: z.string(), parentName: z.string(), source: z.string(), status: z.string(), createdAt: z.string().datetime() })).max(5) })",
+      "usedBy": ["getDashboardRecentLeads"]
+    },
+    {
+      "schemaId": "DashboardUpcomingTrialsResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ trials: z.array(z.object({ leadId: z.string(), parentName: z.string(), childName: z.string(), programName: z.string(), trialDate: z.string().datetime() })) })",
+      "usedBy": ["getDashboardUpcomingTrials"]
+    },
+    {
+      "schemaId": "DashboardPendingPaymentsResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ payments: z.array(z.object({ paymentId: z.string(), parentName: z.string(), childName: z.string(), programName: z.string(), amountDue: z.number(), enrolledAt: z.string().datetime() })) })",
+      "usedBy": ["getDashboardPendingPayments"]
+    }
+  ]
+}

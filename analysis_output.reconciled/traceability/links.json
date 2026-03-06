@@ -1,0 +1,324 @@
+[
+  {
+    "trace_id": "TR-01",
+    "source_ref": "BRD Section 1 - Lead Capture → Enrollment is broken",
+    "target_id": "lead_management",
+    "target_type": "module",
+    "relationship": "addresses"
+  },
+  {
+    "trace_id": "TR-02",
+    "source_ref": "BRD Section 4.1 - Lead Management Module",
+    "target_id": "LM-FT-01",
+    "target_type": "feature",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-03",
+    "source_ref": "BRD Section 4.1 - Lead Status Lifecycle",
+    "target_id": "LM-BR-04",
+    "target_type": "business_rule",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-04",
+    "source_ref": "BRD Section 4.1 - Auto-create Lead Record",
+    "target_id": "LM-BR-01",
+    "target_type": "business_rule",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-05",
+    "source_ref": "BRD Section 4.1 - Admin Capabilities (Kanban/Table, Filter, Notes)",
+    "target_id": "LM-FT-03",
+    "target_type": "feature",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-06",
+    "source_ref": "BRD Section 4.2 - Program Setup",
+    "target_id": "PP-FT-02",
+    "target_type": "feature",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-07",
+    "source_ref": "BRD Section 4.2 - Pricing Engine",
+    "target_id": "PP-FT-03",
+    "target_type": "feature",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-08",
+    "source_ref": "BRD Section 4.2 - Apply coupons",
+    "target_id": "PP-FT-04",
+    "target_type": "feature",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-09",
+    "source_ref": "BRD Section 4.3 - Parent Flow Trial First",
+    "target_id": "ET-FT-02",
+    "target_type": "feature",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-10",
+    "source_ref": "BRD Section 4.3 - Parent Flow Direct Enrollment",
+    "target_id": "ET-FT-03",
+    "target_type": "feature",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-11",
+    "source_ref": "BRD Section 4.4 - Calendar & Scheduling Module",
+    "target_id": "calendar_scheduling",
+    "target_type": "module",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-12",
+    "source_ref": "BRD Section 4.4 - Auto-lock enrollment when capacity reached",
+    "target_id": "CS-REQ-04",
+    "target_type": "requirement",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-13",
+    "source_ref": "BRD Section 4.5 - Payment Model (Offline acknowledgment)",
+    "target_id": "payment_tracking",
+    "target_type": "module",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-14",
+    "source_ref": "BRD Section 4.5 - Payment Workflow",
+    "target_id": "PT-FT-02",
+    "target_type": "feature",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-15",
+    "source_ref": "BRD Section 4.5 - Tracking Fields",
+    "target_id": "PT-REQ-03",
+    "target_type": "requirement",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-16",
+    "source_ref": "BRD Section 4.6 - Communication Automation",
+    "target_id": "communication",
+    "target_type": "module",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-17",
+    "source_ref": "BRD Section 4.6 - Templates (Configurable)",
+    "target_id": "CM-FT-01",
+    "target_type": "feature",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-18",
+    "source_ref": "BRD Section 4.6 - Automation Triggers",
+    "target_id": "CM-FT-02",
+    "target_type": "feature",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-19",
+    "source_ref": "BRD Section 4.7 - Admin Dashboard",
+    "target_id": "admin_dashboard",
+    "target_type": "module",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-20",
+    "source_ref": "BRD Section 4.7 - Key Metrics",
+    "target_id": "AD-FT-01",
+    "target_type": "feature",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-21",
+    "source_ref": "BRD Section 5 - Mobile-friendly",
+    "target_id": "NFR-01",
+    "target_type": "nfr",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-22",
+    "source_ref": "BRD Section 5 - Role-based access",
+    "target_id": "NFR-03",
+    "target_type": "nfr",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-23",
+    "source_ref": "BRD Section 5 - Secure storage",
+    "target_id": "NFR-04",
+    "target_type": "nfr",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-24",
+    "source_ref": "BRD Section 5 - Support multiple locations",
+    "target_id": "NFR-05",
+    "target_type": "nfr",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-25",
+    "source_ref": "BRD Section 7 - Decrease manual emails by 70%+",
+    "target_id": "G-01",
+    "target_type": "goal",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-26",
+    "source_ref": "BRD Section 7 - Increase Trial → Enrollment conversion",
+    "target_id": "G-02",
+    "target_type": "goal",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-27",
+    "source_ref": "BRD Section 7 - Decrease time per enrollment",
+    "target_id": "G-03",
+    "target_type": "goal",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-28",
+    "source_ref": "BRD Section 7 - Zero missed follow-ups",
+    "target_id": "G-04",
+    "target_type": "goal",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-29",
+    "source_ref": "BRD Section 1 - No self-serve calendar",
+    "target_id": "G-05",
+    "target_type": "goal",
+    "relationship": "addresses"
+  },
+  {
+    "trace_id": "TR-30",
+    "source_ref": "BRD Section 1 - Payments not systemized",
+    "target_id": "G-06",
+    "target_type": "goal",
+    "relationship": "addresses"
+  },
+  {
+    "trace_id": "TR-31",
+    "source_ref": "User confirmation: one enrollment per child",
+    "target_id": "enrollment.per_child",
+    "target_type": "global_decision",
+    "relationship": "confirms"
+  },
+  {
+    "trace_id": "TR-32",
+    "source_ref": "BRD Section 4.5 - Parents prefer Zelle",
+    "target_id": "payment.offline_only_mvp",
+    "target_type": "global_decision",
+    "relationship": "confirms"
+  },
+  {
+    "trace_id": "TR-33",
+    "source_ref": "BRD Section 4.6 - Email Phase 1, SMS/WhatsApp Phase 2",
+    "target_id": "comm.email_only_mvp",
+    "target_type": "global_decision",
+    "relationship": "confirms"
+  },
+  {
+    "trace_id": "TR-34",
+    "source_ref": "AI inference: admin sidebar + parent top-nav pattern",
+    "target_id": "nav.primary_model",
+    "target_type": "global_decision",
+    "relationship": "infers"
+  },
+  {
+    "trace_id": "TR-35",
+    "source_ref": "AI inference: shared page templates for consistency",
+    "target_id": "layout.page_template_strategy",
+    "target_type": "global_decision",
+    "relationship": "infers"
+  },
+  {
+    "trace_id": "TR-36",
+    "source_ref": "AI inference: parent portal login deferred to Phase 2",
+    "target_id": "auth.parent_portal_phase2",
+    "target_type": "global_decision",
+    "relationship": "infers"
+  },
+  {
+    "trace_id": "TR-37",
+    "source_ref": "BRD Section 4.2 - Registration fee toggle and manual overrides",
+    "target_id": "PP-REQ-05",
+    "target_type": "requirement",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-38",
+    "source_ref": "BRD Section 4.2 - Manual overrides per enrollment",
+    "target_id": "PP-REQ-06",
+    "target_type": "requirement",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-39",
+    "source_ref": "BRD Section 4.4 - Admin override for exceptions",
+    "target_id": "ET-BR-03",
+    "target_type": "business_rule",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-40",
+    "source_ref": "BRD Section 4.1 - Add notes per lead",
+    "target_id": "LM-FT-05",
+    "target_type": "feature",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-41",
+    "source_ref": "BRD Section 4.3 - Confirmation email + Calendar invite",
+    "target_id": "ET-REQ-06",
+    "target_type": "requirement",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-42",
+    "source_ref": "BRD Section 4.5 - Shows Zelle instructions + Sends payment email",
+    "target_id": "PT-FT-03",
+    "target_type": "feature",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-43",
+    "source_ref": "AI inference: returning parents skip lead capture",
+    "target_id": "parent.returning_recognition",
+    "target_type": "global_decision",
+    "relationship": "infers"
+  },
+  {
+    "trace_id": "TR-44",
+    "source_ref": "BRD Section 4.7 - Leads by source, conversion rates, active enrollments, payment status",
+    "target_id": "AD-REQ-01",
+    "target_type": "requirement",
+    "relationship": "implements"
+  },
+  {
+    "trace_id": "TR-45",
+    "source_ref": "Reconciliation RV-005: WCAG accessibility compliance gap",
+    "target_id": "NFR-07",
+    "target_type": "nfr",
+    "relationship": "addresses"
+  },
+  {
+    "trace_id": "TR-46",
+    "source_ref": "Reconciliation RV-006: Enrollment cancellation business rule gap",
+    "target_id": "ET-BR-06",
+    "target_type": "business_rule",
+    "relationship": "addresses"
+  }
+]

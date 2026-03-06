@@ -1,0 +1,233 @@
+{
+  "navigation_model": {
+    "primary_pattern": "hybrid_navigation",
+    "entry_points": [
+      "Admin: sidebar with Lead Management, Programs, Enrollments, Calendar, Payments, Communications, Dashboard, Settings",
+      "Parent: top-nav with Programs, My Enrollments, Profile"
+    ],
+    "role_visibility_rules": [
+      {
+        "role_id": "admin",
+        "visible_sections": ["lead_management", "programs", "enrollments", "calendar", "payments", "communications", "dashboard", "settings"],
+        "hidden_sections": [],
+        "assumption_source": "ai_assumed",
+        "approval_state": "pending_human_review"
+      },
+      {
+        "role_id": "parent",
+        "visible_sections": ["program_discovery", "my_enrollments", "profile"],
+        "hidden_sections": ["lead_management", "payments_admin", "communications_admin", "dashboard", "settings"],
+        "assumption_source": "ai_assumed",
+        "approval_state": "pending_human_review"
+      },
+      {
+        "role_id": "staff",
+        "visible_sections": ["calendar", "enrollments"],
+        "hidden_sections": ["lead_management", "payments_admin", "settings"],
+        "assumption_source": "ai_assumed",
+        "approval_state": "pending_human_review"
+      }
+    ]
+  },
+  "layout_model": {
+    "template_strategy": "shared_templates",
+    "template_types": ["list", "detail", "form", "dashboard", "wizard"],
+    "consistency_rules": [
+      {
+        "rule": "All admin list views use the same table/card component with consistent filtering, sorting, and pagination",
+        "measurable": true
+      },
+      {
+        "rule": "All parent-facing forms follow a single-column, step-by-step layout with clear progress indication",
+        "measurable": true
+      },
+      {
+        "rule": "All confirmation screens display a summary of submitted information and clear next-step instructions",
+        "measurable": true
+      }
+    ]
+  },
+  "cross_module_handoffs": [
+    {
+      "handoff_id": "HO-01",
+      "from_module": "lead_management",
+      "to_module": "enrollment_trial",
+      "trigger": "Lead status changes to 'trial_scheduled' or admin sends trial booking link",
+      "expected_next_screen": "Trial Booking Form (pre-filled with lead data)",
+      "fallback_behavior": "If lead data is incomplete, show trial booking form with available fields pre-filled and remaining fields required",
+      "priority": "critical",
+      "assumption_source": "ai_assumed",
+      "approval_state": "pending_human_review"
+    },
+    {
+      "handoff_id": "HO-02",
+      "from_module": "enrollment_trial",
+      "to_module": "payment_tracking",
+      "trigger": "Enrollment form submitted successfully",
+      "expected_next_screen": "Zelle payment instructions with amount breakdown",
+      "fallback_behavior": "If pricing cannot be calculated, show enrollment confirmation with note that admin will send payment details separately",
+      "priority": "critical",
+      "assumption_source": "ai_assumed",
+      "approval_state": "pending_human_review"
+    },
+    {
+      "handoff_id": "HO-03",
+      "from_module": "enrollment_trial",
+      "to_module": "communication",
+      "trigger": "Trial booked or enrollment completed",
+      "expected_next_screen": "N/A (background automation sends confirmation email)",
+      "fallback_behavior": "If email fails, log in communications log and flag for admin manual follow-up",
+      "priority": "high",
+      "assumption_source": "ai_assumed",
+      "approval_state": "pending_human_review"
+    },
+    {
+      "handoff_id": "HO-04",
+      "from_module": "payment_tracking",
+      "to_module": "communication",
+      "trigger": "Payment overdue (configurable threshold)",
+      "expected_next_screen": "N/A (background automation sends payment reminder)",
+      "fallback_behavior": "If reminder fails, flag in communications log for admin manual follow-up",
+      "priority": "high",
+      "assumption_source": "ai_assumed",
+      "approval_state": "pending_human_review"
+    },
+    {
+      "handoff_id": "HO-05",
+      "from_module": "calendar",
+      "to_module": "enrollment_trial",
+      "trigger": "Parent selects a trial date from the calendar",
+      "expected_next_screen": "Trial Booking Form with selected date pre-filled",
+      "fallback_behavior": "If selected date becomes unavailable, show next available dates",
+      "priority": "high",
+      "assumption_source": "ai_assumed",
+      "approval_state": "pending_human_review"
+    }
+  ],
+  "continuity_rules": [
+    {
+      "rule": "Parent identity (email) persists across sessions; returning parents are recognized and see their enrollment history",
+      "context_persisted": "parent_email, parent_name, child_records",
+      "reset_trigger": "Logout or session expiry"
+    },
+    {
+      "rule": "Lead data carries forward into enrollment forms when a lead converts to trial or enrollment",
+      "context_persisted": "parent_name, email, phone, child_age, interested_program",
+      "reset_trigger": "New lead record created"
+    },
+    {
+      "rule": "Enrollment context carries into payment tracking — amount due, program details, and child info are linked",
+      "context_persisted": "enrollment_id, calculated_amount, program_id, child_id",
+      "reset_trigger": "Enrollment cancelled"
+    }
+  ],
+  "global_business_rules": [
+    {
+      "rule_id": "GBR-01",
+      "rule": "Each enrollment is per-child. A parent with multiple children must submit a separate enrollment for each child.",
+      "acceptance_criteria": "System does not allow selecting multiple children in a single enrollment form submission"
+    },
+    {
+      "rule_id": "GBR-02",
+      "rule": "Returning parents (matched by email) skip the lead capture flow and go directly to program discovery / enrollment.",
+      "acceptance_criteria": "When a parent with an existing record visits the enrollment page, they are not asked to fill lead capture fields already on file"
+    },
+    {
+      "rule_id": "GBR-03",
+      "rule": "All parent-facing communications use configurable templates. No hardcoded message content.",
+      "acceptance_criteria": "Admin can edit every automated message template from the Communication module"
+    },
+    {
+      "rule_id": "GBR-04",
+      "rule": "Lead status auto-advances when key enrollment events occur (trial booked, trial attended, enrolled), but admin can manually override any status.",
+      "acceptance_criteria": "Lead status updates automatically on enrollment events AND admin can change status to any value at any time"
+    }
+  ],
+  "decision_register": [
+    {
+      "decision_id": "nav.primary_model",
+      "decision_statement": "Admin uses sidebar navigation; parents use simplified top navigation bar",
+      "status": "decided",
+      "assumption_source": "ai_assumed",
+      "approval_state": "pending_human_review",
+      "rewrite_risk": "low",
+      "isolation_recommended": false,
+      "isolation_note": ""
+    },
+    {
+      "decision_id": "layout.page_template_strategy",
+      "decision_statement": "Shared page templates across all modules (list, detail, form, dashboard, wizard)",
+      "status": "decided",
+      "assumption_source": "ai_assumed",
+      "approval_state": "pending_human_review",
+      "rewrite_risk": "low",
+      "isolation_recommended": false,
+      "isolation_note": ""
+    },
+    {
+      "decision_id": "enrollment.per_child",
+      "decision_statement": "Each enrollment is for exactly one child; multi-child families submit separate enrollments",
+      "status": "decided",
+      "assumption_source": "human_confirmed",
+      "approval_state": "user_approved",
+      "rewrite_risk": "medium",
+      "isolation_recommended": true,
+      "isolation_note": "Enrollment form and data model should not assume single-child permanently; keep child_id as a foreign key so multi-child enrollment could be added later without restructuring"
+    },
+    {
+      "decision_id": "parent.returning_recognition",
+      "decision_statement": "Returning parents are recognized by email and skip lead capture, going directly to enrollment",
+      "status": "decided",
+      "assumption_source": "ai_assumed",
+      "approval_state": "pending_human_review",
+      "rewrite_risk": "low",
+      "isolation_recommended": false,
+      "isolation_note": ""
+    },
+    {
+      "decision_id": "payment.offline_only_mvp",
+      "decision_statement": "MVP supports only offline payment tracking (Zelle); no payment gateway integration",
+      "status": "decided",
+      "assumption_source": "human_confirmed",
+      "approval_state": "user_approved",
+      "rewrite_risk": "low",
+      "isolation_recommended": true,
+      "isolation_note": "Payment module should abstract payment method so Stripe/card payments can be added in Phase 2 without rewriting core payment tracking"
+    },
+    {
+      "decision_id": "comm.email_only_mvp",
+      "decision_statement": "MVP uses email-only communication; SMS/WhatsApp deferred to Phase 2",
+      "status": "decided",
+      "assumption_source": "human_confirmed",
+      "approval_state": "user_approved",
+      "rewrite_risk": "low",
+      "isolation_recommended": true,
+      "isolation_note": "Communication module should use a channel abstraction so SMS/WhatsApp can be added as additional channels without rewriting automation logic"
+    },
+    {
+      "decision_id": "auth.parent_portal_phase2",
+      "decision_statement": "Parent portal with login is Phase 2; MVP parent flows are public/link-based with email verification",
+      "status": "decided",
+      "assumption_source": "ai_assumed",
+      "approval_state": "pending_human_review",
+      "rewrite_risk": "medium",
+      "isolation_recommended": true,
+      "isolation_note": "Parent-facing flows should be designed so adding authentication in Phase 2 wraps existing flows rather than replacing them"
+    }
+  ],
+  "layman_summary": {
+    "product_experience_overview": "Parents will find your programs online, pick a trial class from available dates, and enroll their child in a simple step-by-step flow — all from their phone. After enrolling, they see clear Zelle payment instructions and get automatic email confirmations and reminders. You (the admin) see all leads, enrollments, and payments in one place with a clean dashboard. The system automatically sends emails at the right moments so you don't have to. Leads from Facebook, Google, and your website all flow into one list where you can track every parent from first contact to paid enrollment.",
+    "confirmed_items": [
+      "One enrollment per child (separate form for each child)",
+      "Zelle-based payment tracking (no payment gateway in MVP)",
+      "Email-only automation in MVP; SMS/WhatsApp in Phase 2"
+    ],
+    "assumed_items_pending_confirmation": [
+      "Admin uses sidebar navigation; parents use a simpler top navigation",
+      "Returning parents are recognized by email and skip lead capture",
+      "Parent portal with login is Phase 2; MVP uses link-based access with email verification",
+      "Staff role is view-only for calendar and enrollments in Phase 2"
+    ]
+  },
+  "confirmation_status": "partially_confirmed"
+}

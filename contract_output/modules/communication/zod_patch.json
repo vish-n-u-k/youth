@@ -1,0 +1,69 @@
+{
+  "moduleId": "communication",
+  "contractVersion": "v1.0.0",
+  "schemas": [
+    {
+      "schemaId": "TemplateListResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ templates: z.array(z.object({ templateId: z.string(), name: z.string(), subject: z.string(), triggerEvent: z.string().nullable(), isDefault: z.boolean(), updatedAt: z.string().datetime() })) })",
+      "usedBy": ["getTemplates"]
+    },
+    {
+      "schemaId": "TemplateResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ templateId: z.string(), name: z.string(), subject: z.string(), body: z.string(), availableVariables: z.array(z.string()), isDefault: z.boolean(), createdAt: z.string().datetime(), updatedAt: z.string().datetime() })",
+      "usedBy": ["getTemplate", "createTemplate", "updateTemplate"]
+    },
+    {
+      "schemaId": "TemplateRequest",
+      "purpose": "request",
+      "targetFile": null,
+      "definition": "z.object({ name: z.string().min(1), subject: z.string().min(1), body: z.string().min(1) })",
+      "usedBy": ["createTemplate", "updateTemplate"]
+    },
+    {
+      "schemaId": "AutomationListResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ automations: z.array(z.object({ automationId: z.string(), triggerEvent: z.enum(['lead_created','trial_scheduled','trial_approaching','enrollment_completed','payment_overdue','class_start_approaching']), templateId: z.string(), templateName: z.string(), delayMinutes: z.number().nullable(), enabled: z.boolean(), updatedAt: z.string().datetime() })) })",
+      "usedBy": ["getAutomations"]
+    },
+    {
+      "schemaId": "AutomationRequest",
+      "purpose": "request",
+      "targetFile": null,
+      "definition": "z.object({ triggerEvent: z.enum(['lead_created','trial_scheduled','trial_approaching','enrollment_completed','payment_overdue','class_start_approaching']), templateId: z.string(), delayMinutes: z.number().int().min(0).optional(), enabled: z.boolean() })",
+      "usedBy": ["updateAutomation"]
+    },
+    {
+      "schemaId": "AutomationResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ automationId: z.string(), triggerEvent: z.string(), templateId: z.string(), templateName: z.string(), delayMinutes: z.number().nullable(), enabled: z.boolean(), updatedAt: z.string().datetime() })",
+      "usedBy": ["updateAutomation"]
+    },
+    {
+      "schemaId": "CommunicationsLogQuery",
+      "purpose": "query",
+      "targetFile": null,
+      "definition": "z.object({ deliveryStatus: z.enum(['sent','failed','pending']).optional(), triggerEvent: z.string().optional(), search: z.string().optional(), page: z.number().int().min(1).default(1), limit: z.number().int().min(1).max(100).default(25) })",
+      "usedBy": ["getCommunicationsLog"]
+    },
+    {
+      "schemaId": "CommunicationsLogResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ communications: z.array(z.object({ logId: z.string(), recipientEmail: z.string(), recipientName: z.string(), subject: z.string(), templateName: z.string(), triggerEvent: z.string(), deliveryStatus: z.enum(['sent','failed','pending']), sentAt: z.string().datetime().nullable(), failureReason: z.string().nullable() })), total: z.number(), page: z.number(), limit: z.number() })",
+      "usedBy": ["getCommunicationsLog"]
+    },
+    {
+      "schemaId": "RetryEmailResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ logId: z.string(), message: z.string(), retryQueued: z.boolean() })",
+      "usedBy": ["retryEmail"]
+    }
+  ]
+}

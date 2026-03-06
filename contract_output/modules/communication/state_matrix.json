@@ -1,0 +1,75 @@
+{
+  "moduleId": "communication",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "template_manager",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Loading templates..."
+        },
+        "empty": {
+          "applicability": "not_applicable",
+          "message": ""
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Failed to load templates. Please refresh.",
+          "retryAction": "Refresh page"
+        },
+        "success": {
+          "applicability": "required",
+          "message": "Template saved successfully."
+        }
+      },
+      "sourceRef": "fe_details://screens/template_manager/states"
+    },
+    {
+      "screenId": "automation_rules",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Loading automation rules..."
+        },
+        "empty": {
+          "applicability": "not_applicable",
+          "message": ""
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Failed to load automation rules. Please refresh.",
+          "retryAction": "Refresh page"
+        },
+        "success": {
+          "applicability": "required",
+          "message": "Automation rule updated."
+        }
+      },
+      "sourceRef": "fe_details://screens/automation_rules/states"
+    },
+    {
+      "screenId": "communications_log",
+      "states": {
+        "loading": {
+          "applicability": "required",
+          "message": "Loading communications log..."
+        },
+        "empty": {
+          "applicability": "required",
+          "message": "No emails sent yet. Communications will appear here as automations fire."
+        },
+        "error": {
+          "applicability": "required",
+          "message": "Failed to load communications log. Please refresh.",
+          "retryAction": "Refresh page"
+        },
+        "success": {
+          "applicability": "optional",
+          "message": "Email retry queued."
+        }
+      },
+      "sourceRef": "fe_details://screens/communications_log/states"
+    }
+  ]
+}

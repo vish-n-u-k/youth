@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings &amp; Configuration — Young Engineers Enrollment &amp; Operations Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @media print { .no-print { display: none !important; } }
+    details summary::-webkit-details-marker { display: none; }
+    details summary::marker { content: ''; }
+    details summary::before { content: '▶ '; font-size: 0.75em; }
+    details[open] summary::before { content: '▼ '; }
+  </style>
+</head>
+<body class="bg-white text-gray-900 antialiased">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <nav class="mb-6 no-print">
+      <a href="../prd_interactive.html#modules-overview" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Back to PRD
+      </a>
+    </nav>
+    <section id="module-settings" class="mb-14">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6 pb-2 border-b-2 border-gray-200">Module: Settings & Configuration</h2>
+    <a href="#modules-overview" class="text-sm text-blue-600 hover:underline mb-4 inline-block">&larr; Back to Modules Overview</a><div class="bg-gradient-to-r from-gray-50 to-white rounded-lg p-5 border mb-6">
+    <div class="flex flex-wrap items-center gap-2 mb-2"><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600"></span> <span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">medium</span> <span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-emerald-100 text-emerald-700">MVP</span></div>
+    <p class="text-sm text-gray-700">Global configuration for location details, Zelle payment instructions, staff roles (Phase 2), and notification preferences.</p></div><div class="mb-6"><h3 class="text-lg font-semibold text-gray-800 mb-3">Screens (2)</h3><div class="overflow-x-auto border rounded-lg">
+    <table class="min-w-full text-sm divide-y divide-gray-200">
+      <thead><tr><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">ID</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">Name</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">Description</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">MVP</th></tr></thead>
+      <tbody class="divide-y divide-gray-100"><tr class="bg-white"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">ST-SCR-01</code></td><td class="px-4 py-3">General Settings</td><td class="px-4 py-3">Configure location details, Zelle payment info, and global preferences</td><td class="px-4 py-3"></td></tr><tr class="bg-gray-50/50"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">ST-SCR-02</code></td><td class="px-4 py-3">Staff &amp; Roles (Phase 2)</td><td class="px-4 py-3">Manage staff accounts and role permissions — Phase 2</td><td class="px-4 py-3"></td></tr></tbody>
+    </table></div></div><div class="mb-6"><h3 class="text-lg font-semibold text-gray-800 mb-3">Features (4)</h3><div class="space-y-2"><div class="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+      <code class="text-xs bg-white px-1.5 py-0.5 rounded border flex-shrink-0 mt-0.5 whitespace-nowrap">ST-FT-01</code>
+      <div><span class="font-medium text-sm">Location Configuration</span><p class="text-xs text-gray-600 mt-0.5">Set business name, address, and contact details displayed on parent-facing pages</p></div>
+    </div><div class="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+      <code class="text-xs bg-white px-1.5 py-0.5 rounded border flex-shrink-0 mt-0.5 whitespace-nowrap">ST-FT-02</code>
+      <div><span class="font-medium text-sm">Zelle Payment Configuration</span><p class="text-xs text-gray-600 mt-0.5">Configure Zelle recipient details shown to parents after enrollment</p></div>
+    </div><div class="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+      <code class="text-xs bg-white px-1.5 py-0.5 rounded border flex-shrink-0 mt-0.5 whitespace-nowrap">ST-FT-03</code>
+      <div><span class="font-medium text-sm">Notification Preferences</span><p class="text-xs text-gray-600 mt-0.5">Admin configures when and how they receive system notifications</p></div>
+    </div><div class="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+      <code class="text-xs bg-white px-1.5 py-0.5 rounded border flex-shrink-0 mt-0.5 whitespace-nowrap">ST-FT-04</code>
+      <div><span class="font-medium text-sm">Staff Management</span><p class="text-xs text-gray-600 mt-0.5">Add staff members and assign roles with limited permissions</p></div>
+    </div></div></div><div class="mb-6"><h3 class="text-lg font-semibold text-gray-800 mb-3">Requirements (4)</h3><div class="space-y-3"><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">ST-REQ-01</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Admin can configure: business name, address, phone, email, website URL</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">Settings are saved and used in parent-facing pages and email templates</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">ST-REQ-02</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Admin can configure Zelle payment instructions: recipient name, Zelle email or phone, and any custom instructions text</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">Configured Zelle details appear on the enrollment confirmation page and in payment instruction emails</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">ST-REQ-03</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Admin can toggle receiving email notifications for: new lead received, new enrollment submitted, payment marked as received</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">Each notification type has an on/off toggle; admin receives emails only for enabled notifications</p></div></details>
+    </div><div class="border rounded-lg p-4">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap">ST-REQ-04</code><span class="inline-flex items-center whitespace-nowrap px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-600">unknown</span></div>
+      <p class="text-sm text-gray-800 mb-2">Admin can invite staff members by email and assign role-based access (view-only calendar, view-only enrollments)</p>
+      <details class="group"><summary class="cursor-pointer text-sm font-medium text-blue-600 hover:text-blue-800 py-1">Acceptance Criteria</summary>
+    <div class="mt-2 pl-4 text-sm text-gray-700 border-l-2 border-gray-200"><p class="whitespace-pre-wrap">Phase 2: Staff accounts can be created; permissions limit accessible modules</p></div></details>
+    </div></div></div><div class="mb-6"><h3 class="text-lg font-semibold text-gray-800 mb-3">Business Rules (2)</h3><div class="overflow-x-auto border rounded-lg">
+    <table class="min-w-full text-sm divide-y divide-gray-200">
+      <thead><tr><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">ID</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">Description</th><th class="px-4 py-3 bg-gray-50 font-semibold text-gray-700 text-left text-xs uppercase tracking-wider">Type</th></tr></thead>
+      <tbody class="divide-y divide-gray-100"><tr class="bg-white"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">ST-BR-01</code></td><td class="px-4 py-3">Zelle payment configuration must be set before the first program can be published</td><td class="px-4 py-3"></td></tr><tr class="bg-gray-50/50"><td class="px-4 py-3"><code class="text-xs whitespace-nowrap">ST-BR-02</code></td><td class="px-4 py-3">Location configuration supports one location in MVP; data model includes location_id for future multi-location support</td><td class="px-4 py-3"></td></tr></tbody>
+    </table></div></div>
+  </section>
+    <footer class="mt-16 pt-8 border-t border-gray-200 text-center text-sm text-gray-400">
+      Generated on 2026-03-06
+    </footer>
+  </div>
+</body>
+</html>

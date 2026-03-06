@@ -1,0 +1,55 @@
+{
+  "moduleId": "auth_accounts",
+  "contractVersion": "v1.0.0",
+  "schemas": [
+    {
+      "schemaId": "AdminLoginRequest",
+      "purpose": "request",
+      "targetFile": null,
+      "definition": "z.object({ email: z.string().email(), password: z.string().min(8) })",
+      "usedBy": ["adminLogin"]
+    },
+    {
+      "schemaId": "AdminLoginResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ token: z.string(), user: z.object({ id: z.string(), email: z.string().email(), role: z.literal('admin'), name: z.string() }) })",
+      "usedBy": ["adminLogin"]
+    },
+    {
+      "schemaId": "PasswordResetRequest",
+      "purpose": "request",
+      "targetFile": null,
+      "definition": "z.object({ email: z.string().email() })",
+      "usedBy": ["requestPasswordReset"]
+    },
+    {
+      "schemaId": "PasswordResetResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ message: z.string() })",
+      "usedBy": ["requestPasswordReset"]
+    },
+    {
+      "schemaId": "SetNewPasswordRequest",
+      "purpose": "request",
+      "targetFile": null,
+      "definition": "z.object({ token: z.string(), newPassword: z.string().min(8), confirmPassword: z.string().min(8) }).refine(data => data.newPassword === data.confirmPassword, { message: 'Passwords must match' })",
+      "usedBy": ["setNewPassword"]
+    },
+    {
+      "schemaId": "SetNewPasswordResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ message: z.string() })",
+      "usedBy": ["setNewPassword"]
+    },
+    {
+      "schemaId": "ApiError",
+      "purpose": "error",
+      "targetFile": null,
+      "definition": "z.object({ error: z.string(), message: z.string(), statusCode: z.number() })",
+      "usedBy": ["adminLogin", "requestPasswordReset", "setNewPassword"]
+    }
+  ]
+}

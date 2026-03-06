@@ -1,0 +1,16 @@
+{
+  "moduleId": "admin_dashboard",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "dashboard_overview",
+      "name": "Dashboard Overview",
+      "route": "/admin/dashboard",
+      "entry": true,
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "visibilityCondition": null,
+      "sourceRef": "fe_details://screens/dashboard_overview"
+    }
+  ]
+}

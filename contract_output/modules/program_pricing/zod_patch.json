@@ -1,0 +1,62 @@
+{
+  "moduleId": "program_pricing",
+  "contractVersion": "v1.0.0",
+  "schemas": [
+    {
+      "schemaId": "ProgramListQuery",
+      "purpose": "query",
+      "targetFile": null,
+      "definition": "z.object({ status: z.enum(['draft','active','closed']).optional(), page: z.number().int().min(1).default(1), limit: z.number().int().min(1).max(100).default(25) })",
+      "usedBy": ["getPrograms"]
+    },
+    {
+      "schemaId": "ProgramListResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ programs: z.array(z.object({ programId: z.string(), name: z.string(), ageGroupMin: z.number(), ageGroupMax: z.number(), startDate: z.string().datetime(), endDate: z.string().datetime(), enrollmentCount: z.number(), capacity: z.number(), status: z.enum(['draft','active','closed']), totalFee: z.number() })), total: z.number(), page: z.number(), limit: z.number() })",
+      "usedBy": ["getPrograms"]
+    },
+    {
+      "schemaId": "ProgramResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ programId: z.string(), name: z.string(), ageGroupMin: z.number(), ageGroupMax: z.number(), totalSessions: z.number(), sessionDuration: z.number(), location: z.string(), startDate: z.string().datetime(), endDate: z.string().datetime(), capacity: z.number(), status: z.enum(['draft','active','closed']), baseFee: z.number(), feeType: z.enum(['total','per_session']), totalFee: z.number(), registrationFee: z.number().nullable(), registrationFeeRequired: z.boolean(), trialAvailable: z.boolean(), locationId: z.string(), enrollmentCount: z.number(), createdAt: z.string().datetime(), updatedAt: z.string().datetime() })",
+      "usedBy": ["getProgram", "createProgram", "updateProgram"]
+    },
+    {
+      "schemaId": "ProgramRequest",
+      "purpose": "request",
+      "targetFile": null,
+      "definition": "z.object({ name: z.string().min(1), ageGroupMin: z.number().int().min(0), ageGroupMax: z.number().int().min(0), totalSessions: z.number().int().min(1), sessionDuration: z.number().min(1), location: z.string().min(1), startDate: z.string().datetime(), endDate: z.string().datetime(), capacity: z.number().int().min(1), status: z.enum(['draft','active','closed']), baseFee: z.number().min(0), feeType: z.enum(['total','per_session']), registrationFee: z.number().min(0).optional(), registrationFeeRequired: z.boolean(), trialAvailable: z.boolean() }).refine(data => data.ageGroupMax >= data.ageGroupMin, { message: 'Max age must be >= min age' })",
+      "usedBy": ["createProgram", "updateProgram"]
+    },
+    {
+      "schemaId": "CouponListResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ coupons: z.array(z.object({ couponId: z.string(), code: z.string(), discountType: z.enum(['percentage','flat']), discountValue: z.number(), scope: z.enum(['program_fee','registration_fee','both']), expiresAt: z.string().datetime().nullable(), usageLimit: z.number().nullable(), usageCount: z.number(), createdAt: z.string().datetime() })) })",
+      "usedBy": ["getCoupons"]
+    },
+    {
+      "schemaId": "CouponRequest",
+      "purpose": "request",
+      "targetFile": null,
+      "definition": "z.object({ code: z.string().min(1), discountType: z.enum(['percentage','flat']), discountValue: z.number().min(0), scope: z.enum(['program_fee','registration_fee','both']), expiresAt: z.string().datetime().optional(), usageLimit: z.number().int().min(1).optional() })",
+      "usedBy": ["createCoupon", "updateCoupon"]
+    },
+    {
+      "schemaId": "CouponResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ couponId: z.string(), code: z.string(), discountType: z.enum(['percentage','flat']), discountValue: z.number(), scope: z.enum(['program_fee','registration_fee','both']), expiresAt: z.string().datetime().nullable(), usageLimit: z.number().nullable(), usageCount: z.number(), createdAt: z.string().datetime() })",
+      "usedBy": ["createCoupon", "updateCoupon"]
+    },
+    {
+      "schemaId": "DeleteResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ message: z.string(), deleted: z.boolean() })",
+      "usedBy": ["deleteCoupon"]
+    }
+  ]
+}

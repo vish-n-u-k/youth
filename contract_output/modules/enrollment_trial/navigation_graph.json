@@ -1,0 +1,71 @@
+{
+  "moduleId": "enrollment_trial",
+  "contractVersion": "v1.0.0",
+  "edges": [
+    {
+      "edgeId": "et-e-01",
+      "fromScreenId": "program_discovery",
+      "trigger": {
+        "type": "click",
+        "sourceId": "bookTrialButton",
+        "event": "Start trial booking for a program"
+      },
+      "toScreenId": "trial_booking_form",
+      "condition": "Program has trial available and dates exist",
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/program_discovery/interactions/1"
+    },
+    {
+      "edgeId": "et-e-02",
+      "fromScreenId": "program_discovery",
+      "trigger": {
+        "type": "click",
+        "sourceId": "enrollNowButton",
+        "event": "Start enrollment for a program"
+      },
+      "toScreenId": "enrollment_form",
+      "condition": "Program is not full and enrollment is open",
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/program_discovery/interactions/2"
+    },
+    {
+      "edgeId": "et-e-03",
+      "fromScreenId": "trial_booking_form",
+      "trigger": {
+        "type": "submit",
+        "sourceId": "trialBookingForm",
+        "event": "Trial booked successfully"
+      },
+      "toScreenId": null,
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/trial_booking_form/interactions/1"
+    },
+    {
+      "edgeId": "et-e-04",
+      "fromScreenId": "enrollment_form",
+      "trigger": {
+        "type": "submit",
+        "sourceId": "enrollmentForm",
+        "event": "Enrollment submitted successfully"
+      },
+      "toScreenId": "enrollment_confirmation",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/enrollment_form/interactions/1"
+    },
+    {
+      "edgeId": "et-e-05",
+      "fromScreenId": "enrollment_confirmation",
+      "trigger": {
+        "type": "click",
+        "sourceId": "backToPrograms",
+        "event": "Navigate back to program listing"
+      },
+      "toScreenId": "program_discovery",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/enrollment_confirmation/interactions/1"
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "moduleId": "program_pricing",
+  "contractVersion": "v1.0.0",
+  "edges": [
+    {
+      "edgeId": "pp-e-01",
+      "fromScreenId": "program_list",
+      "trigger": {
+        "type": "click",
+        "sourceId": "programRow",
+        "event": "Open program for editing"
+      },
+      "toScreenId": "program_setup",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/program_list/interactions/0"
+    },
+    {
+      "edgeId": "pp-e-02",
+      "fromScreenId": "program_list",
+      "trigger": {
+        "type": "click",
+        "sourceId": "createProgramButton",
+        "event": "Create new program"
+      },
+      "toScreenId": "program_setup",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/program_list/interactions/1"
+    },
+    {
+      "edgeId": "pp-e-03",
+      "fromScreenId": "program_setup",
+      "trigger": {
+        "type": "submit",
+        "sourceId": "programForm",
+        "event": "Program saved"
+      },
+      "toScreenId": "program_list",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/program_setup/interactions/0"
+    },
+    {
+      "edgeId": "pp-e-04",
+      "fromScreenId": "program_list",
+      "trigger": {
+        "type": "click",
+        "sourceId": "couponLink",
+        "event": "Navigate to coupon management"
+      },
+      "toScreenId": "coupon_management",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/program_list/interactions/2"
+    },
+    {
+      "edgeId": "pp-e-05",
+      "fromScreenId": "coupon_management",
+      "trigger": {
+        "type": "click",
+        "sourceId": "backToPrograms",
+        "event": "Navigate back to program list"
+      },
+      "toScreenId": "program_list",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/coupon_management/interactions/3"
+    }
+  ]
+}

@@ -1,0 +1,199 @@
+{
+  "contractVersion": "v1.0.0",
+  "status": "agreed",
+  "changeType": "none",
+  "navigation": {
+    "primaryPattern": "hybrid_navigation",
+    "entryPoints": [
+      "/admin/dashboard",
+      "/programs"
+    ],
+    "roleVisibilityRules": [
+      {
+        "roleId": "admin",
+        "visibleSections": [
+          "Lead Management",
+          "Programs",
+          "Enrollments",
+          "Calendar",
+          "Payments",
+          "Communications",
+          "Dashboard",
+          "Settings"
+        ],
+        "hiddenSections": []
+      },
+      {
+        "roleId": "parent",
+        "visibleSections": [
+          "Programs",
+          "My Enrollments",
+          "Profile"
+        ],
+        "hiddenSections": [
+          "Lead Management",
+          "Payments",
+          "Communications",
+          "Dashboard",
+          "Settings",
+          "Calendar"
+        ]
+      },
+      {
+        "roleId": "staff",
+        "visibleSections": [
+          "Calendar",
+          "Enrollments"
+        ],
+        "hiddenSections": [
+          "Lead Management",
+          "Programs",
+          "Payments",
+          "Communications",
+          "Dashboard",
+          "Settings"
+        ]
+      }
+    ]
+  },
+  "layout": {
+    "templateStrategy": "shared_templates",
+    "templateTypes": [
+      "list",
+      "detail",
+      "form",
+      "wizard",
+      "dashboard"
+    ],
+    "consistencyRules": [
+      {
+        "id": "CR-01",
+        "rule": "All admin list views use the same table/card component with consistent column alignment and action placement",
+        "appliesTo": "admin",
+        "measurable": true
+      },
+      {
+        "id": "CR-02",
+        "rule": "All parent forms are single-column step-by-step with a progress indicator",
+        "appliesTo": "parent",
+        "measurable": true
+      },
+      {
+        "id": "CR-03",
+        "rule": "All confirmation screens display submitted information summary and next steps",
+        "appliesTo": ["admin", "parent"],
+        "measurable": true
+      }
+    ]
+  },
+  "handoffs": [
+    {
+      "handoffId": "HO-01",
+      "fromModule": "lead_management",
+      "toModule": "enrollment_trial",
+      "trigger": "Lead status changes to trial_scheduled or admin sends trial booking link",
+      "expectedNextScreen": "trial_booking_form",
+      "fallbackBehavior": "Show empty trial booking form without pre-filled data; log warning for admin",
+      "priority": "critical"
+    },
+    {
+      "handoffId": "HO-02",
+      "fromModule": "enrollment_trial",
+      "toModule": "payment_tracking",
+      "trigger": "Enrollment form submitted successfully",
+      "expectedNextScreen": "zelle_instructions",
+      "fallbackBehavior": "Show enrollment confirmation with generic payment instructions; flag for admin follow-up",
+      "priority": "critical"
+    },
+    {
+      "handoffId": "HO-03",
+      "fromModule": "enrollment_trial",
+      "toModule": "communication",
+      "trigger": "Trial booked or enrollment completed",
+      "expectedNextScreen": "none (background email fires)",
+      "fallbackBehavior": "Log failed email trigger; surface in communications log for admin retry",
+      "priority": "high"
+    },
+    {
+      "handoffId": "HO-04",
+      "fromModule": "payment_tracking",
+      "toModule": "communication",
+      "trigger": "Payment overdue threshold exceeded and status still pending",
+      "expectedNextScreen": "none (background payment reminder email fires)",
+      "fallbackBehavior": "Log failed reminder trigger; surface in communications log for admin retry",
+      "priority": "high"
+    },
+    {
+      "handoffId": "HO-05",
+      "fromModule": "calendar_scheduling",
+      "toModule": "enrollment_trial",
+      "trigger": "Parent selects a trial date from available dates",
+      "expectedNextScreen": "trial_booking_form",
+      "fallbackBehavior": "Show trial booking form without pre-filled date; parent selects date manually",
+      "priority": "medium"
+    }
+  ],
+  "globalPolicies": [
+    {
+      "id": "GP-01",
+      "description": "One enrollment per child; no multi-child batch submissions",
+      "type": "policy",
+      "sourceRef": "analysis_output/global_experience.json#id=GBR-01"
+    },
+    {
+      "id": "GP-02",
+      "description": "Returning parents identified by email skip lead capture and go directly to enrollment",
+      "type": "navigation",
+      "sourceRef": "analysis_output/global_experience.json#id=GBR-02"
+    },
+    {
+      "id": "GP-03",
+      "description": "All parent-facing emails use admin-configurable templates with no hardcoded content",
+      "type": "policy",
+      "sourceRef": "analysis_output/global_experience.json#id=GBR-03"
+    },
+    {
+      "id": "GP-04",
+      "description": "Lead status auto-advances on enrollment events; admin can always manually override",
+      "type": "policy",
+      "sourceRef": "analysis_output/global_experience.json#id=GBR-04"
+    },
+    {
+      "id": "GP-05",
+      "description": "All admin routes require authentication; unauthenticated access redirects to login",
+      "type": "access_control",
+      "sourceRef": "analysis_output/global_experience.json#id=AA-BR-01"
+    },
+    {
+      "id": "GP-06",
+      "description": "Parent-facing pages are publicly accessible in MVP without login",
+      "type": "access_control",
+      "sourceRef": "analysis_output/global_experience.json#id=AA-BR-02"
+    },
+    {
+      "id": "GP-07",
+      "description": "Mobile-responsive design from 375px width; no horizontal scroll",
+      "type": "policy",
+      "sourceRef": "analysis_output/global_experience.json#id=NFR-01"
+    },
+    {
+      "id": "GP-08",
+      "description": "Page load under 3 seconds on 3G connections",
+      "type": "policy",
+      "sourceRef": "analysis_output/global_experience.json#id=NFR-06"
+    }
+  ],
+  "sourceRefs": {
+    "navigationModelRef": "analysis_output/global_experience.json#/navigation_model",
+    "layoutModelRef": "analysis_output/global_experience.json#/layout_model",
+    "decisionRefs": [
+      "analysis_output/global_experience.json#decision_id=nav.primary_model",
+      "analysis_output/global_experience.json#decision_id=layout.page_template_strategy",
+      "analysis_output/global_experience.json#decision_id=enrollment.per_child",
+      "analysis_output/global_experience.json#decision_id=parent.returning_recognition",
+      "analysis_output/global_experience.json#decision_id=payment.offline_only_mvp",
+      "analysis_output/global_experience.json#decision_id=comm.email_only_mvp",
+      "analysis_output/global_experience.json#decision_id=auth.parent_portal_phase2"
+    ]
+  }
+}

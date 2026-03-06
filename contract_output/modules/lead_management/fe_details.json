@@ -1,0 +1,234 @@
+{
+  "moduleId": "lead_management",
+  "contractVersion": "v1.0.0",
+  "status": "agreed",
+  "changeType": "none",
+  "globalBindings": {
+    "globalContractRef": "contract_output/global/fe_global_contract.json",
+    "inheritedDecisionIds": [
+      "nav.primary_model",
+      "parent.returning_recognition"
+    ],
+    "inheritedPolicyIds": [
+      "GP-02",
+      "GP-04",
+      "GP-05",
+      "GP-07",
+      "GP-08"
+    ],
+    "moduleOverrides": []
+  },
+  "screens": [
+    {
+      "screenId": "lead_list",
+      "name": "Lead List",
+      "route": "/admin/leads",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "dataDisplayed": [
+        {
+          "field": "leads",
+          "source": "api",
+          "schemaRef": "zod://LeadListResponse"
+        }
+      ],
+      "dataCaptured": [],
+      "interactions": [
+        "Toggle between Kanban and Table view",
+        "Filter by source",
+        "Filter by status",
+        "Filter by program",
+        "Drag card to change status (Kanban)",
+        "Click lead card to open Lead Detail",
+        "Search leads by name or email"
+      ],
+      "states": {
+        "loading": "Loading leads...",
+        "empty": "No leads yet. Leads will appear here when captured from your website, Facebook, or Google forms.",
+        "error": "Failed to load leads. Please refresh."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "getLeads",
+          "method": "GET",
+          "path": "/api/leads",
+          "requestSchemaRef": "zod://LeadListQuery",
+          "responseSchemaRef": "zod://LeadListResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "updateLeadStatus",
+          "method": "PATCH",
+          "path": "/api/leads/:leadId/status",
+          "requestSchemaRef": "zod://UpdateLeadStatusRequest",
+          "responseSchemaRef": "zod://LeadResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    },
+    {
+      "screenId": "lead_detail",
+      "name": "Lead Detail",
+      "route": "/admin/leads/:leadId",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "dataDisplayed": [
+        {
+          "field": "lead",
+          "source": "api",
+          "schemaRef": "zod://LeadResponse"
+        },
+        {
+          "field": "notes",
+          "source": "api",
+          "schemaRef": "zod://LeadNotesResponse"
+        },
+        {
+          "field": "activityTimeline",
+          "source": "api",
+          "schemaRef": "zod://LeadActivityResponse"
+        }
+      ],
+      "dataCaptured": [
+        {
+          "field": "parentName",
+          "required": true,
+          "schemaRef": "zod://UpdateLeadRequest"
+        },
+        {
+          "field": "email",
+          "required": true,
+          "schemaRef": "zod://UpdateLeadRequest"
+        },
+        {
+          "field": "phone",
+          "required": false,
+          "schemaRef": "zod://UpdateLeadRequest"
+        },
+        {
+          "field": "childName",
+          "required": false,
+          "schemaRef": "zod://UpdateLeadRequest"
+        },
+        {
+          "field": "childAge",
+          "required": false,
+          "schemaRef": "zod://UpdateLeadRequest"
+        },
+        {
+          "field": "interestedProgram",
+          "required": false,
+          "schemaRef": "zod://UpdateLeadRequest"
+        },
+        {
+          "field": "noteText",
+          "required": true,
+          "schemaRef": "zod://AddLeadNoteRequest"
+        }
+      ],
+      "interactions": [
+        "Edit lead profile fields",
+        "Save lead changes",
+        "Change lead status via dropdown",
+        "Add a note",
+        "Send trial booking link",
+        "Navigate back to lead list"
+      ],
+      "states": {
+        "loading": "Loading lead details...",
+        "empty": "N/A",
+        "error": "Failed to load lead details. Please try again."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "getLead",
+          "method": "GET",
+          "path": "/api/leads/:leadId",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://LeadResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "updateLead",
+          "method": "PUT",
+          "path": "/api/leads/:leadId",
+          "requestSchemaRef": "zod://UpdateLeadRequest",
+          "responseSchemaRef": "zod://LeadResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "getLeadNotes",
+          "method": "GET",
+          "path": "/api/leads/:leadId/notes",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://LeadNotesResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "addLeadNote",
+          "method": "POST",
+          "path": "/api/leads/:leadId/notes",
+          "requestSchemaRef": "zod://AddLeadNoteRequest",
+          "responseSchemaRef": "zod://LeadNoteResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "getLeadActivity",
+          "method": "GET",
+          "path": "/api/leads/:leadId/activity",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://LeadActivityResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "sendTrialBookingLink",
+          "method": "POST",
+          "path": "/api/leads/:leadId/send-trial-link",
+          "requestSchemaRef": "zod://SendTrialLinkRequest",
+          "responseSchemaRef": "zod://SendTrialLinkResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "LM-A-01",
+      "text": "Returning parents identified by email match; different email = new lead",
+      "severity": "low",
+      "state": "open",
+      "assumptionSource": "ai_assumed",
+      "approvalState": "pending_human_review",
+      "rewriteRisk": "low",
+      "isolationRecommended": false,
+      "isolationNote": "",
+      "sourceRef": "analysis_output/assumptions.json#id=A-01"
+    },
+    {
+      "id": "LM-A-02",
+      "text": "Facebook Lead Forms ingested via webhook or polling; method deferred to implementation",
+      "severity": "low",
+      "state": "open",
+      "assumptionSource": "ai_assumed",
+      "approvalState": "pending_human_review",
+      "rewriteRisk": "low",
+      "isolationRecommended": false,
+      "isolationNote": "",
+      "sourceRef": "analysis_output/assumptions.json#id=A-03"
+    },
+    {
+      "id": "LM-A-03",
+      "text": "Google Forms/Ads leads use same ingest mechanism and produce same lead record format",
+      "severity": "low",
+      "state": "open",
+      "assumptionSource": "ai_assumed",
+      "approvalState": "pending_human_review",
+      "rewriteRisk": "low",
+      "isolationRecommended": false,
+      "isolationNote": "",
+      "sourceRef": "analysis_output/assumptions.json#id=A-04"
+    }
+  ]
+}

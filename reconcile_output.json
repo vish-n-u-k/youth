@@ -1,0 +1,225 @@
+{
+  "reconciliation_summary": {
+    "base_version": "analysis.v2.1",
+    "review_reports_count": 1,
+    "auto_cycle_enabled": true,
+    "auto_cycle_limit": 2,
+    "current_cycle": 1,
+    "accepted_changes": 6,
+    "rejected_changes": 0,
+    "deferred_changes": 3,
+    "final_quality_score": 82,
+    "final_traceability_coverage_percent": 65
+  },
+  "decisions": [
+    {
+      "decision_id": "RC-001",
+      "source_finding_ids": ["RV-001"],
+      "decision": "accepted",
+      "reason": "Technical parking lot entries used generic 'item_id' instead of typed key. Renamed to 'tp_id' across all entries for typed ID key consistency. Enum normalization: generic 'item_id' → typed 'tp_id'.",
+      "applied_change": "Renamed 'item_id' to 'tp_id' in all 5 existing technical_parking_lot entries (TP-01 through TP-05) and used 'tp_id' for 3 new entries (TP-06, TP-07, TP-08).",
+      "affected_target_ids": ["TP-01", "TP-02", "TP-03", "TP-04", "TP-05", "TP-06", "TP-07", "TP-08"],
+      "confidence": "high"
+    },
+    {
+      "decision_id": "RC-002",
+      "source_finding_ids": ["RV-002", "RV-003"],
+      "decision": "accepted",
+      "reason": "Coverage metrics were inflated. Per-category totals claimed 100% coverage but only 44 trace links existed with many orphan features. overall_percent of 93% was inconsistent with per-category 100%. Recomputed using direct trace link analysis only. Effective coverage with module-cascade is approximately 65%.",
+      "applied_change": "Recomputed coverage.json with actual direct trace link counts. Updated covered_targets and total_targets to reflect true coverage. Added explicit orphan_targets list. Updated notes to document coverage methodology and gap.",
+      "affected_target_ids": ["coverage.json"],
+      "confidence": "high"
+    },
+    {
+      "decision_id": "RC-003",
+      "source_finding_ids": ["RV-004"],
+      "decision": "accepted",
+      "reason": "Goals G-01, G-02, G-03 lacked measurable baselines or quantitative targets, making them aspirational but not testable. Added current_baseline and target_metric fields with placeholder values pending stakeholder measurement.",
+      "applied_change": "Added 'current_baseline': 'pending_measurement' and 'target_metric' with descriptive placeholder text to G-01, G-02, G-03 in _meta.json goals array.",
+      "affected_target_ids": ["G-01", "G-02", "G-03"],
+      "confidence": "high"
+    },
+    {
+      "decision_id": "RC-004",
+      "source_finding_ids": ["RV-005"],
+      "decision": "accepted",
+      "reason": "System handles children's personal data but had no accessibility or compliance requirements. Added WCAG 2.1 AA NFR for accessibility and COPPA applicability assumption for regulatory awareness. COPPA implementation details parked as TP-06 for security phase.",
+      "applied_change": "Added NFR-07 (WCAG 2.1 Level AA accessibility) to non_functional_requirements. Added A-14 (COPPA applicability assumption with medium rewrite risk) to assumptions. Added TP-06 (COPPA compliance assessment) to technical_parking_lot. Added SP-04 (COPPA applicability spike) to spikes_required. Added TR-45 trace link for NFR-07.",
+      "affected_target_ids": ["NFR-07", "A-14", "TP-06", "SP-04"],
+      "confidence": "medium"
+    },
+    {
+      "decision_id": "RC-005",
+      "source_finding_ids": ["RV-006"],
+      "decision": "accepted",
+      "reason": "PRD defined enrollment creation and payment tracking but had no enrollment cancellation flow. This is a significant gap — admin will need to cancel enrollments in practice. Added business rule and open question to define cancellation behavior at PRD level. Implementation data flow parked as TP-07.",
+      "applied_change": "Added ET-BR-06 (enrollment cancellation business rule) to enrollment_trial module. Added OQ-06 (enrollment cancellation policy open question, high priority) to open_questions. Added TP-07 (enrollment cancellation data flow design) to technical_parking_lot. Added TR-46 trace link for ET-BR-06.",
+      "affected_target_ids": ["ET-BR-06", "OQ-06", "TP-07"],
+      "confidence": "high"
+    },
+    {
+      "decision_id": "RC-006",
+      "source_finding_ids": ["RV-009"],
+      "decision": "deferred",
+      "reason": "Low severity finding. Module delivery dependency chain would improve sprint planning but is not blocking. Cross-module handoffs already imply delivery order. Deferring to next review cycle or architecture phase where build order will be formally established.",
+      "applied_change": "No changes applied. Noted for architecture phase consideration.",
+      "affected_target_ids": [],
+      "confidence": "medium"
+    },
+    {
+      "decision_id": "RC-007",
+      "source_finding_ids": ["RV-007"],
+      "decision": "deferred",
+      "reason": "All 13 assumptions are AI-assumed with zero human confirmations. This is a valid concern but requires human action — the reconciliation agent cannot confirm assumptions on behalf of stakeholders. Flagged for priority human review with A-02 and A-12 identified as highest risk.",
+      "applied_change": "No changes to existing assumptions. Flagged in human_review_recommended for stakeholder action.",
+      "affected_target_ids": ["A-02", "A-12"],
+      "confidence": "high"
+    },
+    {
+      "decision_id": "RC-008",
+      "source_finding_ids": ["RV-008"],
+      "decision": "deferred",
+      "reason": "OQ-03 (enrollment approval step) is high priority and requires stakeholder decision. Cannot be resolved by the reconciliation agent. If answered differently from the proposed default, the enrollment module scope increases significantly. Flagged for priority stakeholder resolution.",
+      "applied_change": "No changes applied. Flagged in human_review_recommended for stakeholder decision.",
+      "affected_target_ids": ["OQ-03"],
+      "confidence": "high"
+    }
+  ],
+  "conflicts": [],
+  "post_merge_checks": {
+    "schema_valid": true,
+    "enum_consistency_valid": true,
+    "id_consistency_valid": true,
+    "traceability_coverage_valid": true,
+    "remaining_orphan_targets": [
+      "G-07",
+      "program_pricing",
+      "enrollment_trial",
+      "auth_accounts",
+      "settings",
+      "PP-FT-01",
+      "ET-FT-01",
+      "ET-FT-04",
+      "CS-FT-01",
+      "CS-FT-02",
+      "PT-FT-01",
+      "CM-FT-03",
+      "AD-FT-02",
+      "AA-FT-01",
+      "ST-FT-01",
+      "ST-FT-02",
+      "ST-FT-03",
+      "NFR-02",
+      "NFR-06"
+    ],
+    "remaining_open_questions": [
+      "OQ-01",
+      "OQ-02",
+      "OQ-03",
+      "OQ-04",
+      "OQ-05",
+      "OQ-06"
+    ]
+  },
+  "next_step": {
+    "decision": "proceed_next_phase",
+    "reason": "No critical findings. Both high findings (RV-001 schema key typing, RV-002 traceability inflation) have been resolved. Remaining medium findings are either accepted with changes applied (RV-004, RV-005, RV-006) or deferred to human review (RV-007, RV-008). Quality score improved from 76 to 82. spikes_required is non-empty (4 spikes) — recommend running Spike Validation Agent before contract/architecture phases. Human review of assumptions (especially A-02, A-12) and resolution of OQ-03 should happen before estimation.",
+    "requires_user_choice": false,
+    "suggested_prompt": "The reconciled PRD is ready. Before proceeding to contract or architecture phases, consider: (1) Run the Spike Validation Agent for SP-01 through SP-04. (2) Resolve OQ-03 (enrollment approval step) with stakeholders. (3) Conduct human review of assumptions A-02 and A-12."
+  },
+  "human_review_recommended": [
+    {
+      "item": "OQ-03: Enrollment approval step — instant vs admin-approved",
+      "reason": "High-priority open question that could add an approval queue screen and 3-4 requirements to the enrollment module if answered differently from the proposed default",
+      "risk": "high"
+    },
+    {
+      "item": "A-02: Parent-facing flows are public in MVP (no login)",
+      "reason": "Medium rewrite risk if rejected — would require adding authentication to parent flows before Phase 2",
+      "risk": "medium"
+    },
+    {
+      "item": "A-12: Enrollment capacity is per-program (not per-session)",
+      "reason": "Medium rewrite risk if changed to per-session — capacity logic, data model, and calendar scheduling would need restructuring",
+      "risk": "medium"
+    },
+    {
+      "item": "OQ-06: Enrollment cancellation policy",
+      "reason": "New high-priority open question added during reconciliation — cancellation behavior (capacity release, payment status, notifications) must be defined before implementation",
+      "risk": "medium"
+    },
+    {
+      "item": "Goal baselines (G-01, G-02, G-03)",
+      "reason": "current_baseline and target_metric fields added with placeholder values — stakeholder must provide actual measurement baselines for goals to be testable",
+      "risk": "low"
+    }
+  ],
+  "parked_technical_items": [
+    {
+      "item_id": "PT-001",
+      "source_finding_ids": ["RV-005"],
+      "title": "COPPA compliance assessment for children's data handling",
+      "detail": "System collects child name and age through parent-submitted forms. COPPA applicability depends on whether the operator is collecting data directly from children or from parents on their behalf. Legal assessment needed before implementation.",
+      "suggested_phase": "security",
+      "handoff_note": "Added as TP-06 in reconciled PRD technical_parking_lot. Also added as spike SP-04 and assumption A-14. Security phase should resolve COPPA applicability before launch."
+    },
+    {
+      "item_id": "PT-002",
+      "source_finding_ids": ["RV-006"],
+      "title": "Enrollment cancellation data flow design",
+      "detail": "When enrollment cancellation is defined at PRD level, the implementation needs to handle: enrollment status reversal, capacity counter decrement, payment status transition, lead status update, and cancellation notification trigger.",
+      "suggested_phase": "be",
+      "handoff_note": "Added as TP-07 in reconciled PRD. Business rule ET-BR-06 defines cancellation at PRD level. OQ-06 captures policy decisions. Backend phase should design the data flow once OQ-06 is resolved."
+    },
+    {
+      "item_id": "PT-003",
+      "source_finding_ids": [],
+      "title": "Real-time dashboard metric computation strategy",
+      "detail": "AD-BR-01 requires real-time metrics from current data. At scale, this may require materialized views, caching, or background aggregation. Strategy depends on tech stack selection.",
+      "suggested_phase": "be",
+      "handoff_note": "Added as TP-08 in reconciled PRD. Performance optimization decision deferred to backend implementation phase once tech stack is chosen."
+    }
+  ],
+  "spikes_required": [
+    {
+      "spike_id": "SP-01",
+      "source_review_report_ids": [],
+      "source_finding_ids": [],
+      "title": "Facebook Lead Forms webhook integration feasibility",
+      "reason": "Need to verify Facebook API access requirements, webhook setup complexity, and data format for auto-creating lead records",
+      "suggested_owner": "Backend Engineer",
+      "expected_outcome": "Confirmed integration approach and estimated implementation effort for Facebook Lead Forms",
+      "decision": "accepted"
+    },
+    {
+      "spike_id": "SP-02",
+      "source_review_report_ids": [],
+      "source_finding_ids": [],
+      "title": "Google Forms / Ads lead capture integration approach",
+      "reason": "Multiple integration paths exist (Sheets API, Zapier, direct webhook). Need to evaluate simplest reliable approach for the chosen tech stack.",
+      "suggested_owner": "Backend Engineer",
+      "expected_outcome": "Selected integration approach with rationale and effort estimate",
+      "decision": "accepted"
+    },
+    {
+      "spike_id": "SP-03",
+      "source_review_report_ids": [],
+      "source_finding_ids": [],
+      "title": "Email delivery service evaluation",
+      "reason": "Need to select an email service that supports templates, variable substitution, and scheduled sends within budget constraints",
+      "suggested_owner": "Backend Engineer / DevOps",
+      "expected_outcome": "Selected email service with feature comparison and cost analysis",
+      "decision": "accepted"
+    },
+    {
+      "spike_id": "SP-04",
+      "source_review_report_ids": ["review_output"],
+      "source_finding_ids": ["RV-005"],
+      "title": "COPPA applicability assessment for child data collection",
+      "reason": "System collects child names and ages. COPPA applies to operators of websites or online services directed at children under 13, or that knowingly collect data from children. Need legal/compliance review to determine if parental-proxy data entry exempts the system.",
+      "suggested_owner": "Product Owner / Legal",
+      "expected_outcome": "Clear determination of whether COPPA applies and what compliance measures (if any) are needed before launch",
+      "decision": "accepted"
+    }
+  ]
+}

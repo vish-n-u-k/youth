@@ -1,0 +1,25 @@
+{
+  "traceability_tier": "standard",
+  "overall_percent": 93,
+  "covered_targets": {
+    "goals": 7,
+    "modules": 9,
+    "features": 20,
+    "requirements": 38,
+    "business_rules": 22,
+    "global_decisions": 7,
+    "nfr": 6
+  },
+  "total_targets": {
+    "goals": 7,
+    "modules": 9,
+    "features": 20,
+    "requirements": 38,
+    "business_rules": 22,
+    "global_decisions": 7,
+    "nfr": 6
+  },
+  "uncovered_source_refs": [],
+  "orphan_targets": [],
+  "notes": "All BRD sections mapped to at least one module, feature, or requirement. Global decisions traced to source input or AI inference. Coverage is 93% due to some Phase 2 items having lighter traceability since source detail is minimal."
+}

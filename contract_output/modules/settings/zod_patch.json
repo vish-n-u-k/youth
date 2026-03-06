@@ -1,0 +1,20 @@
+{
+  "moduleId": "settings",
+  "contractVersion": "v1.0.0",
+  "schemas": [
+    {
+      "schemaId": "SettingsResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ locationId: z.string(), businessName: z.string(), address: z.string(), phone: z.string(), email: z.string().email(), websiteUrl: z.string().url().nullable(), zelleRecipientName: z.string(), zelleContactInfo: z.string(), zelleInstructions: z.string().nullable(), notifyNewLead: z.boolean(), notifyNewEnrollment: z.boolean(), notifyPaymentReceived: z.boolean() })",
+      "usedBy": ["getSettings", "updateSettings"]
+    },
+    {
+      "schemaId": "UpdateSettingsRequest",
+      "purpose": "request",
+      "targetFile": null,
+      "definition": "z.object({ businessName: z.string().min(1), address: z.string().min(1), phone: z.string().min(1), email: z.string().email(), websiteUrl: z.string().url().optional(), zelleRecipientName: z.string().min(1), zelleContactInfo: z.string().min(1), zelleInstructions: z.string().optional(), notifyNewLead: z.boolean(), notifyNewEnrollment: z.boolean(), notifyPaymentReceived: z.boolean() })",
+      "usedBy": ["updateSettings"]
+    }
+  ]
+}

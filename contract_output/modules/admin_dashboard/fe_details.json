@@ -1,0 +1,122 @@
+{
+  "moduleId": "admin_dashboard",
+  "contractVersion": "v1.0.0",
+  "status": "agreed",
+  "changeType": "none",
+  "globalBindings": {
+    "globalContractRef": "contract_output/global/fe_global_contract.json",
+    "inheritedDecisionIds": [
+      "nav.primary_model"
+    ],
+    "inheritedPolicyIds": [
+      "GP-05",
+      "GP-07",
+      "GP-08"
+    ],
+    "moduleOverrides": []
+  },
+  "screens": [
+    {
+      "screenId": "dashboard_overview",
+      "name": "Dashboard Overview",
+      "route": "/admin/dashboard",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "dataDisplayed": [
+        {
+          "field": "metrics",
+          "source": "api",
+          "schemaRef": "zod://DashboardMetricsResponse"
+        },
+        {
+          "field": "recentLeads",
+          "source": "api",
+          "schemaRef": "zod://DashboardRecentLeadsResponse"
+        },
+        {
+          "field": "upcomingTrials",
+          "source": "api",
+          "schemaRef": "zod://DashboardUpcomingTrialsResponse"
+        },
+        {
+          "field": "pendingPayments",
+          "source": "api",
+          "schemaRef": "zod://DashboardPendingPaymentsResponse"
+        }
+      ],
+      "dataCaptured": [],
+      "interactions": [
+        "Click metric card for quick navigation to relevant module",
+        "Click recent lead to open lead detail",
+        "Click upcoming trial to open lead detail",
+        "Click pending payment to open payment detail"
+      ],
+      "states": {
+        "loading": "Loading dashboard...",
+        "empty": "Welcome! Your dashboard will populate as you add programs and capture leads.",
+        "error": "Failed to load dashboard. Please refresh."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "getDashboardMetrics",
+          "method": "GET",
+          "path": "/api/dashboard/metrics",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://DashboardMetricsResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "getDashboardRecentLeads",
+          "method": "GET",
+          "path": "/api/dashboard/recent-leads",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://DashboardRecentLeadsResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "getDashboardUpcomingTrials",
+          "method": "GET",
+          "path": "/api/dashboard/upcoming-trials",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://DashboardUpcomingTrialsResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "getDashboardPendingPayments",
+          "method": "GET",
+          "path": "/api/dashboard/pending-payments",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://DashboardPendingPaymentsResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "AD-A-01",
+      "text": "All dashboard metrics are computed real-time from current data on page load; no pre-aggregation",
+      "severity": "low",
+      "state": "open",
+      "assumptionSource": "ai_assumed",
+      "approvalState": "pending_human_review",
+      "rewriteRisk": "low",
+      "isolationRecommended": false,
+      "isolationNote": "",
+      "sourceRef": "analysis_output/assumptions.json#id=A-08"
+    },
+    {
+      "id": "AD-A-02",
+      "text": "Dashboard is the default post-login landing page for admin",
+      "severity": "low",
+      "state": "confirmed",
+      "assumptionSource": "ai_assumed",
+      "approvalState": "user_approved",
+      "rewriteRisk": "low",
+      "isolationRecommended": false,
+      "isolationNote": "",
+      "sourceRef": "analysis_output/modules/admin_dashboard.json"
+    }
+  ]
+}

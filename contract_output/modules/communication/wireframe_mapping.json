@@ -1,0 +1,157 @@
+{
+  "moduleId": "communication",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "template_manager",
+      "template": "list",
+      "widgets": [
+        {
+          "widgetId": "cm-w-01",
+          "type": "tabs",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Templates | Automations | Log tabs"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "cm-w-02",
+          "type": "header",
+          "bind": {
+            "kind": "custom",
+            "ref": "Email Templates heading + Create Template button"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "cm-w-03",
+          "type": "table",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "templates (name, subject, trigger, default status, last updated)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "cm-w-04",
+          "type": "modal_placeholder",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Template editor modal (name, subject, body with variable insertion)"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "Edit template",
+      "primaryActionTarget": null,
+      "sourceRefs": [
+        "fe_details://screens/template_manager"
+      ]
+    },
+    {
+      "screenId": "automation_rules",
+      "template": "list",
+      "widgets": [
+        {
+          "widgetId": "cm-w-05",
+          "type": "tabs",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Templates | Automations | Log tabs"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "cm-w-06",
+          "type": "header",
+          "bind": {
+            "kind": "custom",
+            "ref": "Automation Rules heading"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "cm-w-07",
+          "type": "table",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "automations (trigger, template, timing, enabled toggle)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "cm-w-08",
+          "type": "custom:toggle",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Enable/disable automation"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "Edit automation rule",
+      "primaryActionTarget": null,
+      "sourceRefs": [
+        "fe_details://screens/automation_rules"
+      ]
+    },
+    {
+      "screenId": "communications_log",
+      "template": "list",
+      "widgets": [
+        {
+          "widgetId": "cm-w-09",
+          "type": "tabs",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Templates | Automations | Log tabs"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "cm-w-10",
+          "type": "header",
+          "bind": {
+            "kind": "custom",
+            "ref": "Communications Log heading"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "cm-w-11",
+          "type": "custom:filter_bar",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Filter by status, trigger event, search by recipient"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "cm-w-12",
+          "type": "table",
+          "bind": {
+            "kind": "dataDisplayed",
+            "ref": "log entries (recipient, subject, template, trigger, status, sent time)"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "cm-w-13",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Retry failed email"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "View communications",
+      "primaryActionTarget": null,
+      "sourceRefs": [
+        "fe_details://screens/communications_log",
+        "navigation_graph://edges/cm-e-04"
+      ]
+    }
+  ]
+}

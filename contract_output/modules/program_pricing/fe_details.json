@@ -1,0 +1,306 @@
+{
+  "moduleId": "program_pricing",
+  "contractVersion": "v1.0.0",
+  "status": "agreed",
+  "changeType": "none",
+  "globalBindings": {
+    "globalContractRef": "contract_output/global/fe_global_contract.json",
+    "inheritedDecisionIds": [
+      "nav.primary_model",
+      "payment.offline_only_mvp"
+    ],
+    "inheritedPolicyIds": [
+      "GP-01",
+      "GP-05",
+      "GP-07",
+      "GP-08"
+    ],
+    "moduleOverrides": []
+  },
+  "screens": [
+    {
+      "screenId": "program_list",
+      "name": "Program List",
+      "route": "/admin/programs",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "dataDisplayed": [
+        {
+          "field": "programs",
+          "source": "api",
+          "schemaRef": "zod://ProgramListResponse"
+        }
+      ],
+      "dataCaptured": [],
+      "interactions": [
+        "Click program to edit",
+        "Create new program",
+        "Filter by status (draft/active/closed)"
+      ],
+      "states": {
+        "loading": "Loading programs...",
+        "empty": "No programs created yet. Click 'Create Program' to get started.",
+        "error": "Failed to load programs. Please refresh."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "getPrograms",
+          "method": "GET",
+          "path": "/api/programs",
+          "requestSchemaRef": "zod://ProgramListQuery",
+          "responseSchemaRef": "zod://ProgramListResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    },
+    {
+      "screenId": "program_setup",
+      "name": "Program Setup / Edit",
+      "route": "/admin/programs/:programId",
+      "type": "input_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "dataDisplayed": [
+        {
+          "field": "program",
+          "source": "api",
+          "schemaRef": "zod://ProgramResponse"
+        }
+      ],
+      "dataCaptured": [
+        {
+          "field": "name",
+          "required": true,
+          "schemaRef": "zod://ProgramRequest"
+        },
+        {
+          "field": "ageGroupMin",
+          "required": true,
+          "schemaRef": "zod://ProgramRequest"
+        },
+        {
+          "field": "ageGroupMax",
+          "required": true,
+          "schemaRef": "zod://ProgramRequest"
+        },
+        {
+          "field": "totalSessions",
+          "required": true,
+          "schemaRef": "zod://ProgramRequest"
+        },
+        {
+          "field": "sessionDuration",
+          "required": true,
+          "schemaRef": "zod://ProgramRequest"
+        },
+        {
+          "field": "location",
+          "required": true,
+          "schemaRef": "zod://ProgramRequest"
+        },
+        {
+          "field": "startDate",
+          "required": true,
+          "schemaRef": "zod://ProgramRequest"
+        },
+        {
+          "field": "endDate",
+          "required": true,
+          "schemaRef": "zod://ProgramRequest"
+        },
+        {
+          "field": "capacity",
+          "required": true,
+          "schemaRef": "zod://ProgramRequest"
+        },
+        {
+          "field": "status",
+          "required": true,
+          "schemaRef": "zod://ProgramRequest"
+        },
+        {
+          "field": "baseFee",
+          "required": true,
+          "schemaRef": "zod://ProgramRequest"
+        },
+        {
+          "field": "feeType",
+          "required": true,
+          "schemaRef": "zod://ProgramRequest"
+        },
+        {
+          "field": "registrationFee",
+          "required": false,
+          "schemaRef": "zod://ProgramRequest"
+        },
+        {
+          "field": "registrationFeeRequired",
+          "required": true,
+          "schemaRef": "zod://ProgramRequest"
+        },
+        {
+          "field": "trialAvailable",
+          "required": true,
+          "schemaRef": "zod://ProgramRequest"
+        }
+      ],
+      "interactions": [
+        "Save program",
+        "Toggle registration fee required/waived",
+        "Set fee type (total or per-session)",
+        "Set program status (draft/active/closed)",
+        "Navigate back to program list"
+      ],
+      "states": {
+        "loading": "Loading program...",
+        "empty": "N/A",
+        "error": "Failed to save program. Please try again."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "getProgram",
+          "method": "GET",
+          "path": "/api/programs/:programId",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://ProgramResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "createProgram",
+          "method": "POST",
+          "path": "/api/programs",
+          "requestSchemaRef": "zod://ProgramRequest",
+          "responseSchemaRef": "zod://ProgramResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "updateProgram",
+          "method": "PUT",
+          "path": "/api/programs/:programId",
+          "requestSchemaRef": "zod://ProgramRequest",
+          "responseSchemaRef": "zod://ProgramResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    },
+    {
+      "screenId": "coupon_management",
+      "name": "Coupon Management",
+      "route": "/admin/programs/coupons",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "dataDisplayed": [
+        {
+          "field": "coupons",
+          "source": "api",
+          "schemaRef": "zod://CouponListResponse"
+        }
+      ],
+      "dataCaptured": [
+        {
+          "field": "code",
+          "required": true,
+          "schemaRef": "zod://CouponRequest"
+        },
+        {
+          "field": "discountType",
+          "required": true,
+          "schemaRef": "zod://CouponRequest"
+        },
+        {
+          "field": "discountValue",
+          "required": true,
+          "schemaRef": "zod://CouponRequest"
+        },
+        {
+          "field": "scope",
+          "required": true,
+          "schemaRef": "zod://CouponRequest"
+        },
+        {
+          "field": "expiresAt",
+          "required": false,
+          "schemaRef": "zod://CouponRequest"
+        },
+        {
+          "field": "usageLimit",
+          "required": false,
+          "schemaRef": "zod://CouponRequest"
+        }
+      ],
+      "interactions": [
+        "Create coupon",
+        "Edit coupon",
+        "Delete coupon",
+        "Navigate back to program list"
+      ],
+      "states": {
+        "loading": "Loading coupons...",
+        "empty": "No coupons created yet. Create one to offer discounts.",
+        "error": "Failed to load coupons. Please refresh."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "getCoupons",
+          "method": "GET",
+          "path": "/api/coupons",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://CouponListResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "createCoupon",
+          "method": "POST",
+          "path": "/api/coupons",
+          "requestSchemaRef": "zod://CouponRequest",
+          "responseSchemaRef": "zod://CouponResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "updateCoupon",
+          "method": "PUT",
+          "path": "/api/coupons/:couponId",
+          "requestSchemaRef": "zod://CouponRequest",
+          "responseSchemaRef": "zod://CouponResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "deleteCoupon",
+          "method": "DELETE",
+          "path": "/api/coupons/:couponId",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://DeleteResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "PP-A-01",
+      "text": "Coupons are admin-created only; no self-serve coupon creation; optional expiry and usage limits",
+      "severity": "low",
+      "state": "open",
+      "assumptionSource": "ai_assumed",
+      "approvalState": "pending_human_review",
+      "rewriteRisk": "low",
+      "isolationRecommended": false,
+      "isolationNote": "",
+      "sourceRef": "analysis_output/assumptions.json#id=A-06"
+    },
+    {
+      "id": "PP-A-02",
+      "text": "Enrollment capacity is per-program (not per-session); may need to be configurable later",
+      "severity": "medium",
+      "state": "open",
+      "assumptionSource": "ai_assumed",
+      "approvalState": "pending_human_review",
+      "rewriteRisk": "medium",
+      "isolationRecommended": true,
+      "isolationNote": "Keep capacity as a configurable field so it can be changed to per-session later without schema rewrite",
+      "sourceRef": "analysis_output/assumptions.json#id=A-12"
+    }
+  ]
+}

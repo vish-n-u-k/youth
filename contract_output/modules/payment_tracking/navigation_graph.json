@@ -1,0 +1,45 @@
+{
+  "moduleId": "payment_tracking",
+  "contractVersion": "v1.0.0",
+  "edges": [
+    {
+      "edgeId": "pt-e-01",
+      "fromScreenId": "payment_dashboard",
+      "trigger": {
+        "type": "click",
+        "sourceId": "paymentRow",
+        "event": "Open payment detail"
+      },
+      "toScreenId": "payment_detail",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/payment_dashboard/interactions/1"
+    },
+    {
+      "edgeId": "pt-e-02",
+      "fromScreenId": "payment_detail",
+      "trigger": {
+        "type": "submit",
+        "sourceId": "paymentUpdateForm",
+        "event": "Payment updated"
+      },
+      "toScreenId": null,
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/payment_detail/interactions/0"
+    },
+    {
+      "edgeId": "pt-e-03",
+      "fromScreenId": "payment_detail",
+      "trigger": {
+        "type": "click",
+        "sourceId": "backToDashboard",
+        "event": "Navigate back to payment dashboard"
+      },
+      "toScreenId": "payment_dashboard",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/payment_detail/interactions/3"
+    }
+  ]
+}

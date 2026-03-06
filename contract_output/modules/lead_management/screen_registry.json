@@ -1,0 +1,26 @@
+{
+  "moduleId": "lead_management",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "lead_list",
+      "name": "Lead List",
+      "route": "/admin/leads",
+      "entry": true,
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "visibilityCondition": null,
+      "sourceRef": "fe_details://screens/lead_list"
+    },
+    {
+      "screenId": "lead_detail",
+      "name": "Lead Detail",
+      "route": "/admin/leads/:leadId",
+      "entry": false,
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "visibilityCondition": null,
+      "sourceRef": "fe_details://screens/lead_detail"
+    }
+  ]
+}

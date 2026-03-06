@@ -1,0 +1,204 @@
+{
+  "moduleId": "auth_accounts",
+  "contractVersion": "v1.0.0",
+  "screens": [
+    {
+      "screenId": "admin_login",
+      "template": "form",
+      "widgets": [
+        {
+          "widgetId": "auth-w-01",
+          "type": "header",
+          "bind": {
+            "kind": "custom",
+            "ref": "App branding / title"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "auth-w-02",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "email"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "auth-w-03",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "password"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "auth-w-04",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Submit login form"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "auth-w-05",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Navigate to forgot password"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "auth-w-06",
+          "type": "alert",
+          "bind": {
+            "kind": "state",
+            "ref": "error"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "Submit login form",
+      "primaryActionTarget": "admin_dashboard:dashboard_overview",
+      "sourceRefs": [
+        "fe_details://screens/admin_login",
+        "navigation_graph://edges/auth-e-01"
+      ]
+    },
+    {
+      "screenId": "password_reset_request",
+      "template": "form",
+      "widgets": [
+        {
+          "widgetId": "auth-w-07",
+          "type": "header",
+          "bind": {
+            "kind": "custom",
+            "ref": "Reset Password heading"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "auth-w-08",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "email"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "auth-w-09",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Submit reset request"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "auth-w-10",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Navigate back to login"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "auth-w-11",
+          "type": "alert",
+          "bind": {
+            "kind": "state",
+            "ref": "success"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "auth-w-12",
+          "type": "alert",
+          "bind": {
+            "kind": "state",
+            "ref": "error"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "Submit reset request",
+      "primaryActionTarget": null,
+      "sourceRefs": [
+        "fe_details://screens/password_reset_request",
+        "navigation_graph://edges/auth-e-03"
+      ]
+    },
+    {
+      "screenId": "set_new_password",
+      "template": "form",
+      "widgets": [
+        {
+          "widgetId": "auth-w-13",
+          "type": "header",
+          "bind": {
+            "kind": "custom",
+            "ref": "Set New Password heading"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "auth-w-14",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "newPassword"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "auth-w-15",
+          "type": "field",
+          "bind": {
+            "kind": "dataCaptured",
+            "ref": "confirmPassword"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "auth-w-16",
+          "type": "button",
+          "bind": {
+            "kind": "interaction",
+            "ref": "Submit new password"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "auth-w-17",
+          "type": "alert",
+          "bind": {
+            "kind": "state",
+            "ref": "success"
+          },
+          "required": true
+        },
+        {
+          "widgetId": "auth-w-18",
+          "type": "alert",
+          "bind": {
+            "kind": "state",
+            "ref": "error"
+          },
+          "required": true
+        }
+      ],
+      "primaryAction": "Submit new password",
+      "primaryActionTarget": "admin_login",
+      "sourceRefs": [
+        "fe_details://screens/set_new_password",
+        "navigation_graph://edges/auth-e-05"
+      ]
+    }
+  ]
+}

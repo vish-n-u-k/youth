@@ -1,0 +1,58 @@
+{
+  "moduleId": "lead_management",
+  "contractVersion": "v1.0.0",
+  "edges": [
+    {
+      "edgeId": "lm-e-01",
+      "fromScreenId": "lead_list",
+      "trigger": {
+        "type": "click",
+        "sourceId": "leadCard",
+        "event": "Open lead detail"
+      },
+      "toScreenId": "lead_detail",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/lead_list/interactions/5"
+    },
+    {
+      "edgeId": "lm-e-02",
+      "fromScreenId": "lead_detail",
+      "trigger": {
+        "type": "click",
+        "sourceId": "sendTrialLinkButton",
+        "event": "Send trial booking link to parent"
+      },
+      "toScreenId": null,
+      "condition": "Lead has valid email",
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/lead_detail/interactions/4"
+    },
+    {
+      "edgeId": "lm-e-03",
+      "fromScreenId": "lead_detail",
+      "trigger": {
+        "type": "click",
+        "sourceId": "backToListLink",
+        "event": "Navigate back to lead list"
+      },
+      "toScreenId": "lead_list",
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/lead_detail/interactions/5"
+    },
+    {
+      "edgeId": "lm-e-04",
+      "fromScreenId": "lead_list",
+      "trigger": {
+        "type": "custom",
+        "sourceId": "kanbanDrag",
+        "event": "Drag lead card to new status column"
+      },
+      "toScreenId": null,
+      "condition": null,
+      "failureTo": null,
+      "sourceRef": "fe_details://screens/lead_list/interactions/4"
+    }
+  ]
+}

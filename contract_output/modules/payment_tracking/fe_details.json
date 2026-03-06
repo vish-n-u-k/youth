@@ -1,0 +1,185 @@
+{
+  "moduleId": "payment_tracking",
+  "contractVersion": "v1.0.0",
+  "status": "agreed",
+  "changeType": "none",
+  "globalBindings": {
+    "globalContractRef": "contract_output/global/fe_global_contract.json",
+    "inheritedDecisionIds": [
+      "nav.primary_model",
+      "payment.offline_only_mvp"
+    ],
+    "inheritedPolicyIds": [
+      "GP-05",
+      "GP-06",
+      "GP-07",
+      "GP-08"
+    ],
+    "moduleOverrides": []
+  },
+  "screens": [
+    {
+      "screenId": "payment_dashboard",
+      "name": "Payment Dashboard",
+      "route": "/admin/payments",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "dataDisplayed": [
+        {
+          "field": "payments",
+          "source": "api",
+          "schemaRef": "zod://PaymentListResponse"
+        }
+      ],
+      "dataCaptured": [],
+      "interactions": [
+        "Filter by payment status (pending/paid/partial/waived)",
+        "Click payment row to open detail",
+        "Search by parent or child name"
+      ],
+      "states": {
+        "loading": "Loading payments...",
+        "empty": "No payments to track yet. Payments will appear here after enrollments.",
+        "error": "Failed to load payments. Please refresh."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "getPayments",
+          "method": "GET",
+          "path": "/api/payments",
+          "requestSchemaRef": "zod://PaymentListQuery",
+          "responseSchemaRef": "zod://PaymentListResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    },
+    {
+      "screenId": "payment_detail",
+      "name": "Payment Detail",
+      "route": "/admin/payments/:paymentId",
+      "type": "api_driven",
+      "authRequired": true,
+      "allowedRoles": ["admin"],
+      "dataDisplayed": [
+        {
+          "field": "payment",
+          "source": "api",
+          "schemaRef": "zod://PaymentDetailResponse"
+        }
+      ],
+      "dataCaptured": [
+        {
+          "field": "status",
+          "required": true,
+          "schemaRef": "zod://UpdatePaymentRequest"
+        },
+        {
+          "field": "amountReceived",
+          "required": true,
+          "schemaRef": "zod://UpdatePaymentRequest"
+        },
+        {
+          "field": "paymentMethod",
+          "required": false,
+          "schemaRef": "zod://UpdatePaymentRequest"
+        },
+        {
+          "field": "notes",
+          "required": false,
+          "schemaRef": "zod://UpdatePaymentRequest"
+        }
+      ],
+      "interactions": [
+        "Update payment status",
+        "Record amount received",
+        "Add payment notes",
+        "Navigate back to payment dashboard"
+      ],
+      "states": {
+        "loading": "Loading payment details...",
+        "empty": "N/A",
+        "error": "Failed to load payment details. Please try again."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "getPayment",
+          "method": "GET",
+          "path": "/api/payments/:paymentId",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://PaymentDetailResponse",
+          "errorSchemaRef": "zod://ApiError"
+        },
+        {
+          "operationId": "updatePayment",
+          "method": "PUT",
+          "path": "/api/payments/:paymentId",
+          "requestSchemaRef": "zod://UpdatePaymentRequest",
+          "responseSchemaRef": "zod://PaymentDetailResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    },
+    {
+      "screenId": "zelle_instructions",
+      "name": "Zelle Payment Instructions",
+      "route": "/enrollment/:enrollmentId/pay",
+      "type": "api_driven",
+      "authRequired": false,
+      "allowedRoles": ["parent"],
+      "dataDisplayed": [
+        {
+          "field": "zelleInstructions",
+          "source": "api",
+          "schemaRef": "zod://ZelleInstructionsResponse"
+        }
+      ],
+      "dataCaptured": [],
+      "interactions": [
+        "Copy Zelle details to clipboard",
+        "Navigate back to programs"
+      ],
+      "states": {
+        "loading": "Loading payment instructions...",
+        "empty": "N/A",
+        "error": "Unable to load payment instructions. Please contact us."
+      },
+      "endpointProposals": [
+        {
+          "operationId": "getZelleInstructions",
+          "method": "GET",
+          "path": "/api/public/enrollments/:enrollmentId/payment-instructions",
+          "requestSchemaRef": null,
+          "responseSchemaRef": "zod://ZelleInstructionsResponse",
+          "errorSchemaRef": "zod://ApiError"
+        }
+      ]
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "PT-A-01",
+      "text": "Payment overdue threshold is admin-configurable; default is 3 days after enrollment",
+      "severity": "low",
+      "state": "open",
+      "assumptionSource": "ai_assumed",
+      "approvalState": "pending_human_review",
+      "rewriteRisk": "low",
+      "isolationRecommended": false,
+      "isolationNote": "",
+      "sourceRef": "analysis_output/assumptions.json#id=A-07"
+    },
+    {
+      "id": "PT-A-02",
+      "text": "Partial payments tracked manually by admin; no automated installment schedules in MVP",
+      "severity": "low",
+      "state": "open",
+      "assumptionSource": "ai_assumed",
+      "approvalState": "pending_human_review",
+      "rewriteRisk": "low",
+      "isolationRecommended": false,
+      "isolationNote": "",
+      "sourceRef": "analysis_output/assumptions.json#id=A-13"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "moduleId": "enrollment_trial",
+  "contractVersion": "v1.0.0",
+  "schemas": [
+    {
+      "schemaId": "PublicProgramListResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ programs: z.array(z.object({ programId: z.string(), name: z.string(), ageGroupMin: z.number(), ageGroupMax: z.number(), schedule: z.string(), totalFee: z.number(), trialAvailable: z.boolean(), isFull: z.boolean(), enrollmentOpen: z.boolean() })) })",
+      "usedBy": ["getPublicPrograms"]
+    },
+    {
+      "schemaId": "PublicProgramResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ programId: z.string(), name: z.string(), ageGroupMin: z.number(), ageGroupMax: z.number(), totalSessions: z.number(), sessionDuration: z.number(), location: z.string(), startDate: z.string().datetime(), endDate: z.string().datetime(), totalFee: z.number(), registrationFee: z.number().nullable(), registrationFeeRequired: z.boolean(), trialAvailable: z.boolean(), isFull: z.boolean(), enrollmentOpen: z.boolean() })",
+      "usedBy": ["getPublicProgram", "trial_booking_form", "enrollment_form"]
+    },
+    {
+      "schemaId": "TrialBookingRequest",
+      "purpose": "request",
+      "targetFile": null,
+      "definition": "z.object({ programId: z.string(), parentName: z.string().min(1), email: z.string().email(), phone: z.string().min(1), childName: z.string().min(1), childAge: z.number().int().min(0).max(18), trialDateId: z.string() })",
+      "usedBy": ["bookTrial"]
+    },
+    {
+      "schemaId": "TrialBookingResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ trialId: z.string(), programName: z.string(), trialDate: z.string().datetime(), parentName: z.string(), childName: z.string(), confirmationEmailSent: z.boolean(), message: z.string() })",
+      "usedBy": ["bookTrial"]
+    },
+    {
+      "schemaId": "PriceBreakdownRequest",
+      "purpose": "request",
+      "targetFile": null,
+      "definition": "z.object({ couponCode: z.string().optional() })",
+      "usedBy": ["getPriceBreakdown"]
+    },
+    {
+      "schemaId": "PriceBreakdownResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ programFee: z.number(), registrationFee: z.number().nullable(), couponDiscount: z.number(), couponAppliedTo: z.enum(['program_fee','registration_fee','both']).nullable(), totalDue: z.number(), breakdown: z.array(z.object({ label: z.string(), amount: z.number() })) })",
+      "usedBy": ["getPriceBreakdown"]
+    },
+    {
+      "schemaId": "EnrollmentRequest",
+      "purpose": "request",
+      "targetFile": null,
+      "definition": "z.object({ programId: z.string(), parentName: z.string().min(1), email: z.string().email(), phone: z.string().min(1), childName: z.string().min(1), childAge: z.number().int().min(0).max(18), couponCode: z.string().optional() })",
+      "usedBy": ["submitEnrollment"]
+    },
+    {
+      "schemaId": "EnrollmentResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ enrollmentId: z.string(), programName: z.string(), parentName: z.string(), childName: z.string(), totalDue: z.number(), paymentStatus: z.literal('pending'), confirmationEmailSent: z.boolean() })",
+      "usedBy": ["submitEnrollment"]
+    },
+    {
+      "schemaId": "EnrollmentConfirmationResponse",
+      "purpose": "response",
+      "targetFile": null,
+      "definition": "z.object({ enrollmentId: z.string(), programName: z.string(), parentName: z.string(), childName: z.string(), childAge: z.number(), schedule: z.string(), location: z.string(), totalDue: z.number(), priceBreakdown: z.array(z.object({ label: z.string(), amount: z.number() })), paymentStatus: z.string(), zelleInstructions: z.object({ recipientName: z.string(), contactInfo: z.string(), amount: z.number(), referenceNote: z.string(), customInstructions: z.string().nullable() }) })",
+      "usedBy": ["getEnrollmentConfirmation"]
+    }
+  ]
+}
