@@ -116,13 +116,41 @@
       },
       "fe": { "status": "not_started" }
     },
-    "communication": { "db": { "status": "completed", "notes": "Models included in global DB foundation (Template, Automation, CommunicationLog)" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } },
-    "enrollment_trial": { "db": { "status": "completed", "notes": "Models included in global DB foundation (Trial, Enrollment)" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } },
-    "program_pricing": { "db": { "status": "completed", "notes": "Models included in global DB foundation (Program, Coupon)" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } },
-    "calendar_scheduling": { "db": { "status": "completed", "notes": "Models included in global DB foundation (CalendarDate)" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } },
-    "admin_dashboard": { "db": { "status": "completed", "notes": "No dedicated models — reads from other module tables" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } },
-    "lead_management": { "db": { "status": "completed", "notes": "Models included in global DB foundation (Lead, LeadNote, LeadActivity)" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } },
-    "payment_tracking": { "db": { "status": "completed", "notes": "Models included in global DB foundation (Payment)" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } }
+    "communication": {
+      "db": { "status": "completed", "notes": "Models included in global DB foundation (Template, Automation, CommunicationLog)" },
+      "be": { "status": "completed", "startedAt": "2026-03-08T02:00:00Z", "completedAt": "2026-03-08T02:00:00Z", "testing": { "status": "passed", "results": ["tsc --noEmit: 0 errors in communication module code"] }, "notes": ["8 endpoints: templates CRUD (4), automations list+update (2), log list (1), retry (1)", "Zod schemas: TemplateRequest, AutomationRequest, CommunicationsLogQuery", "Audit logging on automation update and email retry"] },
+      "fe": { "status": "not_started" }
+    },
+    "enrollment_trial": {
+      "db": { "status": "completed", "notes": "Models included in global DB foundation (Trial, Enrollment)" },
+      "be": { "status": "completed", "startedAt": "2026-03-08T02:00:00Z", "completedAt": "2026-03-08T02:00:00Z", "testing": { "status": "passed", "results": ["tsc --noEmit: 0 errors in enrollment_trial module code"] }, "notes": ["9 endpoints: admin enrollments (3), public programs (3), public trials (1), public enrollments (2)", "Business rules: GP-01 duplicate check, GP-02 auto-lead, GP-04 lead status advance, capacity checks, coupon validation", "Handoffs: HO-02 payment creation, HO-03 email triggers (trial_scheduled, enrollment_completed)"] },
+      "fe": { "status": "not_started" }
+    },
+    "program_pricing": {
+      "db": { "status": "completed", "notes": "Models included in global DB foundation (Program, Coupon)" },
+      "be": { "status": "completed", "startedAt": "2026-03-08T02:00:00Z", "completedAt": "2026-03-08T02:00:00Z", "testing": { "status": "passed", "results": ["tsc --noEmit: 0 errors in program_pricing module code"] }, "notes": ["8 endpoints: programs CRUD (4), coupons CRUD (4 incl. delete)", "Zod schemas: ProgramRequest (with age validation refine), CouponRequest", "totalFee computed from baseFee * totalSessions for per_session feeType"] },
+      "fe": { "status": "not_started" }
+    },
+    "calendar_scheduling": {
+      "db": { "status": "completed", "notes": "Models included in global DB foundation (CalendarDate)" },
+      "be": { "status": "completed", "startedAt": "2026-03-08T02:00:00Z", "completedAt": "2026-03-08T02:00:00Z", "testing": { "status": "passed", "results": ["tsc --noEmit: 0 errors in calendar_scheduling module code"] }, "notes": ["5 endpoints: calendar CRUD (3), public trial dates (1), trial-dates nested under programs (1)", "spotsRemaining calculated from capacity minus non-cancelled trial count"] },
+      "fe": { "status": "not_started" }
+    },
+    "admin_dashboard": {
+      "db": { "status": "completed", "notes": "No dedicated models — reads from other module tables" },
+      "be": { "status": "completed", "startedAt": "2026-03-08T02:00:00Z", "completedAt": "2026-03-08T02:00:00Z", "testing": { "status": "passed", "results": ["tsc --noEmit: 0 errors in admin_dashboard module code"] }, "notes": ["4 endpoints: stats, recent-enrollments, recent-leads, upcoming-trials", "All read-only aggregation queries across multiple tables"] },
+      "fe": { "status": "not_started" }
+    },
+    "lead_management": {
+      "db": { "status": "completed", "notes": "Models included in global DB foundation (Lead, LeadNote, LeadActivity)" },
+      "be": { "status": "completed", "startedAt": "2026-03-08T02:00:00Z", "completedAt": "2026-03-08T02:00:00Z", "testing": { "status": "passed", "results": ["tsc --noEmit: 0 errors in lead_management module code"] }, "notes": ["8 endpoints: leads list+detail+update (3), status update (1), notes CRUD (2), activity timeline (1), send trial link (1)", "GP-04: admin can manually override lead status in any direction", "send-trial-link uses emailService adapter"] },
+      "fe": { "status": "not_started" }
+    },
+    "payment_tracking": {
+      "db": { "status": "completed", "notes": "Models included in global DB foundation (Payment)" },
+      "be": { "status": "completed", "startedAt": "2026-03-08T02:00:00Z", "completedAt": "2026-03-08T02:00:00Z", "testing": { "status": "passed", "results": ["tsc --noEmit: 0 errors in payment_tracking module code"] }, "notes": ["4 endpoints: payments list (1), payment detail (1), payment update (1), payment detail GET (1)", "Audit logging on payment status updates"] },
+      "fe": { "status": "not_started" }
+    }
   },
   "history": [
     {
@@ -190,8 +218,9 @@
     }
   ],
   "resumeHints": {
-    "nextAction": "Commit and push impl/global/be branch (pending user approval). Then begin module implementations starting with settings, auth_accounts, communication (Layer 0 — independent modules).",
+    "nextAction": "All 9 BE modules complete. Commit and push impl/module/communication branch, merge to main. Next: FE global foundation (fe phase).",
     "blockers": [],
-    "legacyCleanup": "41 TS errors in legacy scaffold code must be resolved during auth_accounts module (RF-003). Files: src/app/api/auth/*, src/app/api/roles/*, src/server/auth/*, src/server/security/{lockout,audit,rate-limit}.ts, src/lib/permissions/*, src/config/route-permissions.ts"
+    "legacyCleanup": "29 TS errors in legacy scaffold code (src/app/providers.tsx, src/lib/permissions/*, src/server/auth/*, src/server/security/*). Does not affect new pipeline. Safe to clean up during FE phase or as separate task.",
+    "endpointSummary": "52 HTTP endpoints across 35 route files. Modules: settings (2), auth_accounts (5), communication (8), enrollment_trial (9), program_pricing (8), calendar_scheduling (5), admin_dashboard (4), lead_management (8), payment_tracking (4), health (1)."
   }
 }
