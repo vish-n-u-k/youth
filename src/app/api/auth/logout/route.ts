@@ -1,74 +1,42 @@
+/**
+ * @purpose Admin logout endpoint
+ * @inputs  Authenticated admin session (cookie)
+ * @outputs { message: "Logged out successfully" } + cleared session cookie
+ * @sideEffects Session DELETE, AuditLog CREATE (logout)
+ * @errors  401 (unauthenticated)
+ * @idempotency Safe to call multiple times — missing session is not an error
+ */
 import { NextResponse } from 'next/server';
+import {
+  createHandler,
+  authSession,
+  auditAction,
+} from '@/server/middleware';
+import { logout, getSessionCookieConfig } from '@/server/services/authService';
 
-import { withAuth, type AuthenticatedRequest } from '@/server/auth';
-import { db } from '@/server/db';
-import { auditLog } from '@/server/security';
-
-async function handler(request: AuthenticatedRequest): Promise<NextResponse> {
-  try {
-    // Get token from cookie or header
-    const token =
-      request.cookies.get('session')?.value ??
-      request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
-
-    // Delete session from database
-    if (token) {
-      await db.session.deleteMany({
-        where: { token },
-      });
+export const POST = createHandler({
+  middleware: [
+    authSession,
+    auditAction({ action: 'admin_logout', security: true }),
+  ],
+  handler: async (req) => {
+    const sessionId = req.cookies.get('session')?.value;
+    if (sessionId) {
+      await logout(sessionId);
     }
 
-    // Log logout event
-    const ip = getClientIp(request);
-    const userAgent = request.headers.get('user-agent') ?? undefined;
-
-    await auditLog({
-      event: 'LOGOUT',
-      userId: request.auth?.userId,
-      email: request.auth?.email,
-      ip,
-      userAgent,
-    });
-
-    // Clear cookie
-    const response = NextResponse.json({
-      success: true,
-      message: 'Logged out successfully',
-    });
-
-    response.cookies.set('session', '', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+    const cookieConfig = getSessionCookieConfig();
+    const response = NextResponse.json(
+      { message: 'Logged out successfully' },
+      { status: 200 }
+    );
+    response.cookies.set(cookieConfig.name, '', {
+      httpOnly: cookieConfig.httpOnly,
+      secure: cookieConfig.secure,
+      sameSite: cookieConfig.sameSite,
+      path: cookieConfig.path,
       maxAge: 0,
-      path: '/',
     });
-
-    // Also clear permission token cookie if exists
-    response.cookies.set('permission_token', '', {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 0,
-      path: '/',
-    });
-
     return response;
-  } catch (error) {
-    console.error('Logout error:', error);
-    return NextResponse.json({ error: 'Logout failed' }, { status: 500 });
-  }
-}
-
-/**
- * Extract IP address from request
- */
-function getClientIp(request: AuthenticatedRequest): string {
-  const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) {
-    return forwarded.split(',')[0]?.trim() ?? 'unknown';
-  }
-  return request.headers.get('x-real-ip') ?? 'unknown';
-}
-
-export const POST = withAuth(handler);
+  },
+});

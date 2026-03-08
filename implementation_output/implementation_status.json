@@ -56,7 +56,7 @@
         "commitHash": "b1dfb3d",
         "pushed": true,
         "mergeReady": true,
-        "merged": false,
+        "merged": true,
         "updatedAt": "2026-03-08T00:00:00Z"
       },
       "testing": {
@@ -94,15 +94,35 @@
     }
   },
   "modulesProgress": {
-    "settings": { "db": { "status": "not_started" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } },
-    "auth_accounts": { "db": { "status": "not_started" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } },
-    "communication": { "db": { "status": "not_started" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } },
-    "enrollment_trial": { "db": { "status": "not_started" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } },
-    "program_pricing": { "db": { "status": "not_started" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } },
-    "calendar_scheduling": { "db": { "status": "not_started" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } },
-    "admin_dashboard": { "db": { "status": "not_started" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } },
-    "lead_management": { "db": { "status": "not_started" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } },
-    "payment_tracking": { "db": { "status": "not_started" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } }
+    "settings": {
+      "db": { "status": "completed", "notes": "Models included in global DB foundation (LocationSettings)" },
+      "be": {
+        "status": "completed",
+        "startedAt": "2026-03-08T01:00:00Z",
+        "completedAt": "2026-03-08T01:00:00Z",
+        "testing": { "status": "passed", "results": ["tsc --noEmit: 0 errors in settings module code"] },
+        "notes": ["2 endpoints: GET /api/settings, PUT /api/settings", "Zod schema: UpdateSettingsRequestSchema", "Middleware: authSession, requireRole, validateBody, auditAction"]
+      },
+      "fe": { "status": "not_started" }
+    },
+    "auth_accounts": {
+      "db": { "status": "completed", "notes": "Models included in global DB foundation (Admin, Session, PasswordResetToken)" },
+      "be": {
+        "status": "completed",
+        "startedAt": "2026-03-08T01:00:00Z",
+        "completedAt": "2026-03-08T01:00:00Z",
+        "testing": { "status": "passed", "results": ["tsc --noEmit: 0 errors in auth module code", "Legacy routes (register, permissions, roles) removed — not in architecture"] },
+        "notes": ["5 endpoints: POST login, POST logout, GET me, POST forgot-password, POST reset-password", "Legacy routes replaced with new middleware pipeline", "Rate limiting: auth_login (5/900s ip+email), auth_recovery (3/900s ip), auth_reset (5/900s ip)", "Security: timing-safe password reset response (AA-A-03), single-use tokens, session invalidation on password change"]
+      },
+      "fe": { "status": "not_started" }
+    },
+    "communication": { "db": { "status": "completed", "notes": "Models included in global DB foundation (Template, Automation, CommunicationLog)" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } },
+    "enrollment_trial": { "db": { "status": "completed", "notes": "Models included in global DB foundation (Trial, Enrollment)" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } },
+    "program_pricing": { "db": { "status": "completed", "notes": "Models included in global DB foundation (Program, Coupon)" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } },
+    "calendar_scheduling": { "db": { "status": "completed", "notes": "Models included in global DB foundation (CalendarDate)" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } },
+    "admin_dashboard": { "db": { "status": "completed", "notes": "No dedicated models — reads from other module tables" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } },
+    "lead_management": { "db": { "status": "completed", "notes": "Models included in global DB foundation (Lead, LeadNote, LeadActivity)" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } },
+    "payment_tracking": { "db": { "status": "completed", "notes": "Models included in global DB foundation (Payment)" }, "be": { "status": "not_started" }, "fe": { "status": "not_started" } }
   },
   "history": [
     {

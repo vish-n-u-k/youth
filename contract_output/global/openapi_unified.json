@@ -6,7 +6,8 @@
     "description": "Canonical unified API contract for the Youth Platform. Single source of truth for all BE endpoints across all modules.",
     "x-generated-by": "be-agent",
     "x-generated-at": "2026-03-08T00:00:00Z",
-    "x-status": "global_foundation_complete"
+    "x-status": "modules_in_progress",
+    "x-modules-implemented": ["settings", "auth_accounts"]
   },
   "servers": [
     {
@@ -60,6 +61,119 @@
           }
         }
       }
+    },
+    "/api/auth/login": {
+      "post": {
+        "operationId": "adminLogin",
+        "summary": "Admin login with email and password",
+        "tags": ["auth_accounts"],
+        "security": [],
+        "x-rate-limit": "auth_login",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AdminLoginRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Login successful. Session cookie set.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AdminLoginResponse" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "operationId": "adminLogout",
+        "summary": "Admin logout — clears session",
+        "tags": ["auth_accounts"],
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": { "description": "Logout successful", "content": { "application/json": { "schema": { "type": "object", "required": ["message"], "properties": { "message": { "type": "string" } } } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "operationId": "getSession",
+        "summary": "Validate current session and return logged-in user",
+        "tags": ["auth_accounts"],
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": { "description": "Session is valid", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AdminLoginResponse" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/api/auth/forgot-password": {
+      "post": {
+        "operationId": "requestPasswordReset",
+        "summary": "Request a password reset link via email",
+        "tags": ["auth_accounts"],
+        "security": [],
+        "x-rate-limit": "auth_recovery",
+        "x-security-note": "Always returns success regardless of email existence (AA-A-03)",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PasswordResetRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Reset link sent (same response whether email exists or not)", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MessageResponse" } } } },
+          "429": { "$ref": "#/components/responses/TooManyRequests" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/api/auth/reset-password": {
+      "post": {
+        "operationId": "setNewPassword",
+        "summary": "Set a new password using a reset token",
+        "tags": ["auth_accounts"],
+        "security": [],
+        "x-rate-limit": "auth_reset",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SetNewPasswordRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Password updated successfully", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MessageResponse" } } } },
+          "400": { "description": "Invalid token or validation error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "410": { "description": "Reset link expired (24h TTL)", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/api/settings": {
+      "get": {
+        "operationId": "getSettings",
+        "summary": "Get current location settings",
+        "tags": ["settings"],
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": { "description": "Current settings", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SettingsResponse" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "put": {
+        "operationId": "updateSettings",
+        "summary": "Update location settings",
+        "tags": ["settings"],
+        "security": [{ "cookieAuth": [] }],
+        "x-idempotency": "idempotent",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateSettingsRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "Settings updated", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SettingsResponse" } } } },
+          "400": { "description": "Validation error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
     }
   },
   "components": {
@@ -104,6 +218,86 @@
           }
         },
         "x-zod-schema": "ApiError"
+      },
+      "AdminLoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 8 }
+        },
+        "x-zod-schema": "AdminLoginRequest"
+      },
+      "AdminLoginResponse": {
+        "type": "object",
+        "required": ["user"],
+        "properties": {
+          "user": { "$ref": "#/components/schemas/AdminProfile" }
+        },
+        "x-zod-schema": "AdminLoginResponse"
+      },
+      "PasswordResetRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": { "type": "string", "format": "email" }
+        },
+        "x-zod-schema": "PasswordResetRequest"
+      },
+      "SetNewPasswordRequest": {
+        "type": "object",
+        "required": ["token", "newPassword", "confirmPassword"],
+        "properties": {
+          "token": { "type": "string" },
+          "newPassword": { "type": "string", "minLength": 8 },
+          "confirmPassword": { "type": "string", "minLength": 8 }
+        },
+        "x-validation": "newPassword must equal confirmPassword",
+        "x-zod-schema": "SetNewPasswordRequest"
+      },
+      "MessageResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "message": { "type": "string" }
+        }
+      },
+      "SettingsResponse": {
+        "type": "object",
+        "required": ["locationId", "businessName", "address", "phone", "email", "zelleRecipientName", "zelleContactInfo", "notifyNewLead", "notifyNewEnrollment", "notifyPaymentReceived"],
+        "properties": {
+          "locationId": { "type": "string" },
+          "businessName": { "type": "string" },
+          "address": { "type": "string" },
+          "phone": { "type": "string" },
+          "email": { "type": "string", "format": "email" },
+          "websiteUrl": { "type": "string", "format": "uri", "nullable": true },
+          "zelleRecipientName": { "type": "string" },
+          "zelleContactInfo": { "type": "string" },
+          "zelleInstructions": { "type": "string", "nullable": true },
+          "notifyNewLead": { "type": "boolean" },
+          "notifyNewEnrollment": { "type": "boolean" },
+          "notifyPaymentReceived": { "type": "boolean" }
+        },
+        "x-zod-schema": "SettingsResponse"
+      },
+      "UpdateSettingsRequest": {
+        "type": "object",
+        "required": ["businessName", "address", "phone", "email", "zelleRecipientName", "zelleContactInfo", "notifyNewLead", "notifyNewEnrollment", "notifyPaymentReceived"],
+        "properties": {
+          "businessName": { "type": "string", "minLength": 1 },
+          "address": { "type": "string", "minLength": 1 },
+          "phone": { "type": "string", "minLength": 1 },
+          "email": { "type": "string", "format": "email" },
+          "websiteUrl": { "type": "string", "format": "uri" },
+          "zelleRecipientName": { "type": "string", "minLength": 1 },
+          "zelleContactInfo": { "type": "string", "minLength": 1 },
+          "zelleInstructions": { "type": "string" },
+          "notifyNewLead": { "type": "boolean" },
+          "notifyNewEnrollment": { "type": "boolean" },
+          "notifyPaymentReceived": { "type": "boolean" }
+        },
+        "x-zod-schema": "UpdateSettingsRequest"
       },
       "AdminProfile": {
         "type": "object",
