@@ -1,0 +1,202 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Youth Platform Unified API",
+    "version": "1.0.0",
+    "description": "Canonical unified API contract for the Youth Platform. Single source of truth for all BE endpoints across all modules.",
+    "x-generated-by": "be-agent",
+    "x-generated-at": "2026-03-08T00:00:00Z",
+    "x-status": "global_foundation_complete"
+  },
+  "servers": [
+    {
+      "url": "{APP_URL}",
+      "description": "Backend API server",
+      "variables": {
+        "APP_URL": {
+          "default": "http://localhost:3000",
+          "description": "Backend application URL from environment"
+        }
+      }
+    }
+  ],
+  "security": [
+    { "cookieAuth": [] }
+  ],
+  "tags": [
+    { "name": "platform", "description": "Global platform endpoints (health, status)" },
+    { "name": "auth_accounts", "description": "Authentication and account management" },
+    { "name": "settings", "description": "Location settings and configuration" },
+    { "name": "lead_management", "description": "Lead CRM and activity tracking" },
+    { "name": "enrollment_trial", "description": "Trial booking and enrollment" },
+    { "name": "program_pricing", "description": "Programs and coupon management" },
+    { "name": "calendar_scheduling", "description": "Calendar date management" },
+    { "name": "payment_tracking", "description": "Payment tracking and Zelle instructions" },
+    { "name": "communication", "description": "Email templates, automations, and delivery logs" },
+    { "name": "admin_dashboard", "description": "Dashboard metrics and widgets" }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "operationId": "healthCheck",
+        "summary": "Platform health check",
+        "tags": ["platform"],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["status", "timestamp"],
+                  "properties": {
+                    "status": { "type": "string", "enum": ["ok"] },
+                    "timestamp": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "session",
+        "description": "Server-side session via httpOnly cookie. Cookie contains session ID; session validated against DB on every request."
+      }
+    },
+    "schemas": {
+      "ApiError": {
+        "type": "object",
+        "required": ["error", "message", "statusCode"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Machine-readable error code",
+            "enum": ["BAD_REQUEST", "VALIDATION_ERROR", "UNAUTHORIZED", "FORBIDDEN", "NOT_FOUND", "CONFLICT", "GONE", "TOO_MANY_REQUESTS", "INTERNAL_ERROR"]
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message"
+          },
+          "statusCode": {
+            "type": "integer",
+            "description": "HTTP status code",
+            "enum": [400, 401, 403, 404, 409, 410, 429, 500]
+          },
+          "details": {
+            "type": "array",
+            "description": "Field-level validation errors (present only for VALIDATION_ERROR)",
+            "items": {
+              "type": "object",
+              "required": ["field", "message"],
+              "properties": {
+                "field": { "type": "string" },
+                "message": { "type": "string" }
+              }
+            }
+          }
+        },
+        "x-zod-schema": "ApiError"
+      },
+      "AdminProfile": {
+        "type": "object",
+        "required": ["id", "email", "name", "role"],
+        "properties": {
+          "id": { "type": "string", "format": "cuid" },
+          "email": { "type": "string", "format": "email" },
+          "name": { "type": "string" },
+          "role": { "type": "string", "enum": ["admin"] }
+        },
+        "description": "Admin user profile returned in session context"
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Authentication required — session cookie missing or invalid",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ApiError" }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Authenticated but insufficient role/permissions",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ApiError" }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Requested resource not found",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ApiError" }
+          }
+        }
+      },
+      "TooManyRequests": {
+        "description": "Rate limit exceeded",
+        "headers": {
+          "Retry-After": {
+            "schema": { "type": "integer" },
+            "description": "Seconds until rate limit window resets"
+          },
+          "X-RateLimit-Remaining": {
+            "schema": { "type": "integer" },
+            "description": "Remaining requests in current window"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ApiError" }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "Unexpected server error",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ApiError" }
+          }
+        }
+      }
+    },
+    "headers": {
+      "X-Request-ID": {
+        "schema": { "type": "string", "format": "uuid" },
+        "description": "Unique request identifier for log correlation and distributed tracing"
+      }
+    }
+  },
+  "x-middleware-pipeline": {
+    "description": "Global middleware execution order applied to all API routes",
+    "order": [
+      { "position": 1, "id": "request_id", "appliesTo": "all", "description": "Generate UUID request ID" },
+      { "position": 2, "id": "cors", "appliesTo": "all", "description": "CORS headers (root middleware.ts)" },
+      { "position": 3, "id": "helmet", "appliesTo": "all", "description": "Security headers (root middleware.ts)" },
+      { "position": 4, "id": "rate_limit", "appliesTo": "public", "description": "Rate limiting (6 tiers)" },
+      { "position": 5, "id": "auth_session", "appliesTo": "protected", "description": "Session cookie validation" },
+      { "position": 6, "id": "role_permission_check", "appliesTo": "protected", "description": "RBAC enforcement" },
+      { "position": 7, "id": "input_validation", "appliesTo": "conditional", "description": "Zod schema validation" },
+      { "position": 8, "id": "business_rule_guard", "appliesTo": "conditional", "description": "Domain rule checks" },
+      { "position": 9, "id": "audit_log", "appliesTo": "conditional", "description": "Post-handler audit trail" },
+      { "position": 10, "id": "error_handler", "appliesTo": "all", "description": "Global error catch-all" }
+    ]
+  },
+  "x-rate-limit-tiers": {
+    "auth_login": { "windowMs": 900000, "maxRequests": 5, "scope": "ip+email" },
+    "auth_recovery": { "windowMs": 900000, "maxRequests": 3, "scope": "ip" },
+    "auth_reset": { "windowMs": 900000, "maxRequests": 5, "scope": "ip" },
+    "public_read": { "windowMs": 60000, "maxRequests": 60, "scope": "ip" },
+    "public_write": { "windowMs": 900000, "maxRequests": 5, "scope": "ip" },
+    "coupon_check": { "windowMs": 60000, "maxRequests": 30, "scope": "ip" }
+  }
+}
