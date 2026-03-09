@@ -1,5 +1,3 @@
-import type { ApiResponse } from '@/shared/types';
-
 // ============================================
 // API CLIENT
 // ============================================
@@ -21,10 +19,11 @@ class ApiClient {
   private async request<T>(
     endpoint: string,
     options: RequestOptions = {}
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     const { body, headers, ...rest } = options;
 
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         ...headers,
@@ -33,36 +32,38 @@ class ApiClient {
       ...rest,
     });
 
-    const data = (await response.json()) as ApiResponse<T>;
+    const data: unknown = await response.json();
 
     if (!response.ok) {
+      const err = data as Record<string, unknown>;
       throw new ApiError(
-        data.error?.code ?? 'UNKNOWN_ERROR',
-        data.error?.message ?? 'An unexpected error occurred',
-        response.status
+        (err.error as string) ?? 'UNKNOWN_ERROR',
+        (err.message as string) ?? 'An unexpected error occurred',
+        (err.statusCode as number) ?? response.status,
+        err.details
       );
     }
 
-    return data;
+    return data as T;
   }
 
-  async get<T>(endpoint: string, options?: RequestOptions): Promise<ApiResponse<T>> {
+  async get<T>(endpoint: string, options?: RequestOptions): Promise<T> {
     return this.request<T>(endpoint, { ...options, method: 'GET' });
   }
 
-  async post<T>(endpoint: string, body?: unknown, options?: RequestOptions): Promise<ApiResponse<T>> {
+  async post<T>(endpoint: string, body?: unknown, options?: RequestOptions): Promise<T> {
     return this.request<T>(endpoint, { ...options, method: 'POST', body });
   }
 
-  async put<T>(endpoint: string, body?: unknown, options?: RequestOptions): Promise<ApiResponse<T>> {
+  async put<T>(endpoint: string, body?: unknown, options?: RequestOptions): Promise<T> {
     return this.request<T>(endpoint, { ...options, method: 'PUT', body });
   }
 
-  async patch<T>(endpoint: string, body?: unknown, options?: RequestOptions): Promise<ApiResponse<T>> {
+  async patch<T>(endpoint: string, body?: unknown, options?: RequestOptions): Promise<T> {
     return this.request<T>(endpoint, { ...options, method: 'PATCH', body });
   }
 
-  async delete<T>(endpoint: string, options?: RequestOptions): Promise<ApiResponse<T>> {
+  async delete<T>(endpoint: string, options?: RequestOptions): Promise<T> {
     return this.request<T>(endpoint, { ...options, method: 'DELETE' });
   }
 }
@@ -71,7 +72,8 @@ export class ApiError extends Error {
   constructor(
     public code: string,
     public override message: string,
-    public status: number
+    public status: number,
+    public details?: unknown
   ) {
     super(message);
     this.name = 'ApiError';

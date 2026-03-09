@@ -81,3 +81,7 @@ a:hover {
 .text-success {
   color: var(--success);
 }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
