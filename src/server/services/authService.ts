@@ -56,7 +56,6 @@ export async function login(email: string, password: string) {
   if (!valid) {
     throw AppError.unauthorized('Invalid email or password');
   }
-
   // Enforce max concurrent sessions
   const sessions = await db.session.findMany({
     where: { adminId: admin.id, expiresAt: { gt: new Date() } },

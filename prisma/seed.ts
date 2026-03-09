@@ -19,7 +19,7 @@
 // ============================================
 
 import { PrismaClient, TriggerEvent } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+import crypto from 'crypto';
 
 const prisma = new PrismaClient();
 
@@ -68,9 +68,14 @@ async function main() {
   });
 
   if (!existingAdmin) {
-    const saltRounds = 10;
     const defaultPassword = 'changeme123';
-    const passwordHash = await bcrypt.hash(defaultPassword, saltRounds);
+    const salt = crypto.randomBytes(32);
+    const passwordHash = await new Promise<string>((resolve, reject) => {
+      crypto.scrypt(defaultPassword, salt, 64, (err, key) => {
+        if (err) reject(err);
+        resolve(salt.toString('hex') + ':' + key.toString('hex'));
+      });
+    });
 
     await prisma.admin.create({
       data: {
