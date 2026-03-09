@@ -94,15 +94,15 @@
       "startedAt": "2026-03-08T10:00:00Z",
       "completedAt": "2026-03-08T12:00:00Z",
       "git": {
-        "deliveryStatus": "in_progress",
-        "approvalStatus": "pending",
-        "approvalRequestedAt": "2026-03-08T12:00:00Z",
+        "deliveryStatus": "completed",
+        "approvalStatus": "approved",
         "branch": "impl/global/fe",
         "parentBranch": "main",
-        "pushed": false,
-        "mergeReady": false,
+        "commitHash": "996d9a9",
+        "pushed": true,
+        "mergeReady": true,
         "merged": false,
-        "updatedAt": "2026-03-08T12:00:00Z"
+        "updatedAt": "2026-03-08T12:30:00Z"
       },
       "testing": {
         "status": "passed",
