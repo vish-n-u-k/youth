@@ -47,8 +47,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
 
       if (response.ok) {
-        const data = (await response.json()) as AdminUser;
-        setUser(data);
+        const data = (await response.json()) as { user: AdminUser };
+        setUser(data.user);
       } else {
         setUser(null);
       }
@@ -77,8 +77,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         });
 
         if (response.ok) {
-          const data = (await response.json()) as { admin: AdminUser };
-          setUser(data.admin);
+          const data = (await response.json()) as { user: AdminUser };
+          setUser(data.user);
           return { success: true };
         }
 
