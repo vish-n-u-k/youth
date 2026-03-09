@@ -101,8 +101,8 @@
         "commitHash": "996d9a9",
         "pushed": true,
         "mergeReady": true,
-        "merged": false,
-        "updatedAt": "2026-03-08T12:30:00Z"
+        "merged": true,
+        "updatedAt": "2026-03-09T00:00:00Z"
       },
       "testing": {
         "status": "passed",
