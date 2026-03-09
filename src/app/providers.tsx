@@ -5,9 +5,9 @@
 // ============================================
 // Wrap the app with all necessary context providers
 
+import { ChakraProvider, defaultSystem } from '@chakra-ui/react';
 import { type ReactNode } from 'react';
 
-import { ChakraProvider } from '@chakra-ui/react';
 
 import { AuthProvider } from '@/client/lib/auth-context';
 
@@ -17,7 +17,7 @@ interface ProvidersProps {
 
 export function Providers({ children }: ProvidersProps) {
   return (
-    <ChakraProvider>
+    <ChakraProvider value={defaultSystem}>
       <AuthProvider>{children}</AuthProvider>
     </ChakraProvider>
   );

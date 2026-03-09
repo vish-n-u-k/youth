@@ -13,41 +13,18 @@ import {
   type ReactNode,
 } from 'react';
 
-import { clearPermissions } from './permission-service';
-
-interface User {
+interface AdminUser {
   id: string;
   email: string;
-  name?: string;
-}
-
-interface ApiResponse<T> {
-  success?: boolean;
-  data?: T;
-  error?: string;
-}
-
-interface MeResponse {
-  user: User;
-}
-
-interface AuthResponse {
-  user: User;
-  token: string;
+  name: string;
+  role: string;
 }
 
 interface AuthContextType {
-  user: User | null;
+  user: AdminUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  organizationId?: string;
-  setOrganizationId: (id: string | undefined) => void;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  register: (
-    email: string,
-    password: string,
-    name?: string
-  ) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -59,9 +36,8 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AdminUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [organizationId, setOrganizationId] = useState<string | undefined>(undefined);
 
   // Fetch current user on mount
   const refreshUser = useCallback(async () => {
@@ -71,17 +47,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
 
       if (response.ok) {
-        const json = (await response.json()) as ApiResponse<MeResponse>;
-        if (json.data?.user) {
-          setUser(json.data.user);
-        }
+        const data = (await response.json()) as AdminUser;
+        setUser(data);
       } else {
         setUser(null);
-        clearPermissions();
       }
     } catch {
       setUser(null);
-      clearPermissions();
     } finally {
       setIsLoading(false);
     }
@@ -104,43 +76,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
           credentials: 'include',
         });
 
-        const json = (await response.json()) as ApiResponse<AuthResponse>;
-
-        if (response.ok && json.data?.user) {
-          setUser(json.data.user);
+        if (response.ok) {
+          const data = (await response.json()) as { admin: AdminUser };
+          setUser(data.admin);
           return { success: true };
         }
 
-        return { success: false, error: json.error ?? 'Login failed' };
-      } catch {
-        return { success: false, error: 'Network error' };
-      }
-    },
-    []
-  );
-
-  const register = useCallback(
-    async (
-      email: string,
-      password: string,
-      name?: string
-    ): Promise<{ success: boolean; error?: string }> => {
-      try {
-        const response = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password, name }),
-          credentials: 'include',
-        });
-
-        const json = (await response.json()) as ApiResponse<AuthResponse>;
-
-        if (response.ok && json.data?.user) {
-          setUser(json.data.user);
-          return { success: true };
-        }
-
-        return { success: false, error: json.error ?? 'Registration failed' };
+        const errorBody = (await response.json()) as { message?: string };
+        return { success: false, error: errorBody.message ?? 'Login failed' };
       } catch {
         return { success: false, error: 'Network error' };
       }
@@ -156,7 +99,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
     } finally {
       setUser(null);
-      clearPermissions();
     }
   }, []);
 
@@ -166,10 +108,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         user,
         isAuthenticated: !!user,
         isLoading,
-        organizationId,
-        setOrganizationId,
         login,
-        register,
         logout,
         refreshUser,
       }}
